@@ -8,9 +8,9 @@ module.exports = {
     function sendTicketMSG() {
       const embed = new client.discord.MessageEmbed()
         .setColor('6d6ee8')
-        .setAuthor('Ticket', 'https://i.imgur.com/oO5ZSRK.png')
+        .setAuthor('Ticket', client.user.avatarURL())
         .setDescription('Cliquez sur le bouton ci-dessous pour ouvrir un ticket')
-        .setFooter('ExoHost.fr', 'https://i.imgur.com/oO5ZSRK.png')
+        .setFooter(client.config.footerText, client.user.avatarURL())
       const row = new client.discord.MessageActionRow()
         .addComponents(
           new client.discord.MessageButton()

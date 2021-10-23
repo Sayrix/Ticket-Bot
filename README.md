@@ -29,7 +29,15 @@ npm i
 
   
   "logsTicket": "id of the channel of ticket logs",
-  "ticketChannel": "id of the channel where is sended the embed to create a ticket"
+  "ticketChannel": "id of the channel where is sended the embed to create a ticket",
+  
+  "footerText": "the footer of the embeds"
+}
+```
+
+```json
+{
+  "token": "token of your discord bot"
 }
 ```
 
