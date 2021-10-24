@@ -15,6 +15,7 @@ npm i
 ## How to config ?
 
 ```json
+//config.json
 {
   "clientId": "id of the bot",
 
@@ -36,6 +37,7 @@ npm i
 ```
 
 ```json
+//token.json
 {
   "token": "token of your discord bot"
 }
