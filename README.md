@@ -43,4 +43,10 @@ npm i
 }
 ```
 
+## How to start ?
+```bash
+node deploy-commands.js # To deploy s/ash commands
+node index.js # To start the ticket-bot
+```
+
 ## Many thanks to the people who will put a ⭐!
