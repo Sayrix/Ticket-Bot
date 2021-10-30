@@ -19,7 +19,16 @@ module.exports = {
         permissionOverwrites: [{
           id: user,
           allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-        }],
+        },
+        {
+          id: interaction.guild.roles.everyone,
+          deny: ['VIEW_CHANNEL'],
+        },
+          {
+            id: client.config.roleSupport,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+      ],
       }).then(async () => {
         interaction.reply({
           content: `<@${user.id}> a été ajouté au ticket !`
