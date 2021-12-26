@@ -268,7 +268,7 @@ module.exports = {
             });
             client.users.cache.get(chan.topic).send({
               embeds: [embed2]
-            }).catch();
+            }).catch(() => {console.log('I can\'t dm him :(')});
             chan.send('Suppression du channel...');
 
             setTimeout(() => {
