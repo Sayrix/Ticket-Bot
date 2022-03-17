@@ -248,7 +248,7 @@ module.exports = {
         if (a.length < 1) a = "Nothing"
         hastebin.createPaste(a, {
             contentType: 'text/plain',
-            server: 'https://hastebin.com'
+            server: 'https://www.toptal.com/developers/hastebin'
           }, {})
           .then(function (urlToPaste) {
             const embed = new client.discord.MessageEmbed()
