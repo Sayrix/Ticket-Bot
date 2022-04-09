@@ -1,18 +1,18 @@
 {
-  "clientId": "636253976639176706",
+  "clientId": "",
 
 
-  "parentOpened": "899390286218805319",
-  "parentTransactions": "899717483634782218",
-  "parentJeux": "899717570129694720",
-  "parentAutres": "899717662567956561",
+  "parentOpened": "",
+  "parentTransactions": "",
+  "parentJeux": "",
+  "parentAutres": "",
 
 
-  "roleSupport": "733509692210544721",
+  "roleSupport": "",
 
   
-  "logsTicket": "899764906511982623",
-  "ticketChannel": "899390321526444084",
+  "logsTicket": "",
+  "ticketChannel": "",
 
   "footerText": "ExoHost.fr"
 }
