@@ -4,7 +4,7 @@ module.exports = {
     console.log('Ticket Bot ready!')
     console.log('Thank you very much for using Ticket Bot! Developed with the ❤️ by Sayrix');
     const oniChan = client.channels.cache.get(client.config.ticketChannel)
-
+    
     function sendTicketMSG() {
       const embed = new client.discord.MessageEmbed()
         .setColor('6d6ee8')
