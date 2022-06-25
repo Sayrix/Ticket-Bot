@@ -5,43 +5,43 @@ const {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('kick')
-    .setDescription('Kick une personne.')
+    .setDescription('Kick a member.')
     .addUserOption(option =>
       option.setName('target')
-      .setDescription('Membre à kick')
+      .setDescription('Kick member')
       .setRequired(true))
     .addStringOption(option =>
         option.setName('raison')
-        .setDescription('Raison du kick')
+        .setDescription('reason to kick')
         .setRequired(false)),
   async execute(interaction, client) {
     const user = client.guilds.cache.get(interaction.guildId).members.cache.get(interaction.options.getUser('target').id);
     const executer = client.guilds.cache.get(interaction.guildId).members.cache.get(interaction.user.id);
 
     if (!executer.permissions.has(client.discord.Permissions.FLAGS.KICK_MEMBERS)) return interaction.reply({
-      content: 'Vous n\'avez pas la permission requise pour éxecuter cette commande ! (`KICK_MEMBERS`)',
+      content: 'you dont have permission to this command! (`KICK_MEMBERS`)',
       ephemeral: true
     });
 
     if (user.roles.highest.rawPosition > executer.roles.highest.rawPosition) return interaction.reply({
-      content: 'La personne que vous souhaitez kick est au dessus de vous !',
+      content: 'you cant kick this member',
       ephemeral: true
     });
 
     if (!user.kickable) return interaction.reply({
-      content: 'La personne que vous souhaitez kick est au dessus de moi ! Je ne peut donc pas le kick.',
+      content: 'i cant kick this member.',
       ephemeral: true
     });
 
     if (interaction.options.getString('raison')) {
       user.kick(interaction.options.getString('raison'))
       interaction.reply({
-        content: `**${user.user.tag}** A été kick avec succès !`
+        content: `**${user.user.tag}** has ben kicked!`
       });
     } else {
       user.kick()
       interaction.reply({
-        content: `**${user.user.tag}** A été kick avec succès !`
+        content: `**${user.user.tag}** has ben kicked!`
       });
     };
   },

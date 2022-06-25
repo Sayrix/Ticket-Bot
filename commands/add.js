@@ -5,10 +5,10 @@ const {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('add')
-    .setDescription('Ajoute quelqu\'un au ticket')
+    .setDescription('add a user')
     .addUserOption(option =>
       option.setName('target')
-      .setDescription('Membre à ajouter au ticket')
+      .setDescription('add a Member to the ticket')
       .setRequired(true)),
   async execute(interaction, client) {
     const chan = client.channels.cache.get(interaction.channelId);
@@ -31,12 +31,12 @@ module.exports = {
       ],
       }).then(async () => {
         interaction.reply({
-          content: `<@${user.id}> a été ajouté au ticket !`
+          content: `<@${user.id}> has ben addet!`
         });
       });
     } else {
       interaction.reply({
-        content: 'Vous n\'êtes pas dans un ticket !',
+        content: 'you dont have a ticket!',
         ephemeral: true
       });
     };

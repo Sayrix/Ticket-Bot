@@ -5,14 +5,43 @@ const {
   Intents
 } = require('discord.js');
 const config = require('./config.json');
+const {
+  REST
+} = require('@discordjs/rest');
+const {
+  Routes
+} = require('discord-api-types/v9');
+const {
+  clientId
+} = require('./config.json');
+const t = require('./token.json');
+
+const slashcommands = [];
+const slashcommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of slashcommandFiles) {
+  const command = require(`./commands/${file}`);
+  slashcommands.push(command.data.toJSON());
+}
+
+const rest = new REST({
+  version: '9'
+}).setToken(t.token);
+
+rest.put(Routes.applicationCommands(clientId), {
+    body: slashcommands
+  })
+  .then(() => console.log('Successfully registered application commands.'))
+  .catch(console.error);
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS]
 });
 
 const Discord = require('discord.js');
 client.discord = Discord;
 client.config = config;
+
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -30,6 +59,7 @@ for (const file of eventFiles) {
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
+
 
   const command = client.commands.get(interaction.commandName);
   if (!command) return;

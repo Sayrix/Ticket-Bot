@@ -1,22 +1,22 @@
 module.exports = {
   name: 'ready',
   async execute(client) {
-    console.log('Ticket Bot ready!')
-    console.log('Thank you very much for using Ticket Bot! Developed with the ❤️ by Sayrix');
+    console.log('Bot Online!')
+    console.log('Bot Entwickler ExothDE');
     const oniChan = client.channels.cache.get(client.config.ticketChannel)
-    
+
     function sendTicketMSG() {
       const embed = new client.discord.MessageEmbed()
-        .setColor('6d6ee8')
-        .setAuthor('Ticket', client.user.avatarURL())
-        .setDescription('Cliquez sur le bouton ci-dessous pour ouvrir un ticket')
+        .setColor('ff0000')
+        .setAuthor('Ticket create', client.user.avatarURL())
+        .setDescription('Welcome to Tech Gaming Ticket 🌴 Support\n\nThere are four different types of tickets. To open a ticket,\nclick just click on the right button\n\nSupport-Ticket\nSupport Ticket For everything related to the server\n• Apply\n• Support\n• General\n• Complaint\n• Hosting\n\n• Apply to Tech 🌴 Gaming\n• Hosting at Tech 🌴 Gaming\n• Support & Questions about Tech 🌴 Gaming\n• General questions and topics\n\nAbuse is punished with a courage / ban.')
         .setFooter(client.config.footerText, client.user.avatarURL())
       const row = new client.discord.MessageActionRow()
         .addComponents(
           new client.discord.MessageButton()
           .setCustomId('open-ticket')
-          .setLabel('Ouvrir un ticket')
-          .setEmoji('✉️')
+          .setLabel('Ticket create')
+          .setEmoji('🎫')
           .setStyle('PRIMARY'),
         );
 
@@ -30,7 +30,7 @@ module.exports = {
 
     async function fetchMore(channel, limit) {
       if (!channel) {
-        throw new Error(`Expected channel, got ${typeof channel}.`);
+        throw new Error(`Kanal created ${typeof channel}.`);
       }
       if (limit <= 100) {
         return channel.messages.fetch({

@@ -7,7 +7,7 @@ module.exports = {
     if (interaction.customId == "open-ticket") {
       if (client.guilds.cache.get(interaction.guildId).channels.cache.find(c => c.topic == interaction.user.id)) {
         return interaction.reply({
-          content: 'Vous avez déjà créé un ticket !',
+          content: 'you have already a Ticket created!',
           ephemeral: true
         });
       };
@@ -17,11 +17,11 @@ module.exports = {
         topic: interaction.user.id,
         permissionOverwrites: [{
             id: interaction.user.id,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
           },
           {
             id: client.config.roleSupport,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
           },
           {
             id: interaction.guild.roles.everyone,
@@ -31,36 +31,46 @@ module.exports = {
         type: 'text',
       }).then(async c => {
         interaction.reply({
-          content: `Ticket créé! <#${c.id}>`,
+          content: `Ticket has ben created! <#${c.id}>`,
           ephemeral: true
         });
 
         const embed = new client.discord.MessageEmbed()
-          .setColor('6d6ee8')
-          .setAuthor('Ticket', 'https://i.imgur.com/oO5ZSRK.png')
-          .setDescription('Séléctionnez la catégorie de votre ticket')
-          .setFooter('ExoHost.fr', 'https://i.imgur.com/oO5ZSRK.png')
+          .setColor('ff9600')
+          .setAuthor('Reason', ' ')
+          .setDescription('choose a reason why you open a ticket')
+          .setFooter('Ticket System', ' ')
           .setTimestamp();
 
         const row = new client.discord.MessageActionRow()
           .addComponents(
             new client.discord.MessageSelectMenu()
             .setCustomId('category')
-            .setPlaceholder('Séléctionnez la catégorie du ticket')
+            .setPlaceholder('choose a reason why you open a ticket')
             .addOptions([{
-                label: 'Transaction',
-                value: 'transaction',
-                emoji: '🪙',
+                label: 'Apply',
+                value: 'Apply',
+                emoji: { name: '📑' }
               },
               {
-                label: 'Jeux',
-                value: 'jeux',
-                emoji: '🎮',
+                label: 'Support',
+                value: 'Support',
+                emoji: { name: '❓' }
               },
               {
-                label: 'Autres',
-                value: 'autre',
-                emoji: '📔',
+                label: 'Complaint',
+                value: 'Complaint',
+                emoji: { name: '😡' }
+              },
+              {
+                label: 'Hosting',
+                value: 'Hosting',
+                emoji: { name: '📌' }
+              },
+              {
+                label: 'Partnership',
+                value: 'Partnership',
+                emoji: { name: '🥇' }
               },
             ]),
           );
@@ -81,17 +91,17 @@ module.exports = {
             if (msg.deletable) {
               msg.delete().then(async () => {
                 const embed = new client.discord.MessageEmbed()
-                  .setColor('6d6ee8')
-                  .setAuthor('Ticket', 'https://i.imgur.com/oO5ZSRK.png')
-                  .setDescription(`<@!${interaction.user.id}> A créé un ticket ${i.values[0]}`)
-                  .setFooter('ExoHost.fr', 'https://i.imgur.com/oO5ZSRK.png')
+                  .setColor('ff9600')
+                  .setAuthor('Ticket', ' ')
+                  .setDescription(`<@!${interaction.user.id}> has create a **Ticket** with the reason・ ${i.values[0]}`)
+                  .setFooter('Ticket System', ' ')
                   .setTimestamp();
 
                 const row = new client.discord.MessageActionRow()
                   .addComponents(
                     new client.discord.MessageButton()
                     .setCustomId('close-ticket')
-                    .setLabel('Fermer le ticket')
+                    .setLabel('close ticket')
                     .setEmoji('899745362137477181')
                     .setStyle('DANGER'),
                   );
@@ -107,19 +117,29 @@ module.exports = {
                 });
               });
             };
-            if (i.values[0] == 'transaction') {
+            if (i.values[0] == 'Apply') {
               c.edit({
-                parent: client.config.parentTransactions
+                parent: client.config.parentApply
               });
             };
-            if (i.values[0] == 'jeux') {
+            if (i.values[0] == 'Support') {
               c.edit({
-                parent: client.config.parentJeux
+                parent: client.config.parentSupport
               });
             };
-            if (i.values[0] == 'autre') {
+            if (i.values[0] == 'Complaint') {
               c.edit({
-                parent: client.config.parentAutres
+                parent: client.config.parentComplaint
+              });
+            };
+            if (i.values[0] == 'Hosting') {
+              c.edit({
+                parent: client.config.parentHosting
+              });
+            };
+            if (i.values[0] == 'Partnership') {
+              c.edit({
+                parent: client.config.parentPartnership
               });
             };
           };
@@ -127,7 +147,7 @@ module.exports = {
 
         collector.on('end', collected => {
           if (collected.size < 1) {
-            c.send(`Aucune catégorie séléctionnée. Fermeture du ticket...`).then(() => {
+            c.send(`There was no reason, the ticket will be closed.`).then(() => {
               setTimeout(() => {
                 if (c.deletable) {
                   c.delete();
@@ -147,16 +167,16 @@ module.exports = {
         .addComponents(
           new client.discord.MessageButton()
           .setCustomId('confirm-close')
-          .setLabel('Fermer le ticket')
+          .setLabel('Ticket close')
           .setStyle('DANGER'),
           new client.discord.MessageButton()
           .setCustomId('no')
-          .setLabel('Annuler la fermeture')
+          .setLabel('close cancel')
           .setStyle('SECONDARY'),
         );
 
       const verif = await interaction.reply({
-        content: 'Êtes vous sûr de vouloir fermer le ticket ?',
+        content: 'Are you sure you want to close the ticket?',
         components: [row]
       });
 
@@ -168,7 +188,7 @@ module.exports = {
       collector.on('collect', i => {
         if (i.customId == 'confirm-close') {
           interaction.editReply({
-            content: `Ticket fermé par <@!${interaction.user.id}>`,
+            content: `The ticket has been closed by <@!${interaction.user.id}>`,
             components: []
           });
 
@@ -191,17 +211,17 @@ module.exports = {
             })
             .then(async () => {
               const embed = new client.discord.MessageEmbed()
-                .setColor('6d6ee8')
-                .setAuthor('Ticket', 'https://i.imgur.com/oO5ZSRK.png')
-                .setDescription('```Contrôle des tickets```')
-                .setFooter('ExoHost.fr', 'https://i.imgur.com/oO5ZSRK.png')
+                .setColor('ff9600')
+                .setAuthor('Ticket', ' ')
+                .setDescription('```Ticket saving```')
+                .setFooter('Ticket System', ' ')
                 .setTimestamp();
 
               const row = new client.discord.MessageActionRow()
                 .addComponents(
                   new client.discord.MessageButton()
                   .setCustomId('delete-ticket')
-                  .setLabel('Supprimer le ticket')
+                  .setLabel('Ticket delete')
                   .setEmoji('🗑️')
                   .setStyle('DANGER'),
                 );
@@ -216,7 +236,7 @@ module.exports = {
         };
         if (i.customId == 'no') {
           interaction.editReply({
-            content: 'Fermeture du ticket annulé !',
+            content: 'Close ticket cancelled!',
             components: []
           });
           collector.stop();
@@ -226,7 +246,7 @@ module.exports = {
       collector.on('end', (i) => {
         if (i.size < 1) {
           interaction.editReply({
-            content: 'Fermeture du ticket annulé !',
+            content: 'Ticket closure cancelled!',
             components: []
           });
         };
@@ -238,28 +258,28 @@ module.exports = {
       const chan = guild.channels.cache.get(interaction.channelId);
 
       interaction.reply({
-        content: 'Sauvegarde des messages...'
+        content: 'ticket saving...'
       });
 
       chan.messages.fetch().then(async (messages) => {
         let a = messages.filter(m => m.author.bot !== true).map(m =>
-          `${new Date(m.createdTimestamp).toLocaleString('fr-FR')} - ${m.author.username}#${m.author.discriminator}: ${m.attachments.size > 0 ? m.attachments.first().proxyURL : m.content}`
+          `${new Date(m.createdTimestamp).toLocaleString('de-DE')} - ${m.author.username}#${m.author.discriminator}: ${m.attachments.size > 0 ? m.attachments.first().proxyURL : m.content}`
         ).reverse().join('\n');
-        if (a.length < 1) a = "Nothing"
+        if (a.length < 1) a = "It was not written in the ticket"
         hastebin.createPaste(a, {
             contentType: 'text/plain',
-            server: 'https://hastebin.com/'
+            server: 'https://hastebin.com'
           }, {})
           .then(function (urlToPaste) {
             const embed = new client.discord.MessageEmbed()
-              .setAuthor('Logs Ticket', 'https://i.imgur.com/oO5ZSRK.png')
-              .setDescription(`📰 Logs du ticket \`${chan.id}\` créé par <@!${chan.topic}> et supprimé par <@!${interaction.user.id}>\n\nLogs: [**Cliquez ici pour voir les logs**](${urlToPaste})`)
+              .setAuthor('Logs Ticket', ' ')
+              .setDescription(`📰 Ticket-Logs \`${chan.id}\` created by <@!${chan.topic}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${urlToPaste})`)
               .setColor('2f3136')
               .setTimestamp();
 
             const embed2 = new client.discord.MessageEmbed()
-              .setAuthor('Logs Ticket', 'https://i.imgur.com/oO5ZSRK.png')
-              .setDescription(`📰 Logs de votre ticket \`${chan.id}\`: [**Cliquez ici pour voir les logs**](${urlToPaste})`)
+              .setAuthor('Logs Ticket', ' ')
+              .setDescription(`📰 Logs of your ticket \`${chan.id}\`: [**Click here to see the logsn**](${urlToPaste})`)
               .setColor('2f3136')
               .setTimestamp();
 
@@ -268,8 +288,8 @@ module.exports = {
             });
             client.users.cache.get(chan.topic).send({
               embeds: [embed2]
-            }).catch(() => {console.log('I can\'t dm him :(')});
-            chan.send('Suppression du channel...');
+            }).catch(() => {console.log('I cant send it DM')});
+            chan.send('Delete channel.');
 
             setTimeout(() => {
               chan.delete();
