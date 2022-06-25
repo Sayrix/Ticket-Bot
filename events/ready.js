@@ -2,7 +2,7 @@ module.exports = {
   name: 'ready',
   async execute(client) {
     console.log('Bot Online!')
-    console.log('Bot Entwickler ExothDE');
+    console.log('Bot Dev Sayrix');
     const oniChan = client.channels.cache.get(client.config.ticketChannel)
 
     function sendTicketMSG() {
