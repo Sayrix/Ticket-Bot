@@ -9,7 +9,7 @@ module.exports = {
       const embed = new client.discord.MessageEmbed()
         .setColor('ff0000')
         .setAuthor('Ticket create', client.user.avatarURL())
-        .setDescription('Welcome to Tech Gaming Ticket 🌴 Support\n\nThere are four different types of tickets. To open a ticket,\nclick just click on the right button\n\nSupport-Ticket\nSupport Ticket For everything related to the server\n• Apply\n• Support\n• General\n• Complaint\n• Hosting\n\n• Apply to Tech 🌴 Gaming\n• Hosting at Tech 🌴 Gaming\n• Support & Questions about Tech 🌴 Gaming\n• General questions and topics\n\nAbuse is punished with a courage / ban.')
+        .setDescription('Welcome to Ticket Support\n\nThere are four different types of tickets. To open a ticket,\nclick just click on the right button\n\nSupport-Ticket\nSupport Ticket For everything related to the server\n• Apply\n• Support\n• General\n• Complaint\n• Hosting\n\n• Apply\n• Hosting\n• Support & Questions\n• General questions and topics\n\nAbuse is punished with a courage / ban.')
         .setFooter(client.config.footerText, client.user.avatarURL())
       const row = new client.discord.MessageActionRow()
         .addComponents(
