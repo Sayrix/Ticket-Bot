@@ -268,7 +268,7 @@ module.exports = {
         if (a.length < 1) a = "It was not written in the ticket"
         hastebin.createPaste(a, {
             contentType: 'text/plain',
-            server: 'https://www.toptal.com/developers/hastebin/documents'
+            server: 'https://hastebin.com'
           }, {})
           .then(function (urlToPaste) {
             const embed = new client.discord.MessageEmbed()
