@@ -279,7 +279,7 @@ module.exports = {
 
             const embed2 = new client.discord.MessageEmbed()
               .setAuthor('Logs Ticket', ' ')
-              .setDescription(`📰 Logs of your ticket \`${chan.id}\`: [**Click here to see the logsn**](${urlToPaste})`)
+              .setDescription(`📰 Logs of your ticket \`${chan.id}\`: [**Click here to see the logs**](${urlToPaste})`)
               .setColor('2f3136')
               .setTimestamp();
 

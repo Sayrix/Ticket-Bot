@@ -31,7 +31,7 @@ module.exports = {
       ],
       }).then(async () => {
         interaction.reply({
-          content: `<@${user.id}> has ben addet!`
+          content: `<@${user.id}> has just been added!`
         });
       });
     } else {
