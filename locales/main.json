@@ -1,0 +1,44 @@
+{
+  "embeds": {
+    "openTicket": {
+      "title": "Open a ticket",
+      "description": "Click on the button to start opening a ticket",
+      "footer": {
+        "text": "is.gd/ticketbot",
+        "iconUrl": ""
+      }
+    },
+    "ticketOpened": {
+      "title": "Ticket CATEGORYNAME",
+      "description": "A staff will reply you as soon a possible!",
+      "footer": {
+        "text": "is.gd/ticketbot",
+        "iconUrl": ""
+      }
+    }
+  },
+  "modals": {
+    "reasonTicketOpen": {
+      "title": "Open ticket",
+      "label": "The reason of your ticket",
+      "placeholder": "Please enter the reason of why you are opening a ticket"
+    }
+  },
+  "buttons": {
+    "close": {
+      "label": "Close ticket",
+      "emoji": "🔒"
+    },
+    "claim": {
+      "label": "Claim",
+      "emoji": "🙋"
+    }
+  },
+  "ticketOpenedMessage": "Ticked opened! TICKETCHANNEL",
+  "cantCloseTicket": "Only staff can close the ticket!",
+
+  "other": {
+    "openTicketButtonMSG": "Open a ticket",
+    "selectTicketTypePlaceholder": "Select a ticket type"
+  }
+}

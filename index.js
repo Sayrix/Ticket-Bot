@@ -1,78 +1,63 @@
-const fs = require('fs');
-const {
-  Client,
-  Collection,
-  Intents
-} = require('discord.js');
-const config = require('./config.json');
-const {
-  REST
-} = require('@discordjs/rest');
-const {
-  Routes
-} = require('discord-api-types/v9');
-const {
-  clientId
-} = require('./config.json');
-const t = require('./token.json');
+const fs = require('fs-extra');
+const path = require('node:path');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { token } = require('./config/token.json');
+const { QuickDB } = require('quick.db');
+const jsonc = require('jsonc');
+const db = new QuickDB();
 
-const slashcommands = [];
-const slashcommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const client = new Client({ intents: [
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.MessageContent
+] });
 
-for (const file of slashcommandFiles) {
-  const command = require(`./commands/${file}`);
-  slashcommands.push(command.data.toJSON());
-}
+// All variables stored in the client object
+client.db = db;
+client.discord = require('discord.js');
+client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.jsonc'), 'utf8'));
 
-const rest = new REST({
-  version: '9'
-}).setToken(t.token);
+client.locales = require("./locales/main.json");
+client.embeds = client.locales.embeds;
 
-rest.put(Routes.applicationCommands(clientId), {
-    body: slashcommands
-  })
-  .then(() => console.log('Successfully registered application commands.'))
-  .catch(console.error);
-
-const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS]
-});
-
-const Discord = require('discord.js');
-client.discord = Discord;
-client.config = config;
-
+// Command handler
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.data.name, command);
-};
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
+}
 
-const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-    client.on(event.name, (...args) => event.execute(...args, client));
-};
-
+// Execute commands
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand()) return;
+	if (!interaction.isChatInputCommand()) return;
+	const command = client.commands.get(interaction.commandName);
+	if (!command) return;
 
-
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-
-  try {
-    await command.execute(interaction, client, config);
-  } catch (error) {
-    console.error(error);
-    return interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: true
-    });
-  };
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
 });
 
-client.login(require('./token.json').token);
+// Event handler
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args, client));
+	}
+}
+
+// Login the bot
+client.login(token);

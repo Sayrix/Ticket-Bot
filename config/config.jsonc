@@ -1,0 +1,39 @@
+{
+  "clientId": "877605878554038273",
+  "guildId": "897568629921562625",
+  "mainColor": "f6c42f",
+
+
+
+  "openTicketChannelId": "897568683394752523",
+  "ticketTypes": [
+    {
+      "codeName": "suggestion", // The name need to be in lowercase
+      "name": "Suggestion", // The name that will be displayed in the ticket
+      "emoji": "💡", // The emoji of the type
+      "color": "#e45671", // Can be a hex color or blank to use the main color
+      "categoryId": "966046284207243364", // The category id where the tickets will be created
+      "customDescription": "Please explain your suggestion in detail. If you have any images, please attach them to your message.\n\nReason: REASON", // The custom description of the ticket type (set to false to use the default one)
+      "askReason": true // If the bot should ask the reason of the ticket
+    },
+    {
+      "codeName": "other", // The name need to be in lowercase
+      "name": "Other", // The name that will be displayed in the ticket
+      "emoji": "", // The emoji of the type can be blank to dont use emoji
+      "color": "", // Can be a hex color or blank to use the main color
+      "categoryId": "966046284207243364", // The category id where the tickets will be created
+      "customDescription": "", // The custom description of the ticket type or blank to use the default one. Here is all parameter: CATEGORYNAME, REASON (blank if there is not reason)
+      "askReason": false // If the bot should ask the reason of the ticket
+    }
+  ],
+  "ticketNameOption": "Ticket-TICKETCOUNT", // Here is all parameter: USERNAME, USERID, TICKETCOUNT
+  "rolesWhoHaveAccessToTheTickets": [
+    "966046902493806642",
+    "897570577857011752"
+  ], // Roles who can access to the tickets
+  "pingRoleWhenOpened": true,
+  "roleToPingWhenOpenedId": "966046902493806642",
+  "claimButton": true,
+  "whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
+  "closeButton": false
+}

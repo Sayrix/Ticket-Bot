@@ -1,16 +1,8 @@
 {
-  "dependencies": {
-    "@discordjs/builders": "^0.6.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "discord-api-types": "^0.24.0",
-    "discord.js": "^13.2.0",
-    "hastebin": "^0.2.1"
-  },
   "name": "ticket-bot",
-  "version": "1.0.0",
-  "description": "Bot with a ticket system using Discord.js v13",
+  "version": "2.0.0",
+  "description": "Bot with a ticket system using Discord.js v14",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,10 +10,22 @@
     "type": "git",
     "url": "git+https://github.com/Sayrix/ticket-bot.git"
   },
-  "author": "Sayrix (github.com/Sayrix)",
-  "license": "Apache License 2.0",
+  "keywords": [
+    "discord",
+    "ticket",
+    "bot"
+  ],
+  "author": "Sayrix",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Sayrix/ticket-bot/issues"
   },
-  "homepage": "https://github.com/Sayrix/ticket-bot#readme"
+  "homepage": "https://github.com/Sayrix/ticket-bot#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.6.2",
+    "discord.js": "^14.1.2",
+    "fs-extra": "^10.1.0",
+    "jsonc": "^2.0.0",
+    "quick.db": "^9.0.6"
+  }
 }
