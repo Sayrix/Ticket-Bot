@@ -1,13 +1,15 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const jsonc = require('jsonc');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord.js');
-const { clientId, guildId } = require('./config/config.json');
 const { token } = require('./config/token.json');
 
 const commands = [];
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+const { clientId, guildId } = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.jsonc'), 'utf8'));
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);

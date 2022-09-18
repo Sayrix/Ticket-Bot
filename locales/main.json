@@ -37,6 +37,7 @@
   "ticketOpenedMessage": "Ticket opened! TICKETCHANNEL",
   "ticketClaimedMessage": "Ticket successfully claimed!",
   "ticketOnlyClaimableByStaff": "The ticket can only be claimed by a staff!",
+  "ticketAlreadyClaimed": "The ticket is already claimed!",
   "cantCloseTicket": "Only staff can close the ticket!",
 
   "other": {

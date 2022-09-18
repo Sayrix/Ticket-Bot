@@ -101,6 +101,7 @@ module.exports = {
         if (row.components.length > 0) body.components = [row];
 
         channel.send(body).then((msg) => {
+          client.db.set(`tickets.${channel.id}.messageId`, msg.id);
           msg.pin().then(() => {
             msg.channel.bulkDelete(1);
           });
@@ -142,38 +143,46 @@ module.exports = {
 
       if (interaction.customId === "claim") {
         const ticket = await client.db.get(`tickets.${interaction.channel.id}`);
-        if (!ticket) return console.error('Ticket not found in the database');
-
-        // Do the ticket claimable only by staff
-
-        if (interaction.user.id === ticket.creator) return interaction.reply({
+        if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true});
+    
+        const canClaim = interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
+    
+        if (!canClaim) return interaction.reply({
           content: client.locales.ticketOnlyClaimableByStaff,
           ephemeral: true
         });
-
-        client.db.set(`tickets.${interaction.channel.id}.claimed`, true);
-        client.db.set(`tickets.${interaction.channel.id}.claimedBy`, interaction.user.id);
-        client.db.set(`tickets.${interaction.channel.id}.claimedAt`, Date.now());
-
-        const msg = interaction.message;
+    
+        if (ticket.claimed) return interaction.reply({
+          content: client.locales.ticketAlreadyClaimed,
+          ephemeral: true
+        });
+    
+        await client.db.set(`tickets.${interaction.channel.id}.claimed`, true);
+        await client.db.set(`tickets.${interaction.channel.id}.claimedBy`, interaction.user.id);
+        await client.db.set(`tickets.${interaction.channel.id}.claimedAt`, Date.now());
+    
+        interaction.channel.messages.fetch()
+        const messageId = await client.db.get(`tickets.${interaction.channel.id}.messageId`)
+        const msg = interaction.channel.messages.cache.get(messageId);
+    
         const embed = msg.embeds[0].data;
         embed.description = embed.description + `\n\n ${client.locales.other.claimedBy.replace('USER', `<@${interaction.user.id}>`)}`;
-
+    
         msg.components[0].components.map(x => {
           if (x.data.custom_id === 'claim') x.data.disabled = true;
         });
-
-        interaction.message.edit({
+    
+        msg.edit({
           content: msg.content,
           embeds: [embed],
           components: msg.components
         });
-
+    
         interaction.reply({
           content: client.locales.ticketClaimedMessage,
           ephemeral: true
         });
-
+    
         interaction.channel.send({
           content: `> Ticket claimed by ${interaction.user}`
         });
