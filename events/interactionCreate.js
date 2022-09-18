@@ -21,6 +21,20 @@ module.exports = {
         ]
       }).then(async channel => {
         await client.db.add(`temp.ticketCount`, 1);
+        const ticketId = await client.db.get(`temp.ticketCount`);
+        await client.db.set(`tickets.${channel.id}`, {
+          id: ticketId-1,
+          category: ticketType,
+          reason: reason,
+          creator: interaction.user.id,
+          createdAt: Date.now(),
+          claimed: false,
+          claimedBy: null,
+          claimedAt: null,
+          closed: false,
+          closedBy: null,
+          closedAt: null
+        });
 
         channel.permissionOverwrites.edit(interaction.user, {
           SendMessages: true,
@@ -123,6 +137,45 @@ module.exports = {
         interaction.reply({
           ephemeral: true,
           components: [row]
+        });
+      };
+
+      if (interaction.customId === "claim") {
+        const ticket = await client.db.get(`tickets.${interaction.channel.id}`);
+        if (!ticket) return console.error('Ticket not found in the database');
+
+        // Do the ticket claimable only by staff
+
+        if (interaction.user.id === ticket.creator) return interaction.reply({
+          content: client.locales.ticketOnlyClaimableByStaff,
+          ephemeral: true
+        });
+
+        client.db.set(`tickets.${interaction.channel.id}.claimed`, true);
+        client.db.set(`tickets.${interaction.channel.id}.claimedBy`, interaction.user.id);
+        client.db.set(`tickets.${interaction.channel.id}.claimedAt`, Date.now());
+
+        const msg = interaction.message;
+        const embed = msg.embeds[0].data;
+        embed.description = embed.description + `\n\n ${client.locales.other.claimedBy.replace('USER', `<@${interaction.user.id}>`)}`;
+
+        msg.components[0].components.map(x => {
+          if (x.data.custom_id === 'claim') x.data.disabled = true;
+        });
+
+        interaction.message.edit({
+          content: msg.content,
+          embeds: [embed],
+          components: msg.components
+        });
+
+        interaction.reply({
+          content: client.locales.ticketClaimedMessage,
+          ephemeral: true
+        });
+
+        interaction.channel.send({
+          content: `> Ticket claimed by ${interaction.user}`
         });
       };
     };

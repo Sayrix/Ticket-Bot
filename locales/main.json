@@ -10,7 +10,7 @@
     },
     "ticketOpened": {
       "title": "Ticket CATEGORYNAME",
-      "description": "A staff will reply you as soon a possible!",
+      "description": "A staff will reply you as soon as possible!",
       "footer": {
         "text": "is.gd/ticketbot",
         "iconUrl": ""
@@ -34,11 +34,14 @@
       "emoji": "🙋"
     }
   },
-  "ticketOpenedMessage": "Ticked opened! TICKETCHANNEL",
+  "ticketOpenedMessage": "Ticket opened! TICKETCHANNEL",
+  "ticketClaimedMessage": "Ticket successfully claimed!",
+  "ticketOnlyClaimableByStaff": "The ticket can only be claimed by a staff!",
   "cantCloseTicket": "Only staff can close the ticket!",
 
   "other": {
     "openTicketButtonMSG": "Open a ticket",
-    "selectTicketTypePlaceholder": "Select a ticket type"
+    "selectTicketTypePlaceholder": "Select a ticket type",
+    "claimedBy": "**Claimed By**: USER"
   }
 }
