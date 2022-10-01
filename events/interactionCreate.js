@@ -22,11 +22,12 @@ module.exports = {
       }).then(async channel => {
         await client.db.add(`temp.ticketCount`, 1);
         const ticketId = await client.db.get(`temp.ticketCount`);
-        await client.db.set(`tickets.${channel.id}`, {
+        await client.db.set(`tickets_${channel.id}`, {
           id: ticketId-1,
           category: ticketType,
           reason: reason,
           creator: interaction.user.id,
+          invited: [],
           createdAt: Date.now(),
           claimed: false,
           claimedBy: null,
@@ -101,7 +102,7 @@ module.exports = {
         if (row.components.length > 0) body.components = [row];
 
         channel.send(body).then((msg) => {
-          client.db.set(`tickets.${channel.id}.messageId`, msg.id);
+          client.db.set(`tickets_${channel.id}.messageId`, msg.id);
           msg.pin().then(() => {
             msg.channel.bulkDelete(1);
           });
@@ -142,50 +143,13 @@ module.exports = {
       };
 
       if (interaction.customId === "claim") {
-        const ticket = await client.db.get(`tickets.${interaction.channel.id}`);
-        if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true});
-    
-        const canClaim = interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
-    
-        if (!canClaim) return interaction.reply({
-          content: client.locales.ticketOnlyClaimableByStaff,
-          ephemeral: true
-        });
-    
-        if (ticket.claimed) return interaction.reply({
-          content: client.locales.ticketAlreadyClaimed,
-          ephemeral: true
-        });
-    
-        await client.db.set(`tickets.${interaction.channel.id}.claimed`, true);
-        await client.db.set(`tickets.${interaction.channel.id}.claimedBy`, interaction.user.id);
-        await client.db.set(`tickets.${interaction.channel.id}.claimedAt`, Date.now());
-    
-        interaction.channel.messages.fetch()
-        const messageId = await client.db.get(`tickets.${interaction.channel.id}.messageId`)
-        const msg = interaction.channel.messages.cache.get(messageId);
-    
-        const embed = msg.embeds[0].data;
-        embed.description = embed.description + `\n\n ${client.locales.other.claimedBy.replace('USER', `<@${interaction.user.id}>`)}`;
-    
-        msg.components[0].components.map(x => {
-          if (x.data.custom_id === 'claim') x.data.disabled = true;
-        });
-    
-        msg.edit({
-          content: msg.content,
-          embeds: [embed],
-          components: msg.components
-        });
-    
-        interaction.reply({
-          content: client.locales.ticketClaimedMessage,
-          ephemeral: true
-        });
-    
-        interaction.channel.send({
-          content: `> Ticket claimed by ${interaction.user}`
-        });
+        const {claim} = require('../utils/claim.js');
+        claim(interaction, client);
+      };
+
+      if (interaction.customId === "close") {
+        const {close} = require('../utils/close.js');
+        close(interaction, client);
       };
     };
 

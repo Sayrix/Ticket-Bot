@@ -22,8 +22,10 @@
   },
   "homepage": "https://github.com/Sayrix/ticket-bot#readme",
   "dependencies": {
+    "axios": "^0.27.2",
     "better-sqlite3": "^7.6.2",
-    "discord.js": "^14.1.2",
+    "discord-html-transcripts": "^2.6.1",
+    "discord.js": "^14.4.0",
     "fs-extra": "^10.1.0",
     "jsonc": "^2.0.0",
     "quick.db": "^9.0.6"

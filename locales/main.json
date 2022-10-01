@@ -15,6 +15,10 @@
         "text": "is.gd/ticketbot",
         "iconUrl": ""
       }
+    },
+    "ticketClosed": {
+      "title": "Ticket closed",
+      "description": "The ticket has been closed"
     }
   },
   "modals": {
@@ -35,10 +39,13 @@
     }
   },
   "ticketOpenedMessage": "Ticket opened! TICKETCHANNEL",
-  "ticketClaimedMessage": "Ticket successfully claimed!",
   "ticketOnlyClaimableByStaff": "The ticket can only be claimed by a staff!",
   "ticketAlreadyClaimed": "The ticket is already claimed!",
-  "cantCloseTicket": "Only staff can close the ticket!",
+  "ticketClaimedMessage": "> Ticket claimed by USER",
+  "ticketOnlyClosableByStaff": "Only staff can close the ticket!",
+  "ticketAlreadyClosed": "The ticket is already closed!",
+  "ticketCreatingTranscript": "> Creating transcript...",
+  "ticketTranscriptCreated": "> Transcript created! TRANSCRIPTURL",
 
   "other": {
     "openTicketButtonMSG": "Open a ticket",

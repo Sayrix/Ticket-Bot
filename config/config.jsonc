@@ -34,6 +34,7 @@
   "pingRoleWhenOpened": true,
   "roleToPingWhenOpenedId": "966046902493806642",
   "claimButton": true,
-  "whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
-  "closeButton": true
+  "whoCanCloseTicket": "EVERYONE", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
+  "closeButton": true,
+  "askReasonWhenClosing": true
 }
