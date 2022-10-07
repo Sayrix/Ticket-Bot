@@ -75,13 +75,23 @@ module.exports = {
         const row = new client.discord.ActionRowBuilder()
 
         if (client.config.closeButton) {
-          row.addComponents(
-            new client.discord.ButtonBuilder()
-              .setCustomId('close')
-              .setLabel(client.locales.buttons.close.label)
-              .setEmoji(client.locales.buttons.close.emoji)
-              .setStyle(client.discord.ButtonStyle.Danger),
-          );
+          if (client.config.askReasonWhenClosing) {
+            row.addComponents(
+              new client.discord.ButtonBuilder()
+                .setCustomId('close_askReason')
+                .setLabel(client.locales.buttons.close.label)
+                .setEmoji(client.locales.buttons.close.emoji)
+                .setStyle(client.discord.ButtonStyle.Danger),
+            );
+          } else {
+            row.addComponents(
+              new client.discord.ButtonBuilder()
+                .setCustomId('close')
+                .setLabel(client.locales.buttons.close.label)
+                .setEmoji(client.locales.buttons.close.emoji)
+                .setStyle(client.discord.ButtonStyle.Danger),
+            );
+          }
         };
 
         if (client.config.claimButton) {
@@ -151,6 +161,11 @@ module.exports = {
         const {close} = require('../utils/close.js');
         close(interaction, client);
       };
+
+      if (interaction.customId === "close_askReason") {
+        const {closeAskReason} = require('../utils/close_askReason.js');
+        closeAskReason(interaction, client);
+      };
     };
 
     if (interaction.isSelectMenu()) {
@@ -185,6 +200,11 @@ module.exports = {
         if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
         createTicket(ticketType, interaction.fields.fields.first().value);
       };
+
+      if (interaction.customId === "askReasonClose") {
+        const {close} = require('../utils/close.js');
+        close(interaction, client, interaction.fields.fields.first().value);
+      }
     };
   },
 };

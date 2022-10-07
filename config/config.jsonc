@@ -4,7 +4,6 @@
   "mainColor": "f6c42f",
 
 
-
   "openTicketChannelId": "897568683394752523",
   "ticketTypes": [
     {
@@ -33,8 +32,10 @@
   ], // Roles who can access to the tickets
   "pingRoleWhenOpened": true,
   "roleToPingWhenOpenedId": "966046902493806642",
+  "logs": true,
+  "logsChannelId": "966046987738816552",
   "claimButton": true,
-  "whoCanCloseTicket": "EVERYONE", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
+  "whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
   "closeButton": true,
   "askReasonWhenClosing": true
 }
