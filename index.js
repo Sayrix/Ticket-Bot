@@ -30,6 +30,7 @@ client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.
 
 client.locales = require("./locales/main.json");
 client.embeds = client.locales.embeds;
+client.log = require("./utils/logs.js").log;
 
 // Command handler
 client.commands = new Collection();
