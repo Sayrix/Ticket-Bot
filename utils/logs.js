@@ -13,7 +13,42 @@ module.exports = {
     const webhook = webhooks.first();
 
     if (logsType === "ticketCreate") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("3ba55c")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Created a ticket (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\``);
 
-    }
+      webhook.send({
+        username: "Ticket Created",
+        avatarURL: "https://i.imgur.com/M38ZmjM.png",
+        embeds: [embed]
+      });
+    };
+
+    if (logsType === "ticketClaim") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("faa61a")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`);
+
+      webhook.send({
+        username: "Ticket Claimed",
+        avatarURL: "https://i.imgur.com/qqEaUyR.png",
+        embeds: [embed]
+      });
+    };
+
+    if (logsType === "ticketClose") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("ed4245")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\` after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`);
+
+      webhook.send({
+        username: "Ticket Closed",
+        avatarURL: "https://i.imgur.com/5ShDA4g.png",
+        embeds: [embed]
+      });
+    };
   }
-}
+};

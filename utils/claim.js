@@ -20,6 +20,17 @@ module.exports = {
       ephemeral: true
     });
 
+    client.log("ticketClaim", {
+      user: {
+        tag: interaction.user.tag,
+        id: interaction.user.id,
+        avatarURL: interaction.user.displayAvatarURL()
+      },
+      ticketId: ticket.id,
+      ticketChannelId: interaction.channel.id,
+      ticketCreatedAt: ticket.createdAt,
+    }, client);
+
     await client.db.set(`tickets_${interaction.channel.id}.claimed`, true);
     await client.db.set(`tickets_${interaction.channel.id}.claimedBy`, interaction.user.id);
     await client.db.set(`tickets_${interaction.channel.id}.claimedAt`, Date.now());

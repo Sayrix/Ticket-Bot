@@ -20,6 +20,16 @@ module.exports = {
           }
         ]
       }).then(async channel => {
+        client.log("ticketCreate", {
+          user: {
+            tag: interaction.user.tag,
+            id: interaction.user.id,
+            avatarURL: interaction.user.displayAvatarURL()
+          },
+          reason: reason,
+          ticketChannelId: channel.id
+        }, client);
+
         await client.db.add(`temp.ticketCount`, 1);
         const ticketId = await client.db.get(`temp.ticketCount`);
         await client.db.set(`tickets_${channel.id}`, {
@@ -159,7 +169,7 @@ module.exports = {
 
       if (interaction.customId === "close") {
         const {close} = require('../utils/close.js');
-        close(interaction, client);
+        close(interaction, client, client.locales.noReasonGiven);
       };
 
       if (interaction.customId === "close_askReason") {
@@ -188,7 +198,7 @@ module.exports = {
           modal.addComponents(firstActionRow);
           await interaction.showModal(modal);
         } else {
-          createTicket(ticketType);
+          createTicket(ticketType, "No reason provided");
         };
       };
     };

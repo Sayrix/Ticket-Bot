@@ -31,6 +31,21 @@ client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.
 client.locales = require("./locales/main.json");
 client.embeds = client.locales.embeds;
 client.log = require("./utils/logs.js").log;
+client.msToHm = function dhm (ms) {
+  const days = Math.floor(ms / (24*60*60*1000));
+  const daysms = ms % (24*60*60*1000);
+  const hours = Math.floor(daysms / (60*60*1000));
+  const hoursms = ms % (60*60*1000);
+  const minutes = Math.floor(hoursms / (60*1000));
+  const minutesms = ms % (60*1000);
+  const sec = Math.floor(minutesms / 1000);
+
+  if (days > 0) return `${days}d ${hours}h ${minutes}m ${sec}s`;
+  if (hours > 0) return `${hours}h ${minutes}m ${sec}s`;
+  if (minutes > 0) return `${minutes}m ${sec}s`;
+  if (sec > 0) return `${sec}s`;
+  return "0s";
+}
 
 // Command handler
 client.commands = new Collection();

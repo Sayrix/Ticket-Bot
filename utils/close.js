@@ -16,6 +16,18 @@ module.exports = {
       ephemeral: true
     });
 
+    client.log("ticketClose", {
+      user: {
+        tag: interaction.user.tag,
+        id: interaction.user.id,
+        avatarURL: interaction.user.displayAvatarURL()
+      },
+      ticketId: ticket.id,
+      ticketChannelId: interaction.channel.id,
+      ticketCreatedAt: ticket.createdAt,
+      reason: reason
+    }, client);
+
     await client.db.set(`tickets_${interaction.channel.id}.closed`, true);
     await client.db.set(`tickets_${interaction.channel.id}.closedBy`, interaction.user.id);
     await client.db.set(`tickets_${interaction.channel.id}.closedAt`, Date.now());
