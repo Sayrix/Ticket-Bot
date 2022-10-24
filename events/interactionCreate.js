@@ -137,6 +137,19 @@ module.exports = {
 
     if (interaction.isButton()) {
       if (interaction.customId === "openTicket") {
+        // Max ticket opened
+
+        const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
+        const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
+        if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
+          if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+            return interaction.reply({
+              content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+              ephemeral: true
+            });
+          };
+        };
+
         // Make a select menus of all tickets types
 
         const row = new client.discord.ActionRowBuilder()
@@ -176,6 +189,11 @@ module.exports = {
         const {closeAskReason} = require('../utils/close_askReason.js');
         closeAskReason(interaction, client);
       };
+
+      if (interaction.customId === "deleteTicket") {
+        const {deleteTicket} = require("../utils/delete.js");
+        deleteTicket(interaction, client);
+      }
     };
 
     if (interaction.isSelectMenu()) {

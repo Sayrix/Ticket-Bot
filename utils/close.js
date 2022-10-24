@@ -4,7 +4,7 @@ const axios = require('axios');
 module.exports = {
   async close(interaction, client, reason) {
     const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-    if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true});
+    if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true}).catch(e => console.log(e));
 
     if (client.config.whoCanCloseTicket === 'STAFFONLY' && !interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))) return interaction.reply({
       content: client.locales.ticketOnlyClosableByStaff,
@@ -43,17 +43,17 @@ module.exports = {
 
     interaction.channel.permissionOverwrites.edit(creator, {
       ViewChannel: false,
-    });
+    }).catch(e => console.log(e));
 
     invited.forEach(async user => {
       interaction.channel.permissionOverwrites.edit(user, {
         ViewChannel: false,
-      });
+      }).catch(e => console.log(e));
     });
 
     interaction.reply({
       content: client.locales.ticketCreatingTranscript,
-    });
+    }).catch(e => console.log(e));
 
     await interaction.channel.messages.fetch()
     const messageId = await client.db.get(`tickets_${interaction.channel.id}.messageId`)
@@ -69,7 +69,7 @@ module.exports = {
       content: msg.content,
       embeds: [embed],
       components: msg.components
-    });
+    }).catch(e => console.log(e));
 
     let attachment = await discordTranscripts.createTranscript(interaction.channel, {
       returnType: 'buffer',
@@ -81,9 +81,9 @@ module.exports = {
 
     async function close(res) {
       interaction.channel.send({
-        content: client.locales.ticketTranscriptCreated.replace('TRANSCRIPTURL', `https://transcript.cf/${res.data.id}`),
-      });
-      await client.db.set(`tickets_${interaction.channel.id}.transcripturl`, `https://transcript.cf/${res.data.id}`);
+        content: client.locales.ticketTranscriptCreated.replace('TRANSCRIPTURL', `<https://transcript.cf/${res.data.id}>`),
+      }).catch(e => console.log(e));
+      await client.db.set(`tickets_${interaction.channel.id}.transcriptURL`, `https://transcript.cf/${res.data.id}`);
       const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 
       const row = new client.discord.ActionRowBuilder()
@@ -100,7 +100,7 @@ module.exports = {
           .replace('REASON', ticket.closeReason)
           .replace('CLOSERNAME', interaction.user.tag))],
         components: [row]
-      });
+      }).catch(e => console.log(e));
 
       const tiketClosedDMEmbed = new client.discord.EmbedBuilder()
       .setColor(client.embeds.ticketClosedDM.color ? client.embeds.ticketClosedDM.color : client.config.mainColor)
@@ -119,11 +119,11 @@ module.exports = {
       client.users.fetch(creator).then(user => {
         user.send({
           embeds: [tiketClosedDMEmbed]
-        });
+        }).catch(e => console.log(e));
       });
     };
 
-    if (Buffer.byteLength(attachment) > 19000000) {
+    if (Buffer.byteLength(attachment) > 19990000) {
       attachment = await discordTranscripts.createTranscript(interaction.channel, {
         returnType: 'buffer',
         fileName: 'transcript.html',
@@ -132,11 +132,11 @@ module.exports = {
         useCDN: true
       });
 
-      axios.post('http://127.0.0.1:3000/upload', {buffer: attachment}).then(res => {
+      axios.post('https://transcript.cf/upload', {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
         close(res);
       })
     } else {
-      axios.post('http://127.0.0.1:3000/upload', {buffer: attachment}).then(res => {
+      axios.post('https://transcript.cf/upload', {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
         close(res);
       })
     };

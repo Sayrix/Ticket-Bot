@@ -50,5 +50,18 @@ module.exports = {
         embeds: [embed]
       });
     };
+
+    if (logsType === "ticketDelete") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("ed4245")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${logs.ticketId} after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation\n\nTranscript: ${logs.transcriptURL}`);
+
+      webhook.send({
+        username: "Ticket Deleted",
+        avatarURL: "https://i.imgur.com/obTW2BS.png",
+        embeds: [embed]
+      });
+    }
   }
 };

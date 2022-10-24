@@ -37,5 +37,6 @@
   "claimButton": true,
   "whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
   "closeButton": true,
-  "askReasonWhenClosing": true
+  "askReasonWhenClosing": true,
+  "maxTicketOpened": 1 // The number of tickets the user can open while another one is already open. Set to 0 to unlimited
 }
