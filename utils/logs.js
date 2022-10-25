@@ -22,7 +22,7 @@ module.exports = {
         username: "Ticket Created",
         avatarURL: "https://i.imgur.com/M38ZmjM.png",
         embeds: [embed]
-      });
+      }).catch(e => console.log(e));
     };
 
     if (logsType === "ticketClaim") {
@@ -35,7 +35,7 @@ module.exports = {
         username: "Ticket Claimed",
         avatarURL: "https://i.imgur.com/qqEaUyR.png",
         embeds: [embed]
-      });
+      }).catch(e => console.log(e));
     };
 
     if (logsType === "ticketClose") {
@@ -48,7 +48,7 @@ module.exports = {
         username: "Ticket Closed",
         avatarURL: "https://i.imgur.com/5ShDA4g.png",
         embeds: [embed]
-      });
+      }).catch(e => console.log(e));
     };
 
     if (logsType === "ticketDelete") {
@@ -61,7 +61,33 @@ module.exports = {
         username: "Ticket Deleted",
         avatarURL: "https://i.imgur.com/obTW2BS.png",
         embeds: [embed]
-      });
-    }
+      }).catch(e => console.log(e));
+    };
+
+    if (logsType === "userAdded") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("3ba55c")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Added <@${logs.added.id}> (${logs.added.id}) to the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`);
+
+      webhook.send({
+        username: "User Added",
+        avatarURL: "https://i.imgur.com/G6QPFBV.png",
+        embeds: [embed]
+      }).catch(e => console.log(e));
+    };
+
+    if (logsType === "userRemoved") {
+      const embed = new client.discord.EmbedBuilder()
+      .setColor("ed4245")
+      .setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+      .setDescription(`${logs.user.tag} (<@${logs.user.id}>) Removed <@${logs.removed.id}> (${logs.removed.id}) from the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`);
+
+      webhook.send({
+        username: "User Removed",
+        avatarURL: "https://i.imgur.com/eFJ8xxC.png",
+        embeds: [embed]
+      }).catch(e => console.log(e));
+    };
   }
 };

@@ -8,17 +8,17 @@ module.exports = {
     if (!canClaim) return interaction.reply({
       content: client.locales.ticketOnlyClaimableByStaff,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
 
     if (interaction.user.id === ticket.creator) return interaction.reply({
       content: client.locales.ticketOnlyClaimableByStaff,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
 
     if (ticket.claimed) return interaction.reply({
       content: client.locales.ticketAlreadyClaimed,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
 
     client.log("ticketClaim", {
       user: {
@@ -50,11 +50,11 @@ module.exports = {
       content: msg.content,
       embeds: [embed],
       components: msg.components
-    });
+    }).catch(e => console.log(e));
 
     interaction.reply({
       content: client.locales.ticketClaimedMessage.replace('USER', `<@${interaction.user.id}>`),
       ephemeral: false
-    });
+    }).catch(e => console.log(e));
   }
 };

@@ -9,12 +9,12 @@ module.exports = {
     if (client.config.whoCanCloseTicket === 'STAFFONLY' && !interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))) return interaction.reply({
       content: client.locales.ticketOnlyClosableByStaff,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
 
     if (ticket.closed) return interaction.reply({
       content: client.locales.ticketAlreadyClosed,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
 
     client.log("ticketClose", {
       user: {
@@ -97,7 +97,7 @@ module.exports = {
       interaction.channel.send({
         embeds: [JSON.parse(JSON.stringify(client.embeds.ticketClosed)
           .replace('TICKETCOUNT', ticket.id)
-          .replace('REASON', ticket.closeReason)
+          .replace('REASON', ticket.closeReason.replace(/[\n\r]/g, '\\n'))
           .replace('CLOSERNAME', interaction.user.tag))],
         components: [row]
       }).catch(e => console.log(e));

@@ -1,7 +1,7 @@
 module.exports = {
   async deleteTicket(interaction, client) {
     const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-    if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true});
+    if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true}).catch(e => console.log(e));
 
     client.log("ticketDelete", {
       user: {
@@ -15,6 +15,6 @@ module.exports = {
     }, client);
 
     await interaction.deferUpdate();
-    interaction.channel.delete();
+    interaction.channel.delete().catch(e => console.log(e));
   }
 };

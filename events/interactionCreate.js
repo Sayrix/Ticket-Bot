@@ -53,7 +53,7 @@ module.exports = {
           ReadMessageHistory: true,
           AttachFiles: true,
           ViewChannel: true,
-        });
+        }).catch(e => console.log(e));
 
         if (client.config.rolesWhoHaveAccessToTheTickets.length > 0) {
           client.config.rolesWhoHaveAccessToTheTickets.forEach(async role => {
@@ -63,7 +63,7 @@ module.exports = {
               ReadMessageHistory: true,
               AttachFiles: true,
               ViewChannel: true,
-            });
+            }).catch(e => console.log(e));
           });
         };
 
@@ -130,8 +130,8 @@ module.exports = {
             content: client.locales.ticketOpenedMessage.replace('TICKETCHANNEL', `<#${channel.id}>`),
             components: [],
             ephemeral: true
-          });
-        });
+          }).catch(e => console.log(e));
+        }).catch(e => console.log(e));
       });
     };
 
@@ -146,7 +146,7 @@ module.exports = {
             return interaction.reply({
               content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
               ephemeral: true
-            });
+            }).catch(e => console.log(e));
           };
         };
 
@@ -172,7 +172,7 @@ module.exports = {
         interaction.reply({
           ephemeral: true,
           components: [row]
-        });
+        }).catch(e => console.log(e));
       };
 
       if (interaction.customId === "claim") {
@@ -214,10 +214,37 @@ module.exports = {
           
           const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
           modal.addComponents(firstActionRow);
-          await interaction.showModal(modal);
+          await interaction.showModal(modal).catch(e => console.log(e));
         } else {
           createTicket(ticketType, "No reason provided");
         };
+      };
+
+      if (interaction.customId === "removeUser") {
+        const ticket = await client.db.get(`tickets_${interaction.message.channelId}`);
+        client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
+
+        interaction.values.forEach(value => {
+          interaction.channel.permissionOverwrites.delete(value).catch(e => console.log(e));
+
+          client.log("userRemoved", {
+            user: {
+              tag: interaction.user.tag,
+              id: interaction.user.id,
+              avatarURL: interaction.user.displayAvatarURL()
+            },
+            ticketId: ticket.id,
+            ticketChannelId: interaction.channel.id,
+            removed: {
+              id: value,
+            }
+          }, client);
+        });
+
+        interaction.update({
+          content: `> Removed ${interaction.values.length < 1 ? interaction.values : interaction.values.map(a => `<@${a}>`).join(', ')} from the ticket`,
+          components: []
+        }).catch(e => console.log(e));
       };
     };
 

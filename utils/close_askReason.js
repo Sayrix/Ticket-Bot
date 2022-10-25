@@ -3,7 +3,7 @@ module.exports = {
     if (client.config.whoCanCloseTicket === 'STAFFONLY' && !interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))) return interaction.reply({
       content: client.locales.ticketOnlyClosableByStaff,
       ephemeral: true
-    });
+    }).catch(e => console.log(e));
     
     const modal = new client.discord.ModalBuilder()
     .setCustomId('askReasonClose')
@@ -18,6 +18,6 @@ module.exports = {
         
     const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
     modal.addComponents(firstActionRow);
-    await interaction.showModal(modal);
+    await interaction.showModal(modal).catch(e => console.log(e));
   }
 }
