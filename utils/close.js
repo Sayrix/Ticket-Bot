@@ -76,7 +76,8 @@ module.exports = {
       fileName: 'transcript.html',
       minify: true,
       saveImages: true,
-      useCDN: true
+      useCDN: true,
+      poweredBy: false
     });
 
     async function close(res) {
