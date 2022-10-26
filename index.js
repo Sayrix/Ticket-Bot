@@ -6,6 +6,10 @@ const { QuickDB } = require('quick.db');
 const jsonc = require('jsonc');
 const db = new QuickDB();
 
+process.on('unhandledRejection', (reason, promise, a) => {
+  console.log(reason, promise, a)
+})
+
 process.stdout.write(`
 \x1b[38;2;143;110;250m████████╗██╗ ██████╗██╗  ██╗███████╗████████╗    ██████╗  ██████╗ ████████╗
 \x1b[38;2;157;101;254m╚══██╔══╝██║██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝    ██╔══██╗██╔═══██╗╚══██╔══╝
