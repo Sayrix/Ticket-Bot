@@ -28,7 +28,7 @@ client.db = db;
 client.discord = require('discord.js');
 client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.jsonc'), 'utf8'));
 
-client.locales = require("./locales/main.json");
+client.locales = require(`./locales/${client.config.lang}.json`);
 client.embeds = client.locales.embeds;
 client.log = require("./utils/logs.js").log;
 client.msToHm = function dhm (ms) {

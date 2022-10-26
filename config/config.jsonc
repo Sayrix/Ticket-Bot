@@ -2,6 +2,7 @@
   "clientId": "877605878554038273",
   "guildId": "897568629921562625",
   "mainColor": "f6c42f",
+  "lang": "main", // If you want to set english please set "main"
 
 
   "openTicketChannelId": "897568683394752523",
