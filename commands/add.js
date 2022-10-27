@@ -1,44 +1,44 @@
-const {
-  SlashCommandBuilder
-} = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('add')
-    .setDescription('add a user')
-    .addUserOption(option =>
-      option.setName('target')
-      .setDescription('add a Member to the ticket')
+	data: new SlashCommandBuilder()
+		.setName('add')
+		.setDescription('Add someone to the ticket')
+    .addUserOption(input => 
+      input.setName('user')
+      .setDescription('The user to add')
       .setRequired(true)),
-  async execute(interaction, client) {
-    const chan = client.channels.cache.get(interaction.channelId);
-    const user = interaction.options.getUser('target');
+	async execute(interaction, client) {
+    const added = interaction.options.getUser('user');
+    const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
+    if (!ticket) return interaction.reply({content: 'Ticket not found', ephemeral: true}).catch(e => console.log(e));
+    if (ticket.invited.includes(added.id)) return interaction.reply({content: 'User already added', ephemeral: true}).catch(e => console.log(e));
 
-    if (chan.name.includes('ticket')) {
-      chan.edit({
-        permissionOverwrites: [{
-          id: user,
-          allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-        },
-        {
-          id: interaction.guild.roles.everyone,
-          deny: ['VIEW_CHANNEL'],
-        },
-          {
-            id: client.config.roleSupport,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-          },
-      ],
-      }).then(async () => {
-        interaction.reply({
-          content: `<@${user.id}> has ben addet!`
-        });
-      });
-    } else {
-      interaction.reply({
-        content: 'you dont have a ticket!',
-        ephemeral: true
-      });
-    };
-  },
+    if (ticket.invited.lenght >= 25) return interaction.reply({content: 'You can\'t add more than 25 users', ephemeral: true}).catch(e => console.log(e));
+
+    client.db.push(`tickets_${interaction.channel.id}.invited`, added.id);
+
+    await interaction.channel.permissionOverwrites.edit(added, {
+      SendMessages: true,
+      AddReactions: true,
+      ReadMessageHistory: true,
+      AttachFiles: true,
+      ViewChannel: true,
+    }).catch(e => console.log(e));
+
+    interaction.reply({content: `> Added <@${added.id}> to the ticket`}).catch(e => console.log(e));
+
+    client.log("userAdded", {
+      user: {
+        tag: interaction.user.tag,
+        id: interaction.user.id,
+        avatarURL: interaction.user.displayAvatarURL()
+      },
+      ticketId: ticket.id,
+      ticketChannelId: interaction.channel.id,
+      added: {
+        id: added.id,
+      }
+    }, client);
+	},
 };

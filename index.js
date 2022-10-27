@@ -1,78 +1,94 @@
-const fs = require('fs');
-const {
-  Client,
-  Collection,
-  Intents
-} = require('discord.js');
-const config = require('./config.json');
-const {
-  REST
-} = require('@discordjs/rest');
-const {
-  Routes
-} = require('discord-api-types/v9');
-const {
-  clientId
-} = require('./config.json');
-const t = require('./token.json');
+const fs = require('fs-extra');
+const path = require('node:path');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { token } = require('./config/token.json');
+const { QuickDB } = require('quick.db');
+const jsonc = require('jsonc');
+const db = new QuickDB();
 
-const slashcommands = [];
-const slashcommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+process.on('unhandledRejection', (reason, promise, a) => {
+  console.log(reason, promise, a)
+})
 
-for (const file of slashcommandFiles) {
-  const command = require(`./commands/${file}`);
-  slashcommands.push(command.data.toJSON());
+process.stdout.write(`
+\x1b[38;2;143;110;250m████████╗██╗ ██████╗██╗  ██╗███████╗████████╗    ██████╗  ██████╗ ████████╗
+\x1b[38;2;157;101;254m╚══██╔══╝██║██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝    ██╔══██╗██╔═══██╗╚══██╔══╝
+\x1b[38;2;172;90;255m   ██║   ██║██║     █████╔╝ █████╗     ██║       ██████╔╝██║   ██║   ██║   
+\x1b[38;2;188;76;255m   ██║   ██║██║     ██╔═██╗ ██╔══╝     ██║       ██╔══██╗██║   ██║   ██║   
+\x1b[38;2;205;54;255m   ██║   ██║╚██████╗██║  ██╗███████╗   ██║       ██████╔╝╚██████╔╝   ██║   
+\x1b[38;2;222;0;255m   ╚═╝   ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝       ╚═════╝  ╚═════╝    ╚═╝\x1b[0m
+                    https://github.com/Sayrix/ticket-bot
+
+Connecting to Discord...`)
+
+const client = new Client({ intents: [
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.MessageContent
+] });
+
+// All variables stored in the client object
+client.db = db;
+client.discord = require('discord.js');
+client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, 'config/config.jsonc'), 'utf8'));
+
+client.locales = require(`./locales/${client.config.lang}.json`);
+client.embeds = client.locales.embeds;
+client.log = require("./utils/logs.js").log;
+client.msToHm = function dhm (ms) {
+  const days = Math.floor(ms / (24*60*60*1000));
+  const daysms = ms % (24*60*60*1000);
+  const hours = Math.floor(daysms / (60*60*1000));
+  const hoursms = ms % (60*60*1000);
+  const minutes = Math.floor(hoursms / (60*1000));
+  const minutesms = ms % (60*1000);
+  const sec = Math.floor(minutesms / 1000);
+
+  if (days > 0) return `${days}d ${hours}h ${minutes}m ${sec}s`;
+  if (hours > 0) return `${hours}h ${minutes}m ${sec}s`;
+  if (minutes > 0) return `${minutes}m ${sec}s`;
+  if (sec > 0) return `${sec}s`;
+  return "0s";
 }
 
-const rest = new REST({
-  version: '9'
-}).setToken(t.token);
-
-rest.put(Routes.applicationCommands(clientId), {
-    body: slashcommands
-  })
-  .then(() => console.log('Successfully registered application commands.'))
-  .catch(console.error);
-
-const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS]
-});
-
-const Discord = require('discord.js');
-client.discord = Discord;
-client.config = config;
-
+// Command handler
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.data.name, command);
-};
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
+}
 
-const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-    client.on(event.name, (...args) => event.execute(...args, client));
-};
-
+// Execute commands
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand()) return;
+	if (!interaction.isChatInputCommand()) return;
+	const command = client.commands.get(interaction.commandName);
+	if (!command) return;
 
-
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-
-  try {
-    await command.execute(interaction, client, config);
-  } catch (error) {
-    console.error(error);
-    return interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: true
-    });
-  };
+	try {
+		await command.execute(interaction, client);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
 });
 
-client.login(require('./token.json').token);
+// Event handler
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args, client));
+	}
+}
+
+// Login the bot
+client.login(token);

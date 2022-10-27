@@ -1,53 +1,11 @@
 # Ticket Bot
 
-Ticket Bot is a discord ticket bot with buttons made with Discord.js v13
+Ticket Bot is a open source project of an ticket discord bot using [discord.js](https://discord.js.org) v14
 
-![](https://i.imgur.com/XecyLJN.gif)
+![Discord.js ticket bot](https://i.imgur.com/564YXvR.png)
 
-## How to install ?
+## Documentation
 
-You need to have Node.JS 16+
-``````bash
-git clone https://github.com/Sayrix/ticket-bot
-cd ticket-bot
-npm i
-``````
+The documentation is available [here](https://ticket-bot-docusaurus.pages.dev/)
 
-## How to config ?
-
-```json
-//config.json
-{
-  "clientId": "id of the bot",
-
-
-  "parentOpened": "id of the category when a ticket is opened",
-  "parentTransactions": "id of the category when a ticket is an ticket transaction",
-  "parentJeux": "id of the category when a ticket is an ticket jeux",
-  "parentAutres": "id of the category when a ticket is an ticket autres",
-
-
-  "roleSupport": "id of the role support",
-
-  
-  "logsTicket": "id of the channel of ticket logs",
-  "ticketChannel": "id of the channel where is sended the embed to create a ticket",
-  
-  "footerText": "the footer of the embeds"
-}
-```
-
-```json
-//token.json
-{
-  "token": "token of your discord bot"
-}
-```
-
-## How to start ?
-```bash
-node deploy-commands.js # To deploy s/ash commands
-node index.js # To start the ticket-bot
-```
-
-## Many thanks to the people who will put a ⭐!
+## Please leave a ⭐ to help the project!

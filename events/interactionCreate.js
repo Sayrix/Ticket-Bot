@@ -1,301 +1,265 @@
-let hastebin = require('hastebin');
+const {PermissionFlagsBits} = require('discord.js');
 
 module.exports = {
-  name: 'interactionCreate',
+	name: 'interactionCreate',
+	once: false,
   async execute(interaction, client) {
-    if (!interaction.isButton()) return;
-    if (interaction.customId == "open-ticket") {
-      if (client.guilds.cache.get(interaction.guildId).channels.cache.find(c => c.topic == interaction.user.id)) {
-        return interaction.reply({
-          content: 'you have already a Ticket created!',
-          ephemeral: true
-        });
-      };
+    async function createTicket(ticketType, reason) {
+      const ticketName = client.config.ticketNameOption
+      .replace('USERNAME', interaction.user.username)
+      .replace('USERID', interaction.user.id)
+      .replace('TICKETCOUNT', await client.db.get(`temp.ticketCount`) || 0);
 
-      interaction.guild.channels.create(`ticket-${interaction.user.username}`, {
-        parent: client.config.parentOpened,
-        topic: interaction.user.id,
-        permissionOverwrites: [{
-            id: interaction.user.id,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
-          },
-          {
-            id: client.config.roleSupport,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'READ_MESSAGE_HISTORY'],
-          },
+      client.guilds.cache.get(client.config.guildId).channels.create({
+        name: ticketName,
+        parent: ticketType.categoryId,
+        permissionOverwrites: [
           {
             id: interaction.guild.roles.everyone,
-            deny: ['VIEW_CHANNEL'],
+            deny: [PermissionFlagsBits.ViewChannel]
+          }
+        ]
+      }).then(async channel => {
+        client.log("ticketCreate", {
+          user: {
+            tag: interaction.user.tag,
+            id: interaction.user.id,
+            avatarURL: interaction.user.displayAvatarURL()
           },
-        ],
-        type: 'text',
-      }).then(async c => {
-        interaction.reply({
-          content: `Ticket has ben created! <#${c.id}>`,
-          ephemeral: true
+          reason: reason,
+          ticketChannelId: channel.id
+        }, client);
+
+        await client.db.add(`temp.ticketCount`, 1);
+        const ticketId = await client.db.get(`temp.ticketCount`);
+        await client.db.set(`tickets_${channel.id}`, {
+          id: ticketId-1,
+          category: ticketType,
+          reason: reason,
+          creator: interaction.user.id,
+          invited: [],
+          createdAt: Date.now(),
+          claimed: false,
+          claimedBy: null,
+          claimedAt: null,
+          closed: false,
+          closedBy: null,
+          closedAt: null
         });
 
-        const embed = new client.discord.MessageEmbed()
-          .setColor('ff9600')
-          .setAuthor('Reason', ' ')
-          .setDescription('choose a reason why you open a ticket')
-          .setFooter('Ticket System', ' ')
-          .setTimestamp();
+        channel.permissionOverwrites.edit(interaction.user, {
+          SendMessages: true,
+          AddReactions: true,
+          ReadMessageHistory: true,
+          AttachFiles: true,
+          ViewChannel: true,
+        }).catch(e => console.log(e));
 
-        const row = new client.discord.MessageActionRow()
-          .addComponents(
-            new client.discord.MessageSelectMenu()
-            .setCustomId('category')
-            .setPlaceholder('choose a reason why you open a ticket')
-            .addOptions([{
-                label: 'Apply',
-                value: 'Apply',
-                emoji: { name: '📑' }
-              },
-              {
-                label: 'Support',
-                value: 'Support',
-                emoji: { name: '❓' }
-              },
-              {
-                label: 'Complaint',
-                value: 'Complaint',
-                emoji: { name: '😡' }
-              },
-              {
-                label: 'Hosting',
-                value: 'Hosting',
-                emoji: { name: '📌' }
-              },
-              {
-                label: 'Partnership',
-                value: 'Partnership',
-                emoji: { name: '🥇' }
-              },
-            ]),
+        if (client.config.rolesWhoHaveAccessToTheTickets.length > 0) {
+          client.config.rolesWhoHaveAccessToTheTickets.forEach(async role => {
+            channel.permissionOverwrites.edit(role, {
+              SendMessages: true,
+              AddReactions: true,
+              ReadMessageHistory: true,
+              AttachFiles: true,
+              ViewChannel: true,
+            }).catch(e => console.log(e));
+          });
+        };
+
+        const ticketOpenedEmbed = new client.discord.EmbedBuilder()
+        .setColor(ticketType.color ? ticketType.color : client.config.mainColor)
+        .setTitle(client.embeds.ticketOpened.title.replace('CATEGORYNAME', ticketType.name))
+        .setDescription(
+          ticketType.customDescription ? ticketType.customDescription
+          .replace('CATEGORYNAME', ticketType.name)
+          .replace('REASON', reason) :
+          client.embeds.ticketOpened.description
+          .replace('CATEGORYNAME', ticketType.name)
+          .replace('REASON', reason))
+        .setFooter({
+          text: "is.gd/ticketbot" + client.embeds.ticketOpened.footer.text.replace("is.gd/ticketbot", ""), // Please respect the LICENSE :D
+          iconUrl: client.embeds.ticketOpened.footer.iconUrl
+        });
+
+        const row = new client.discord.ActionRowBuilder()
+
+        if (client.config.closeButton) {
+          if (client.config.askReasonWhenClosing) {
+            row.addComponents(
+              new client.discord.ButtonBuilder()
+                .setCustomId('close_askReason')
+                .setLabel(client.locales.buttons.close.label)
+                .setEmoji(client.locales.buttons.close.emoji)
+                .setStyle(client.discord.ButtonStyle.Danger),
+            );
+          } else {
+            row.addComponents(
+              new client.discord.ButtonBuilder()
+                .setCustomId('close')
+                .setLabel(client.locales.buttons.close.label)
+                .setEmoji(client.locales.buttons.close.emoji)
+                .setStyle(client.discord.ButtonStyle.Danger),
+            );
+          }
+        };
+
+        if (client.config.claimButton) {
+          row.addComponents(
+            new client.discord.ButtonBuilder()
+              .setCustomId('claim')
+              .setLabel(client.locales.buttons.claim.label)
+              .setEmoji(client.locales.buttons.claim.emoji)
+              .setStyle(client.discord.ButtonStyle.Primary),
           );
+        };
 
-        msg = await c.send({
-          content: `<@!${interaction.user.id}>`,
-          embeds: [embed],
-          components: [row]
-        });
+        const body = {
+          embeds: [ticketOpenedEmbed],
+          content: `<@${interaction.user.id}> ${client.config.pingRoleWhenOpened ? `<@&${client.config.roleToPingWhenOpenedId}>` : ''}`,
+        };
 
-        const collector = msg.createMessageComponentCollector({
-          componentType: 'SELECT_MENU',
-          time: 20000
-        });
+        if (row.components.length > 0) body.components = [row];
 
-        collector.on('collect', i => {
-          if (i.user.id === interaction.user.id) {
-            if (msg.deletable) {
-              msg.delete().then(async () => {
-                const embed = new client.discord.MessageEmbed()
-                  .setColor('ff9600')
-                  .setAuthor('Ticket', ' ')
-                  .setDescription(`<@!${interaction.user.id}> has create a **Ticket** with the reason・ ${i.values[0]}`)
-                  .setFooter('Ticket System', ' ')
-                  .setTimestamp();
-
-                const row = new client.discord.MessageActionRow()
-                  .addComponents(
-                    new client.discord.MessageButton()
-                    .setCustomId('close-ticket')
-                    .setLabel('close ticket')
-                    .setEmoji('899745362137477181')
-                    .setStyle('DANGER'),
-                  );
-
-                const opened = await c.send({
-                  content: `<@&${client.config.roleSupport}>`,
-                  embeds: [embed],
-                  components: [row]
-                });
-
-                opened.pin().then(() => {
-                  opened.channel.bulkDelete(1);
-                });
-              });
-            };
-            if (i.values[0] == 'Apply') {
-              c.edit({
-                parent: client.config.parentApply
-              });
-            };
-            if (i.values[0] == 'Support') {
-              c.edit({
-                parent: client.config.parentSupport
-              });
-            };
-            if (i.values[0] == 'Complaint') {
-              c.edit({
-                parent: client.config.parentComplaint
-              });
-            };
-            if (i.values[0] == 'Hosting') {
-              c.edit({
-                parent: client.config.parentHosting
-              });
-            };
-            if (i.values[0] == 'Partnership') {
-              c.edit({
-                parent: client.config.parentPartnership
-              });
-            };
-          };
-        });
-
-        collector.on('end', collected => {
-          if (collected.size < 1) {
-            c.send(`There was no reason, the ticket will be closed.`).then(() => {
-              setTimeout(() => {
-                if (c.deletable) {
-                  c.delete();
-                };
-              }, 5000);
-            });
-          };
-        });
+        channel.send(body).then((msg) => {
+          client.db.set(`tickets_${channel.id}.messageId`, msg.id);
+          msg.pin().then(() => {
+            msg.channel.bulkDelete(1);
+          });
+          interaction.update({
+            content: client.locales.ticketOpenedMessage.replace('TICKETCHANNEL', `<#${channel.id}>`),
+            components: [],
+            ephemeral: true
+          }).catch(e => console.log(e));
+        }).catch(e => console.log(e));
       });
     };
 
-    if (interaction.customId == "close-ticket") {
-      const guild = client.guilds.cache.get(interaction.guildId);
-      const chan = guild.channels.cache.get(interaction.channelId);
+    if (interaction.isButton()) {
+      if (interaction.customId === "openTicket") {
+        // Max ticket opened
 
-      const row = new client.discord.MessageActionRow()
+        const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
+        const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
+        if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
+          if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+            return interaction.reply({
+              content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+              ephemeral: true
+            }).catch(e => console.log(e));
+          };
+        };
+
+        // Make a select menus of all tickets types
+
+        const row = new client.discord.ActionRowBuilder()
         .addComponents(
-          new client.discord.MessageButton()
-          .setCustomId('confirm-close')
-          .setLabel('Ticket close')
-          .setStyle('DANGER'),
-          new client.discord.MessageButton()
-          .setCustomId('no')
-          .setLabel('close cancel')
-          .setStyle('SECONDARY'),
+          new client.discord.SelectMenuBuilder()
+            .setCustomId('selectTicketType')
+            .setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
+            .setMaxValues(1)
+            .addOptions(
+              client.config.ticketTypes.map(x => {
+                const options = new client.discord.SelectMenuOptionBuilder()
+                options.setLabel(x.name)
+                options.setValue(x.codeName)
+                if (x.emoji) options.setEmoji(x.emoji)
+                return options
+              })
+            ),
         );
 
-      const verif = await interaction.reply({
-        content: 'Are you sure you want to close the ticket?',
-        components: [row]
-      });
+        interaction.reply({
+          ephemeral: true,
+          components: [row]
+        }).catch(e => console.log(e));
+      };
 
-      const collector = interaction.channel.createMessageComponentCollector({
-        componentType: 'BUTTON',
-        time: 10000
-      });
+      if (interaction.customId === "claim") {
+        const {claim} = require('../utils/claim.js');
+        claim(interaction, client);
+      };
 
-      collector.on('collect', i => {
-        if (i.customId == 'confirm-close') {
-          interaction.editReply({
-            content: `The ticket has been closed by <@!${interaction.user.id}>`,
-            components: []
-          });
+      if (interaction.customId === "close") {
+        const {close} = require('../utils/close.js');
+        close(interaction, client, client.locales.noReasonGiven);
+      };
 
-          chan.edit({
-              name: `closed-${chan.name}`,
-              permissionOverwrites: [
-                {
-                  id: client.users.cache.get(chan.topic),
-                  deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-                },
-                {
-                  id: client.config.roleSupport,
-                  allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-                },
-                {
-                  id: interaction.guild.roles.everyone,
-                  deny: ['VIEW_CHANNEL'],
-                },
-              ],
-            })
-            .then(async () => {
-              const embed = new client.discord.MessageEmbed()
-                .setColor('ff9600')
-                .setAuthor('Ticket', ' ')
-                .setDescription('```Ticket saving```')
-                .setFooter('Ticket System', ' ')
-                .setTimestamp();
+      if (interaction.customId === "close_askReason") {
+        const {closeAskReason} = require('../utils/close_askReason.js');
+        closeAskReason(interaction, client);
+      };
 
-              const row = new client.discord.MessageActionRow()
-                .addComponents(
-                  new client.discord.MessageButton()
-                  .setCustomId('delete-ticket')
-                  .setLabel('Ticket delete')
-                  .setEmoji('🗑️')
-                  .setStyle('DANGER'),
-                );
-
-              chan.send({
-                embeds: [embed],
-                components: [row]
-              });
-            });
-
-          collector.stop();
-        };
-        if (i.customId == 'no') {
-          interaction.editReply({
-            content: 'Close ticket cancelled!',
-            components: []
-          });
-          collector.stop();
-        };
-      });
-
-      collector.on('end', (i) => {
-        if (i.size < 1) {
-          interaction.editReply({
-            content: 'Ticket closure cancelled!',
-            components: []
-          });
-        };
-      });
+      if (interaction.customId === "deleteTicket") {
+        const {deleteTicket} = require("../utils/delete.js");
+        deleteTicket(interaction, client);
+      }
     };
 
-    if (interaction.customId == "delete-ticket") {
-      const guild = client.guilds.cache.get(interaction.guildId);
-      const chan = guild.channels.cache.get(interaction.channelId);
+    if (interaction.isSelectMenu()) {
+      if (interaction.customId === "selectTicketType") {
+        const ticketType = client.config.ticketTypes.find(x => x.codeName === interaction.values[0]);
+        if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
+        if (ticketType.askReason) {
+          const modal = new client.discord.ModalBuilder()
+          .setCustomId('askReason')
+          .setTitle(client.locales.modals.reasonTicketOpen.title);
 
-      interaction.reply({
-        content: 'ticket saving...'
-      });
+          const input = new client.discord.TextInputBuilder()
+          .setCustomId('input_'+interaction.values[0])
+          .setLabel(client.locales.modals.reasonTicketOpen.label)
+          .setStyle(client.discord.TextInputStyle.Paragraph)
+          .setPlaceholder(client.locales.modals.reasonTicketOpen.placeholder)
+          .setMaxLength(256);
+          
+          const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
+          modal.addComponents(firstActionRow);
+          await interaction.showModal(modal).catch(e => console.log(e));
+        } else {
+          createTicket(ticketType, "No reason provided");
+        };
+      };
 
-      chan.messages.fetch().then(async (messages) => {
-        let a = messages.filter(m => m.author.bot !== true).map(m =>
-          `${new Date(m.createdTimestamp).toLocaleString('de-DE')} - ${m.author.username}#${m.author.discriminator}: ${m.attachments.size > 0 ? m.attachments.first().proxyURL : m.content}`
-        ).reverse().join('\n');
-        if (a.length < 1) a = "It was not written in the ticket"
-        hastebin.createPaste(a, {
-            contentType: 'text/plain',
-            server: 'https://hastebin.com'
-          }, {})
-          .then(function (urlToPaste) {
-            const embed = new client.discord.MessageEmbed()
-              .setAuthor('Logs Ticket', ' ')
-              .setDescription(`📰 Ticket-Logs \`${chan.id}\` created by <@!${chan.topic}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${urlToPaste})`)
-              .setColor('2f3136')
-              .setTimestamp();
+      if (interaction.customId === "removeUser") {
+        const ticket = await client.db.get(`tickets_${interaction.message.channelId}`);
+        client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
 
-            const embed2 = new client.discord.MessageEmbed()
-              .setAuthor('Logs Ticket', ' ')
-              .setDescription(`📰 Logs of your ticket \`${chan.id}\`: [**Click here to see the logsn**](${urlToPaste})`)
-              .setColor('2f3136')
-              .setTimestamp();
+        interaction.values.forEach(value => {
+          interaction.channel.permissionOverwrites.delete(value).catch(e => console.log(e));
 
-            client.channels.cache.get(client.config.logsTicket).send({
-              embeds: [embed]
-            });
-            client.users.cache.get(chan.topic).send({
-              embeds: [embed2]
-            }).catch(() => {console.log('I cant send it DM')});
-            chan.send('Delete channel.');
+          client.log("userRemoved", {
+            user: {
+              tag: interaction.user.tag,
+              id: interaction.user.id,
+              avatarURL: interaction.user.displayAvatarURL()
+            },
+            ticketId: ticket.id,
+            ticketChannelId: interaction.channel.id,
+            removed: {
+              id: value,
+            }
+          }, client);
+        });
 
-            setTimeout(() => {
-              chan.delete();
-            }, 5000);
-          });
-      });
+        interaction.update({
+          content: `> Removed ${interaction.values.length < 1 ? interaction.values : interaction.values.map(a => `<@${a}>`).join(', ')} from the ticket`,
+          components: []
+        }).catch(e => console.log(e));
+      };
+    };
+
+    if (interaction.isModalSubmit()) {
+      if (interaction.customId === "askReason") {
+        const type = interaction.fields.fields.first().customId.split('_')[1];
+        const ticketType = client.config.ticketTypes.find(x => x.codeName === type);
+        if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
+        createTicket(ticketType, interaction.fields.fields.first().value);
+      };
+
+      if (interaction.customId === "askReasonClose") {
+        const {close} = require('../utils/close.js');
+        close(interaction, client, interaction.fields.fields.first().value);
+      }
     };
   },
 };
