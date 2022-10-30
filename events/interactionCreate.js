@@ -182,7 +182,7 @@ module.exports = {
 
       if (interaction.customId === "close") {
         const {close} = require('../utils/close.js');
-        close(interaction, client, client.locales.noReasonGiven);
+        close(interaction, client, client.locales.other.noReasonGiven);
       };
 
       if (interaction.customId === "close_askReason") {
