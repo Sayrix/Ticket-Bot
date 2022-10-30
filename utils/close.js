@@ -35,7 +35,7 @@ module.exports = {
     if (reason) {
       await client.db.set(`tickets_${interaction.channel.id}.closeReason`, reason);
     } else {
-      await client.db.set(`tickets_${interaction.channel.id}.closeReason`, client.locales.other.noReasonGiven);
+      await client.db.set(`tickets_${interaction.channel.id}.closeReason`, client.locales.noReasonGiven);
     }
 
     const creator = await client.db.get(`tickets_${interaction.channel.id}.creator`);
