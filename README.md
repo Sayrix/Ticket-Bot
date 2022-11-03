@@ -8,4 +8,8 @@ Ticket Bot is a open source project of an ticket discord bot using [discord.js](
 
 The documentation is available [here](https://ticket-bot.pages.dev/)
 
+## Discord
+
+You can come on the discord: https://discord.gg/VasYV6MEJy
+
 ## Please leave a ⭐ to help the project!
