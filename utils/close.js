@@ -96,7 +96,7 @@ module.exports = {
 			);
 
       interaction.channel.send({
-        embeds: [JSON.parse(JSON.stringify(client.embeds.ticketClosed)
+        embeds: [JSON.parse(JSON.stringify(client.locales.embeds.ticketClosed)
           .replace('TICKETCOUNT', ticket.id)
           .replace('REASON', ticket.closeReason.replace(/[\n\r]/g, '\\n'))
           .replace('CLOSERNAME', interaction.user.tag))],
