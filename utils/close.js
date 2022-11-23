@@ -124,7 +124,7 @@ module.exports = {
       });
     };
 
-    if (Buffer.byteLength(attachment) > 19990000) {
+    if (Buffer.byteLength(attachment) > 18990000) {
       attachment = await discordTranscripts.createTranscript(interaction.channel, {
         returnType: 'buffer',
         fileName: 'transcript.html',
