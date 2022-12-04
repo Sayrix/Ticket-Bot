@@ -4,6 +4,8 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
+    await client.guilds.fetch(client.config.guildId)
+    await client.guilds.cache.get(client.config.guildId).members.fetch()
     if (!client.guilds.cache.get(client.config.guildId).members.me.permissions.has("Administrator")) {
       console.log("\n⚠️⚠️⚠️ I don't have the Administrator permission, to prevent any issues please add the Administrator permission to me. ⚠️⚠️⚠️");
       process.exit(0);
