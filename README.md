@@ -15,7 +15,9 @@ You can come on the discord: https://discord.gg/VasYV6MEJy
 ## Sponsors
 
 <p align="center">
-  <img src='https://cdn.jsdelivr.net/gh/sayrix/sponsors/sponsors.svg'/>
+  <a href="https://cdn.jsdelivr.net/gh/sayrix/sponsors/sponsors.svg">
+    <img src='https://cdn.jsdelivr.net/gh/sayrix/sponsors/sponsors.svg'/>
+  </a>
 </p>
 
 ## Please leave a ⭐ to help the project!
