@@ -24,7 +24,8 @@ Connecting to Discord...`)
 const client = new Client({ intents: [
   GatewayIntentBits.Guilds,
   GatewayIntentBits.GuildMessages,
-  GatewayIntentBits.MessageContent
+  GatewayIntentBits.MessageContent,
+  GatewayIntentBits.GuildMembers
 ] });
 
 // All variables stored in the client object
