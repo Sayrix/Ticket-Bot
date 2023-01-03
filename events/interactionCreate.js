@@ -1,5 +1,4 @@
 const {PermissionFlagsBits} = require('discord.js');
-
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
@@ -154,17 +153,18 @@ module.exports = {
 
         const row = new client.discord.ActionRowBuilder()
         .addComponents(
-          new client.discord.SelectMenuBuilder()
+          new client.discord.StringSelectMenuBuilder()
             .setCustomId('selectTicketType')
             .setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
             .setMaxValues(1)
             .addOptions(
               client.config.ticketTypes.map(x => {
-                const options = new client.discord.SelectMenuOptionBuilder()
-                options.setLabel(x.name)
-                options.setValue(x.codeName)
-                if (x.emoji) options.setEmoji(x.emoji)
-                return options
+								const a = {
+									label: x.name,
+									value: x.codeName,
+								}
+                if (x.emoji) a.emoji = x.emoji;
+                return a
               })
             ),
         );
@@ -196,7 +196,7 @@ module.exports = {
       }
     };
 
-    if (interaction.isSelectMenu()) {
+    if (interaction.isStringSelectMenu()) {
       if (interaction.customId === "selectTicketType") {
         const ticketType = client.config.ticketTypes.find(x => x.codeName === interaction.values[0]);
         if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
