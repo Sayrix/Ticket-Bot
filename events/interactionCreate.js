@@ -161,6 +161,7 @@ module.exports = {
               client.config.ticketTypes.map(x => {
 								const a = {
 									label: x.name,
+                  description: x.description,
 									value: x.codeName,
 								}
                 if (x.emoji) a.emoji = x.emoji;
