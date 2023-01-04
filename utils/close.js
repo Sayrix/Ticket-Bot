@@ -72,7 +72,7 @@ module.exports = {
     }).catch(e => console.log(e));
 
     async function close(res) {
-      interaction.channel.setParent(client.config.closeTicketCategoryId);
+      if (client.config.closeTicketCategoryId) interaction.channel.setParent(client.config.closeTicketCategoryId);
       
       interaction.channel.send({
         content: client.locales.ticketTranscriptCreated.replace('TRANSCRIPTURL', `<https://transcript.cf/${res.data.id}>`),
