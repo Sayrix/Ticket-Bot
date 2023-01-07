@@ -4,8 +4,9 @@
   "mainColor": "f6c42f", // The hex color of the embeds by default
   "lang": "main", // If you want to set english please set "main"
 
-
+  "closeTicketCategoryId": "", // The id of the category where a closed ticket will be moved to
   "openTicketChannelId": "", // The id of the channel where the message to create a ticket will be sent
+  
   "ticketTypes": [ // You have a limit of 25 types (the limit of Discord)
     {
       "codeName": "category-one", // The name need to be in lowercase
