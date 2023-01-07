@@ -151,23 +151,22 @@ module.exports = {
 
         // Make a select menus of all tickets types
 
-        const row = new client.discord.ActionRowBuilder()
-        .addComponents(
+        const row = new client.discord.ActionRowBuilder().addComponents(
           new client.discord.StringSelectMenuBuilder()
-            .setCustomId('selectTicketType')
+            .setCustomId("selectTicketType")
             .setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
             .setMaxValues(1)
             .addOptions(
-              client.config.ticketTypes.map(x => {
-								const a = {
-									label: x.name,
-                  description: x.description,
-									value: x.codeName,
-								}
+              client.config.ticketTypes.map((x) => {
+                const a = {
+                  label: x.name,
+                  value: x.codeName,
+                };
+                if (x.description) a.description = x.description;
                 if (x.emoji) a.emoji = x.emoji;
-                return a
+                return a;
               })
-            ),
+            )
         );
 
         interaction.reply({
