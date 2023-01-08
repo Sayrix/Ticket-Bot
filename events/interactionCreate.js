@@ -115,7 +115,7 @@ module.exports = {
 
         const body = {
           embeds: [ticketOpenedEmbed],
-          content: `<@${interaction.user.id}> ${client.config.pingRoleWhenOpened ? `<@&${client.config.roleToPingWhenOpenedId}>` : ''}`,
+          content: `<@${interaction.user.id}> ${client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map(x => `<@&${x}>`).join(', ') : ''}`,
         };
 
         if (row.components.length > 0) body.components = [row];
