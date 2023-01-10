@@ -4,16 +4,14 @@
       "title": "Ouvrir un ticket",
       "description": "Cliquez sur le bouton ci-dessous pour ouvrir un ticket.",
       "footer": {
-        "text": "is.gd/ticketbot",
-        "iconUrl": ""
+        "text": "is.gd/ticketbot"
       }
     },
     "ticketOpened": {
       "title": "Ticket CATEGORYNAME",
       "description": "Votre ticket a été ouvert. Un membre du staff va vous répondre dans les plus brefs délais.",
       "footer": {
-        "text": "is.gd/ticketbot",
-        "iconUrl": ""
+        "text": "is.gd/ticketbot"
       }
     },
     "ticketClosed": {
@@ -24,8 +22,7 @@
       "title": "Ticket fermé",
       "description": "Le ticket n°TICKETCOUNT a été fermé par CLOSERNAME avec comme raison: `REASON`\n\nVoice une transcript du ticket: TRANSCRIPTURL",
       "footer": {
-        "text": "is.gd/ticketbot",
-        "iconUrl": ""
+        "text": "is.gd/ticketbot"
       }
     }
   },
