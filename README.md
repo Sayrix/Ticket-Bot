@@ -17,7 +17,8 @@ You can come on the discord: https://discord.gg/VasYV6MEJy
 Contributions are welcome! Please read the [contributing guidelines](https://github.com/Sayrix/Ticket-Bot/blob/main/CONTRIBUTING.md) first.
 
 ## 💎 Sponsors
-Thanks to all our sponsors! 🙏
+Thanks to all our sponsors! 🙏  
+You can see all perks here: https://github.com/sponsors/Sayrix
 <p align="center">
   <a href="https://cdn.jsdelivr.net/gh/sayrix/sponsors/sponsors.svg">
     <img src='https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.svg'/>
