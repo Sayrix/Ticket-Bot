@@ -59,7 +59,7 @@
   "ticketAlreadyClosed": "Dieses Ticket wurde schon geschlossen!",
   "ticketCreatingTranscript": "> Generiere Transkript...",
   "ticketTranscriptCreated": "> Transkript generiert! TRANSCRIPTURL",
-  "ticketLimitReached": "Du kanns tnur TICKETLIMIT Tickets gleichzeitig offen haben",
+  "ticketLimitReached": "Du kannst nur TICKETLIMIT Tickets gleichzeitig offen haben",
 
   "other": {
     "openTicketButtonMSG": "Öffne ein Ticket",
