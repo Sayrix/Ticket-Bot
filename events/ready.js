@@ -1,4 +1,5 @@
 const readline = require('readline');
+const axios = require('axios');
 
 module.exports = {
 	name: 'ready',
