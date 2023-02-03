@@ -218,7 +218,7 @@ module.exports = {
           modal.addComponents(firstActionRow);
           await interaction.showModal(modal).catch(e => console.log(e));
         } else {
-          createTicket(ticketType, "No reason provided");
+          createTicket(ticketType, client.locales.other.noReasonGiven);
         };
       };
 
