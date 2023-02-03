@@ -54,7 +54,7 @@ module.exports = {
     sendEmbedToOpen();
 
     readline.cursorTo(process.stdout, 0);
-	  process.stdout.write(`🚀  Ready! Logged in as \x1b[37;46;1mtest#0000\x1b[0m (\x1b[37;46;1m111111111111\x1b[0m)
+	  process.stdout.write(`🚀  Ready! Logged in as \x1b[37;46;1m${client.user.tag}\x1b[0m (\x1b[37;46;1m${client.user.id}\x1b[0m)
     🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
     📖  Documentation: \x1b[37;46;1mhttps://ticket-bot.pages.dev \x1b[0m
     🪙  Be a sponsor starting at $1/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, ''));
