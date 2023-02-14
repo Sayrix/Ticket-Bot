@@ -159,7 +159,7 @@ module.exports = {
         const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
         if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
           if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
-            return interaction.reply({
+            return interaction.editReply({
               content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
               ephemeral: true
             }).catch(e => console.log(e));
