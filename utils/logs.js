@@ -1,3 +1,5 @@
+const Discord = require('discord.js');
+
 module.exports = {
 	async log(logsType, logs, client) {
 		if (!client.config.logs) return;
@@ -13,7 +15,7 @@ module.exports = {
 		const webhook = webhooks.first();
 
 		if (logsType === "ticketCreate") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("3ba55c")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Created a ticket (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\``);
@@ -26,7 +28,7 @@ module.exports = {
 		};
 
 		if (logsType === "ticketClaim") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("faa61a")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`);
@@ -39,7 +41,7 @@ module.exports = {
 		};
 
 		if (logsType === "ticketClose") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("ed4245")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\` after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`);
@@ -52,7 +54,7 @@ module.exports = {
 		};
 
 		if (logsType === "ticketDelete") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("ed4245")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${logs.ticketId} after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation\n\nTranscript: ${logs.transcriptURL}`);
@@ -65,7 +67,7 @@ module.exports = {
 		};
 
 		if (logsType === "userAdded") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("3ba55c")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Added <@${logs.added.id}> (${logs.added.id}) to the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`);
@@ -78,7 +80,7 @@ module.exports = {
 		};
 
 		if (logsType === "userRemoved") {
-			const embed = new client.discord.EmbedBuilder()
+			const embed = new Discord.EmbedBuilder()
 			.setColor("ed4245")
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 			.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Removed <@${logs.removed.id}> (${logs.removed.id}) from the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`);

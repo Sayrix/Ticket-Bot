@@ -5,6 +5,7 @@ module.exports = {
 		.setName('close')
 		.setDescription('Close the ticket'),
 	async execute(interaction, client) {
+
 		if (client.config.whoCanCloseTicket === 'STAFFONLY' && !interaction.member.roles.cache.some(r => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))) return interaction.reply({
 			content: client.locales.ticketOnlyClosableByStaff,
 			ephemeral: true
@@ -14,6 +15,7 @@ module.exports = {
 			const {closeAskReason} = require('../utils/close_askReason.js');
 			closeAskReason(interaction, client);
 		} else {
+			await interaction.deferReply().catch(e => console.log(e));
 			const {close} = require('../utils/close.js');
 			close(interaction, client);
 		}

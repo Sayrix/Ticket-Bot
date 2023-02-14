@@ -1,5 +1,6 @@
 const discordTranscripts = require('discord-html-transcripts');
 const axios = require('axios');
+const Discord = require('discord.js');
 
 module.exports = {
 	async close(interaction, client, reason) {
@@ -51,7 +52,7 @@ module.exports = {
 			}).catch(e => console.log(e));
 		});
 
-		interaction.reply({
+		interaction.editReply({
 			content: client.locales.ticketCreatingTranscript,
 		}).catch(e => console.log(e));
 
@@ -80,12 +81,12 @@ module.exports = {
 			await client.db.set(`tickets_${interaction.channel.id}.transcriptURL`, `https://transcript.cf/${res.data.id}`);
 			const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 
-			const row = new client.discord.ActionRowBuilder()
+			const row = new Discord.ActionRowBuilder()
 			.addComponents(
-				new client.discord.ButtonBuilder()
+				new Discord.ButtonBuilder()
 					.setCustomId('deleteTicket')
 					.setLabel(client.locales.other.deleteTicketButtonMSG)
-					.setStyle(client.discord.ButtonStyle.Danger),
+					.setStyle(Discord.ButtonStyle.Danger),
 			);
 
 			interaction.channel.send({
@@ -96,7 +97,7 @@ module.exports = {
 				components: [row]
 			}).catch(e => console.log(e));
 
-			const tiketClosedDMEmbed = new client.discord.EmbedBuilder()
+			const tiketClosedDMEmbed = new Discord.EmbedBuilder()
 			.setColor(client.embeds.ticketClosedDM.color ? client.embeds.ticketClosedDM.color : client.config.mainColor)
 			.setDescription(
 				client.embeds.ticketClosedDM.description

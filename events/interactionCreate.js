@@ -1,9 +1,13 @@
 const {PermissionFlagsBits} = require('discord.js');
+const Discord = require('discord.js');
+
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
 	async execute(interaction, client) {
 		async function createTicket(ticketType, reason) {
+			await interaction.deferReply({ephemeral: true}).catch(e => console.log(e));
+
 			const ticketName = client.config.ticketNameOption
 			.replace('USERNAME', interaction.user.username)
 			.replace('USERID', interaction.user.id)
@@ -66,7 +70,7 @@ module.exports = {
 					});
 				};
 
-				const ticketOpenedEmbed = new client.discord.EmbedBuilder()
+				const ticketOpenedEmbed = new Discord.EmbedBuilder()
 				.setColor(ticketType.color ? ticketType.color : client.config.mainColor)
 				.setTitle(client.embeds.ticketOpened.title.replace('CATEGORYNAME', ticketType.name))
 				.setDescription(
@@ -83,35 +87,35 @@ module.exports = {
 					iconUrl: client.embeds.ticketOpened.footer.iconUrl
 				});
 
-				const row = new client.discord.ActionRowBuilder()
+				const row = new Discord.ActionRowBuilder()
 
 				if (client.config.closeButton) {
 					if (client.config.askReasonWhenClosing) {
 						row.addComponents(
-							new client.discord.ButtonBuilder()
+							new Discord.ButtonBuilder()
 								.setCustomId('close_askReason')
 								.setLabel(client.locales.buttons.close.label)
 								.setEmoji(client.locales.buttons.close.emoji)
-								.setStyle(client.discord.ButtonStyle.Danger),
+								.setStyle(Discord.ButtonStyle.Danger),
 						);
 					} else {
 						row.addComponents(
-							new client.discord.ButtonBuilder()
+							new Discord.ButtonBuilder()
 								.setCustomId('close')
 								.setLabel(client.locales.buttons.close.label)
 								.setEmoji(client.locales.buttons.close.emoji)
-								.setStyle(client.discord.ButtonStyle.Danger),
+								.setStyle(Discord.ButtonStyle.Danger),
 						);
 					}
 				};
 
 				if (client.config.claimButton) {
 					row.addComponents(
-						new client.discord.ButtonBuilder()
+						new Discord.ButtonBuilder()
 							.setCustomId('claim')
 							.setLabel(client.locales.buttons.claim.label)
 							.setEmoji(client.locales.buttons.claim.emoji)
-							.setStyle(client.discord.ButtonStyle.Primary),
+							.setStyle(Discord.ButtonStyle.Primary),
 					);
 				};
 
@@ -127,7 +131,7 @@ module.exports = {
 					msg.pin().then(() => {
 						msg.channel.bulkDelete(1);
 					});
-					interaction.update({
+					interaction.editReply({
 						content: client.locales.ticketOpenedMessage.replace('TICKETCHANNEL', `<#${channel.id}>`),
 						components: [],
 						ephemeral: true
@@ -138,6 +142,8 @@ module.exports = {
 
 		if (interaction.isButton()) {
 			if (interaction.customId === "openTicket") {
+				await interaction.deferReply({ ephemeral: true }).catch(e => console.log(e));
+
 				// Max ticket opened
 
 				const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
@@ -153,8 +159,8 @@ module.exports = {
 
 				// Make a select menus of all tickets types
 
-				const row = new client.discord.ActionRowBuilder().addComponents(
-					new client.discord.StringSelectMenuBuilder()
+				const row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
 						.setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
 						.setMaxValues(1)
@@ -171,7 +177,7 @@ module.exports = {
 						)
 				);
 
-				interaction.reply({
+				interaction.editReply({
 					ephemeral: true,
 					components: [row]
 				}).catch(e => console.log(e));
@@ -183,6 +189,7 @@ module.exports = {
 			};
 
 			if (interaction.customId === "close") {
+				await interaction.deferReply({ephemeral: true}).catch(e => console.log(e));
 				const {close} = require('../utils/close.js');
 				close(interaction, client, client.locales.other.noReasonGiven);
 			};
@@ -203,18 +210,18 @@ module.exports = {
 				const ticketType = client.config.ticketTypes.find(x => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askReason) {
-					const modal = new client.discord.ModalBuilder()
+					const modal = new Discord.ModalBuilder()
 					.setCustomId('askReason')
 					.setTitle(client.locales.modals.reasonTicketOpen.title);
 
-					const input = new client.discord.TextInputBuilder()
+					const input = new Discord.TextInputBuilder()
 					.setCustomId('input_'+interaction.values[0])
 					.setLabel(client.locales.modals.reasonTicketOpen.label)
-					.setStyle(client.discord.TextInputStyle.Paragraph)
+					.setStyle(Discord.TextInputStyle.Paragraph)
 					.setPlaceholder(client.locales.modals.reasonTicketOpen.placeholder)
 					.setMaxLength(256);
 					
-					const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
+					const firstActionRow = new Discord.ActionRowBuilder().addComponents(input);
 					modal.addComponents(firstActionRow);
 					await interaction.showModal(modal).catch(e => console.log(e));
 				} else {
@@ -259,6 +266,7 @@ module.exports = {
 			};
 
 			if (interaction.customId === "askReasonClose") {
+				await interaction.deferReply().catch(e => console.log(e));
 				const {close} = require('../utils/close.js');
 				close(interaction, client, interaction.fields.fields.first().value);
 			}
