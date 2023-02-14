@@ -1,4 +1,5 @@
 node_modules
 json.sqlite
 package-lock.json
-json.sqlite
+config.jsonc
+token.json
