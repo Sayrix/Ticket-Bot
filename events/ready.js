@@ -15,17 +15,21 @@ module.exports = {
 
 		async function sendEmbedToOpen() {
 			const embedMessageId = await client.db.get("temp.openTicketMessageId");
-			const openTicketChannel = await client.channels.fetch(client.config.openTicketChannelId).catch(e => console.error("The channel to open tickets is not found!\n", e));
+			await client.channels.fetch(client.config.openTicketChannelId).catch(e => console.error("The channel to open tickets is not found!\n", e));
+			const openTicketChannel = await client.channels.cache.get(client.config.openTicketChannelId);
 			if (!openTicketChannel) {
 				console.error("The channel to open tickets is not found!");
+				return process.exit(0);
+			};
+
+			if (!openTicketChannel.isTextBased()) {
+				console.error("The channel to open tickets is not a channel!");
 				return process.exit(0);
 			}
 			
 			if (openTicketChannel.messages) {
 				await openTicketChannel.messages.fetch(embedMessageId)
-				.catch(e => console.error("Error when trying to fetch openTicketMessage:\n", e))
-	
-				try {if (embedMessageId) openTicketChannel.messages.cache.get(embedMessageId).delete();} catch (e) {console.error}
+				try {if (embedMessageId) openTicketChannel.messages.cache.get(embedMessageId).delete();} catch (e) {}
 			};
 
 			let embed = client.embeds.openTicket;
@@ -43,13 +47,15 @@ module.exports = {
 					.setStyle(Discord.ButtonStyle.Primary),
 			);
 
-			try { openTicketChannel.send({
-				embeds: [embed],
-				components: [row]
-			})
-			.then(msg => {
-				client.db.set("temp.openTicketMessageId", msg.id);
-			}) } catch(e) {console.error}
+			try {
+				client.channels.cache.get(client.config.openTicketChannelId).send({
+					embeds: [embed],
+					components: [row]
+				})
+				.then(msg => {
+					client.db.set("temp.openTicketMessageId", msg.id);
+				})
+			} catch(e) {console.error(e)}
 		};
 
 		sendEmbedToOpen();
