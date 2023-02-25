@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, Events, SelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, Events, StringSelectMenuBuilder } = require('discord.js');
 const add = require('./add');
 
 /*
@@ -34,7 +34,7 @@ module.exports = {
 
 		const row = new ActionRowBuilder()
 			.addComponents(
-				new SelectMenuBuilder()
+				new StringSelectMenuBuilder()
 					.setCustomId('removeUser')
 					.setPlaceholder('Please select a user to remove')
 					.setMinValues(1)
