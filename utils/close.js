@@ -169,6 +169,8 @@ module.exports = {
 			});
 		};
 
+		const domain = "https://transcript.cf";
+
 		let attachment = await discordTranscripts.createTranscript(interaction.channel, {
 			returnType: 'buffer',
 			fileName: 'transcript.html',
@@ -188,13 +190,27 @@ module.exports = {
 				poweredBy: false
 			});
 
-			axios.post('https://transcript.cf/upload', {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
+			axios.post(`${domain}/upload`, {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
 				close(res);
 			})
 		} else {
-			axios.post('https://transcript.cf/upload', {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
+			axios.post(`${domain}/upload`, {buffer: attachment}, {maxBodyLength: 104857600, maxContentLength: 104857600}).then(res => {
 				close(res);
 			})
+			.catch(async e => {
+				attachment = await discordTranscripts.createTranscript(interaction.channel, {
+					returnType: 'buffer',
+					fileName: 'transcript.html',
+					minify: true,
+					saveImages: false,
+					useCDN: true,
+					poweredBy: false
+				});
+	
+				axios.post(`${domain}/upload`, {buffer: attachment}, {maxBodyLength: 1024 * 1024 * 1024, maxContentLength: 1024 * 1024 * 1024}).then(res => {
+					close(res);
+				});
+			});
 		};
 	}
 };
