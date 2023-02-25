@@ -22,6 +22,11 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
+		if (!client.config.guildId) {
+			console.log("⚠️⚠️⚠️ Please add the guild id in the config.jsonc file. ⚠️⚠️⚠️");
+			process.exit(0);
+		};
+
 		await client.guilds.fetch(client.config.guildId)
 		await client.guilds.cache.get(client.config.guildId).members.fetch()
 		if (!client.guilds.cache.get(client.config.guildId).members.me.permissions.has("Administrator")) {

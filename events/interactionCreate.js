@@ -191,25 +191,25 @@ module.exports = {
 
 				// Max ticket opened
 
-        for (let role of client.config.rolesWhoCanNotCreateTickets) {
-          if (role && interaction.member.roles.cache.has(role)) {
-            return interaction.reply({
-              content: 'You can\'t create a ticket because you are blacklisted',
-              ephemeral: true
-            }).catch(e => console.log(e));
-          }
-        }
+				for (let role of client.config.rolesWhoCanNotCreateTickets) {
+					if (role && interaction.member.roles.cache.has(role)) {
+						return interaction.reply({
+							content: 'You can\'t create a ticket because you are blacklisted',
+							ephemeral: true
+						}).catch(e => console.log(e));
+					}
+				}
 
-        const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
-        const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
-        if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
-          if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
-            return interaction.editReply({
-              content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
-              ephemeral: true
-            }).catch(e => console.log(e));
-          };
-        };
+				const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
+				const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
+					if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+						return interaction.editReply({
+							content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+							ephemeral: true
+						}).catch(e => console.log(e));
+					};
+				};
 
 				// Make a select menus of all tickets types
 
@@ -261,6 +261,17 @@ module.exports = {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
+				const all = (await client.db.all()).filter(data => data.id.startsWith("tickets_"));
+				const ticketsOpened = all.filter(data => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				if (client.config.maxTicketOpened !== 0) { // If maxTicketOpened is 0, it means that there is no limit
+					if(ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+						return interaction.reply({
+							content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+							ephemeral: true
+						}).catch(e => console.log(e));
+					};
+				};
+
 				const ticketType = client.config.ticketTypes.find(x => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askReason) {
