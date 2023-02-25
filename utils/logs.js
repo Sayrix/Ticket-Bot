@@ -28,7 +28,7 @@ module.exports = {
 			await channel.createWebhook({ name: "Ticket Bot Logs"});
 			webhooks = await channel.fetchWebhooks();
 		}
-		const webhook = webhooks.first();
+		const webhook = webhooks.find(wh => wh.token);
 
 		if (logsType === "ticketCreate") {
 			const embed = new Discord.EmbedBuilder()
