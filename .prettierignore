@@ -1,0 +1,12 @@
+.github
+node_modules
+.gitignore
+.git
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+README.md
+LICENSE
+package.json
+package-lock.json
+.eslintrc.js
+.prettierrc
