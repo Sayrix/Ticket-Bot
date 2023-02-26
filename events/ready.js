@@ -47,10 +47,12 @@ module.exports = {
 				console.error("The channel to open tickets is not a channel!");
 				return process.exit(0);
 			}
-			
+
 			if (openTicketChannel.messages) {
 				await openTicketChannel.messages.fetch(embedMessageId)
-				try {if (embedMessageId) openTicketChannel.messages.cache.get(embedMessageId).delete();} catch (e) {}
+				.then(msg => {
+					msg.delete().catch(i => {})
+				}).catch(i => {});
 			};
 
 			let embed = client.embeds.openTicket;
