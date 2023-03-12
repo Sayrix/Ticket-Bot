@@ -239,7 +239,7 @@ module.exports = {
 				for (let role of client.config.rolesWhoCanNotCreateTickets) {
 					if (role && interaction.member.roles.cache.has(role)) {
 						return interaction
-							.reply({
+							.editReply({
 								content:
                   "You can't create a ticket because you are blacklisted",
 								ephemeral: true,
