@@ -1,0 +1,68 @@
+{
+  "embeds": {
+    "openTicket": {
+      "title": "Destek Talebi Başlatın",
+      "description": "Destek talebi başlatmak için butona basın",
+      "footer": {
+        "text": "is.gd/ticketbot"
+      }
+    },
+    "ticketOpened": {
+      "title": "Destek Talebi CATEGORYNAME",
+      "description": "Bir yetkili sizinle en hızlı şekilde iletişime geçecek!",
+      "footer": {
+        "text": "is.gd/ticketbot"
+      }
+    },
+    "ticketClosed": {
+      "title": "Destek talebi kapatıldı",
+      "description": "Destek talebi, CLOSERNAME tarafından şu sebeple kapatıldı: `REASON`"
+    },
+    "ticketClosedDM": {
+      "title": "Destek talebiniz kapatıldı",
+      "description": "TICKETCOUNT nolu destek talebiniz, CLOSERNAME tarafından şu sebeple kapatıldı: `REASON`\n\nDestek talebinizin bir transkripti: TRANSCRIPTURL",
+      "footer": {
+        "text": "is.gd/ticketbot"
+      }
+    }
+  },
+  "modals": {
+    "reasonTicketOpen": {
+      "title": "Destek Talebi Başlatın",
+      "label": "Destek talebinizin sebebi",
+      "placeholder": "Lütfen neden destek talebi açtığınızı anlatın"
+    },
+    "reasonTicketClose": {
+      "title": "Destek Talebi Kapatın",
+      "label": "Destek talebini kapatmanızın sebebi",
+      "placeholder": "Lütfen neden destek talebi kapattığınızı anlatın."
+    }
+  },
+  "buttons": {
+    "close": {
+      "label": "Destek talebini kapat",
+      "emoji": "🔒"
+    },
+    "claim": {
+      "label": "Destek talebini al",
+      "emoji": "🙋"
+    }
+  },
+  "ticketOpenedMessage": "Bir destek talebi başlatıldı! TICKETCHANNEL",
+  "ticketOnlyClaimableByStaff": "Destek talepleri sadece yetkililer tarafından alınabilir!",
+  "ticketAlreadyClaimed": "Bu destek talebi hali hazırda başka bir yetkili tarafından alındı!",
+  "ticketClaimedMessage": "> Destek talebi USER trafından alındı",
+  "ticketOnlyClosableByStaff": "Destek talepleri sadece yetkililer tarafından kapatılabilir!",
+  "ticketAlreadyClosed": "Destek talebi zaten kapalı!",
+  "ticketCreatingTranscript": "> Transkript oluşturuluyor...",
+  "ticketTranscriptCreated": "> Transkript oluşturuldu! TRANSCRIPTURL",
+  "ticketLimitReached": "Aynı anda en fazla TICKETLIMIT destek talebi açabilirsiniz!",
+
+  "other": {
+    "openTicketButtonMSG": "Destek talebi aç",
+    "deleteTicketButtonMSG": "Destek talebini sil",
+    "selectTicketTypePlaceholder": "Destek talebi türü seçin",
+    "claimedBy": "USER **tarafından alındı**",
+    "noReasonGiven": "Sebep belirtilmedi."
+  }
+}
