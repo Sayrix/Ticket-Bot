@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const readline = require("readline");
 const axios = require("axios");
 const Discord = require("discord.js");

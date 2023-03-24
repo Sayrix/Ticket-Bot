@@ -61,8 +61,7 @@ if (client.config.mysql?.enabled) {
 			require.resolve("mysql2");
 		} catch(e) {
 			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
-			// eslint-disable-next-line no-process-exit
-			process.exit(e.code);
+			throw e.code;
 		}
 
 		const mysql = new MySQLDriver({
