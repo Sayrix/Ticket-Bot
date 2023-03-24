@@ -63,6 +63,7 @@
     "deleteTicketButtonMSG": "Eliminar tique",
     "selectTicketTypePlaceholder": "Elegir el tipo de tique",
     "claimedBy": "**Reclamado por**: USER",
-    "noReasonGiven": ":x: No se dio una razón"
+    "noReasonGiven": ":x: No se dio una razón",
+		"unavailable": "Unavailable"
   }
 }

@@ -63,6 +63,7 @@
     "deleteTicketButtonMSG": "Supprimer un ticket",
     "selectTicketTypePlaceholder": "Sélectionnez le type de ticket",
     "claimedBy": "**Claim par**: USER",
-    "noReasonGiven": "Aucune raison donnée"
+    "noReasonGiven": "Aucune raison donnée",
+		"unavailable": "Unavailable"
   }
 }

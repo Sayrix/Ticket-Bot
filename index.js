@@ -19,9 +19,8 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 const { token } = require("./config/token.json");
-const { QuickDB } = require("quick.db");
+const { QuickDB, MySQLDriver } = require("quick.db");
 const jsonc = require("jsonc");
-const db = new QuickDB();
 
 process.on("unhandledRejection", (reason, promise, a) => {
 	console.log(reason, promise, a);
@@ -49,11 +48,40 @@ const client = new Client({
 });
 
 // All variables stored in the client object
-client.db = db;
 client.discord = require("discord.js");
 client.config = jsonc.parse(
 	fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8")
 );
+
+let db = null;
+
+if (client.config.mysql?.enabled) {
+	(async () => {
+		try {
+			require.resolve("mysql2");
+		} catch(e) {
+			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
+			// eslint-disable-next-line no-process-exit
+			process.exit(e.code);
+		}
+
+		const mysql = new MySQLDriver({
+			host: client.config.mysql?.host,
+			user: client.config.mysql?.user,
+			password: client.config.mysql?.password,
+			database: client.config.mysql?.database,
+			charset: "utf8mb4"
+		});
+
+		await mysql.connect();
+
+		db = new QuickDB({ driver: mysql });
+		client.db = db;
+	})();
+} else {
+	db = new QuickDB();
+	client.db = db;
+};
 
 client.locales = require(`./locales/${client.config.lang}.json`);
 client.embeds = client.locales.embeds;

@@ -1,6 +1,7 @@
 const readline = require("readline");
 const axios = require("axios");
 const Discord = require("discord.js");
+const WebSocketClient = require("websocket").client;
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -60,14 +61,6 @@ module.exports = {
 				throw 0;
 			}
 
-			if (openTicketChannel.messages) {
-				await openTicketChannel.messages
-					.fetch(embedMessageId)
-					.then((msg) => {
-						msg.delete().catch(() => {});
-					}).catch(() => {});
-			}
-
 			let embed = client.embeds.openTicket;
 
 			/*
@@ -117,19 +110,27 @@ module.exports = {
 			);
 
 			try {
-				client.channels.cache
-					.get(client.config.openTicketChannelId)
-					.send({
+				const msg = await openTicketChannel?.messages?.fetch(embedMessageId).catch(() => {});
+				if (msg && msg.id) {
+					msg.edit({
 						embeds: [embed],
 						components: [row],
-					})
-					.then((msg) => {
-						client.db.set("temp.openTicketMessageId", msg.id);
 					});
+				} else {
+					client.channels.cache
+						.get(client.config.openTicketChannelId)
+						.send({
+							embeds: [embed],
+							components: [row],
+						})
+						.then((msg) => {
+							client.db.set("temp.openTicketMessageId", msg.id);
+						});
+				}
 			} catch (e) {
 				console.error(e);
-			}
-		}
+			};
+		};
 
 		sendEmbedToOpen();
 
@@ -138,7 +139,7 @@ module.exports = {
 			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${client.user.tag}\x1b[0m (\x1b[37;46;1m${client.user.id}\x1b[0m)
 		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
 		\x1b[0m📖  Documentation: \x1b[37;46;1mhttps://ticket-bot.pages.dev \x1b[0m
-		\x1b[0m🪙  Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(
+		\x1b[0m🪙   Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(
 					/\t/g,
 					""
 				)
@@ -161,6 +162,37 @@ module.exports = {
 				`\x1b[0m💖  Thanks to our sponsors: ${sponsorsList}\n`
 			);
 		}
+
+		async function connect() {
+			let client = new WebSocketClient();
+				
+			client.on("connectFailed", (e) => {
+				setTimeout(connect, 10000);
+				// console.log(`❌  WebSocket Error: ${e.toString()}`);
+			});
+		
+			client.on("connect", (connection) => {
+				connection.on("error", (e) => {
+					setTimeout(connect, 10000);
+					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+				});
+		
+				connection.on("close", (e) => {
+					setTimeout(connect, 10000);
+					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+				});
+		
+				// console.log("✅  Connected to WebSocket server.");
+		
+				setInterval(() => {
+					connection.sendUTF("heartbeat");
+				}, 25000);
+			});
+		
+			client.connect("wss://ws.ticket.pm/", "echo-protocol");
+		};
+		
+		connect();
 	},
 };
 
