@@ -25,7 +25,7 @@
 			"color": "", // Can be a hex color or blank to use the main color
 			"categoryId": "1111111111111111111", // The category id where the tickets will be created
 			"ticketNameOption": "💡-TICKETCOUNT", // Here is all parameter: USERNAME, USERID, TICKETCOUNT (set to blank to use the default name)
-			"customDescription": "", // The custom description of the ticket type (set to blank to use the default description)
+			"customDescription": "", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"askQuestions": false, // If the bot should ask the reason of the ticket
 			"questions": [] // Leave blank if you don't want to ask questions
 		},
@@ -37,7 +37,7 @@
 			"color": "#f8312f", // Can be a hex color or blank to use the main color
 			"categoryId": "1111111111111111111", // The category id where the tickets will be created
 			"ticketNameOption": "", // Here is all parameter: USERNAME, USERID, TICKETCOUNT (set to blank to use the default name)
-			"customDescription": "Please explain your report in detail. If you have any images, please attach them to your message.", // The custom description of the ticket type (set to blank to use the default description)
+			"customDescription": "Please explain your report in detail. If you have any images, please attach them to your message.", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"askQuestions": false, // If the bot should ask the reason of the ticket
 			"questions": [] // Leave blank if you don't want to ask questions
 		},
@@ -49,7 +49,7 @@
 			"color": "", // Can be a hex color or blank to use the main color
 			"categoryId": "1111111111111111111", // The category id where the tickets will be created
 			"ticketNameOption": "", // Here is all parameter: USERNAME, USERID, TICKETCOUNT (set to blank to use the default name)
-			"customDescription": "Thank you for your ticket, a staff will reply you as soon as possible\n\n__**What is the reason of the ticket?**__: REASON1", // The custom description of the ticket type (set to blank to use the default description)
+			"customDescription": "Thank you for your ticket, a staff will reply you as soon as possible\n\n__**What is the reason of the ticket?**__: REASON1", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"askQuestions": true, // If the bot should ask the reason of the ticket
 			"questions": [
 				{

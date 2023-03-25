@@ -132,6 +132,9 @@ module.exports = {
 						.setDescription(
 							ticketType.customDescription ? ticketType.customDescription
 								.replace("CATEGORYNAME", ticketType.name)
+								.replace("USERNAME", interaction.user.username)
+								.replace("USERID", interaction.user.id)
+								.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
 								.replace("REASON1", reason[0])
 								.replace("REASON2", reason[1])
 								.replace("REASON3", reason[2])
@@ -143,6 +146,9 @@ module.exports = {
 								.replace("REASON9", reason[8]) :
 								client.embeds.ticketOpened.description
 									.replace("CATEGORYNAME", ticketType.name)
+									.replace("USERNAME", interaction.user.username)
+									.replace("USERID", interaction.user.id)
+									.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
 									.replace("REASON1", reason[0])
 									.replace("REASON2", reason[1])
 									.replace("REASON3", reason[2])
