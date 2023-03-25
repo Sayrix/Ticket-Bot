@@ -1,6 +1,8 @@
-const discordTranscripts = require("discord-html-transcripts");
+const { generateMessages } = require("ticket-bot-transcript-uploader");
+const zlib = require("zlib");
 const axios = require("axios");
 const Discord = require("discord.js");
+let domain = "https://ticket.pm/";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -20,10 +22,12 @@ limitations under the License.
 
 module.exports = {
 	async close(interaction, client, reason) {
+		if (!client.config.createTranscript) domain = client.locales.other.unavailable;
+
 		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 		if (!ticket)
 			return interaction
-				.reply({ content: "Ticket not found", ephemeral: true })
+				.editReply({ content: "Ticket not found" })
 				.catch((e) => console.log(e));
 
 		if (
@@ -33,7 +37,7 @@ module.exports = {
 			)
 		)
 			return interaction
-				.reply({
+				.editReply({
 					content: client.locales.ticketOnlyClosableByStaff,
 					ephemeral: true,
 				})
@@ -41,7 +45,7 @@ module.exports = {
 
 		if (ticket.closed)
 			return interaction
-				.reply({
+				.editReply({
 					content: client.locales.ticketAlreadyClosed,
 					ephemeral: true,
 				})
@@ -63,7 +67,6 @@ module.exports = {
 			client
 		);
 
-		await client.db.set(`tickets_${interaction.channel.id}.closed`, true);
 		await client.db.set(
 			`tickets_${interaction.channel.id}.closedBy`,
 			interaction.user.id
@@ -113,42 +116,45 @@ module.exports = {
 			.catch((e) => console.log(e));
 
 		await interaction.channel.messages.fetch();
-		const messageId = await client.db.get(
-			`tickets_${interaction.channel.id}.messageId`
-		);
-		const msg = interaction.channel.messages.cache.get(messageId);
-		const embed = msg.embeds[0].data;
 
-		msg.components[0].components.map((x) => {
-			if (x.data.custom_id === "close") x.data.disabled = true;
-			if (x.data.custom_id === "close_askReason") x.data.disabled = true;
-		});
-
-		msg
-			.edit({
-				content: msg.content,
-				embeds: [embed],
-				components: msg.components,
-			})
-			.catch((e) => console.log(e));
-
-		async function close(res) {
+		async function close(id) {
 			if (client.config.closeTicketCategoryId)
 				interaction.channel
 					.setParent(client.config.closeTicketCategoryId)
 					.catch((e) => console.log(e));
 
+			const messageId = await client.db.get(
+				`tickets_${interaction.channel.id}.messageId`
+			);
+			const msg = interaction.channel.messages.cache.get(messageId);
+			const embed = msg.embeds[0].data;
+			
+			msg.components[0]?.components?.map((x) => {
+				if (x.data.custom_id === "close") x.data.disabled = true;
+				if (x.data.custom_id === "close_askReason") x.data.disabled = true;
+			});
+			
+			msg
+				.edit({
+					content: msg.content,
+					embeds: [embed],
+					components: msg.components,
+				})
+				.catch((e) => console.log(e));
+
+			await client.db.set(`tickets_${interaction.channel.id}.closed`, true);
+
 			interaction.channel
 				.send({
 					content: client.locales.ticketTranscriptCreated.replace(
 						"TRANSCRIPTURL",
-						`<https://transcript.cf/${res.data.id}>`
+						domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
 					),
 				})
 				.catch((e) => console.log(e));
 			await client.db.set(
 				`tickets_${interaction.channel.id}.transcriptURL`,
-				`https://transcript.cf/${res.data.id}`
+				domain === client.locales.other.unavailable ? client.locales.other.unavailable : `${domain}${id}`
 			);
 			const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 
@@ -182,7 +188,7 @@ module.exports = {
 				.setDescription(
 					client.embeds.ticketClosedDM.description
 						.replace("TICKETCOUNT", ticket.id)
-						.replace("TRANSCRIPTURL", `https://transcript.cf/${res.data.id}`)
+						.replace("TRANSCRIPTURL", `${domain}${id}`)
 						.replace("REASON", ticket.closeReason)
 						.replace("CLOSERNAME", interaction.user.tag)
 				)
@@ -238,81 +244,48 @@ module.exports = {
 					})
 					.catch((e) => console.log(e));
 			});
+		};
+
+		if (!client.config.createTranscript) {
+			close("");
+			return;
 		}
 
-		const domain = "https://transcript.cf";
-
-		let attachment = await discordTranscripts.createTranscript(
-			interaction.channel,
-			{
-				returnType: "buffer",
-				fileName: "transcript.html",
-				minify: true,
-				saveImages: true,
-				useCDN: true,
-				poweredBy: false,
-			}
-		);
-
-		if (Buffer.byteLength(attachment) > 18990000) {
-			attachment = await discordTranscripts.createTranscript(
-				interaction.channel,
-				{
-					returnType: "buffer",
-					fileName: "transcript.html",
-					minify: true,
-					saveImages: false,
-					useCDN: true,
-					poweredBy: false,
+		async function fetchAll() {
+			let collArray = new Array();
+			let lastID = interaction.channel.lastMessageID;
+			// eslint-disable-next-line no-constant-condition
+			while (true) {
+				const fetched = await interaction.channel.messages.fetch({ limit: 100, before: lastID });
+				if (fetched.size === 0) {
+					break;
 				}
-			);
+				collArray.push(fetched);
+				lastID = fetched.last().id;
+				if (fetched.size !== 100) {
+					break;
+				}
+			}
+			const messages = collArray[0].concat(...collArray.slice(1));
+			return messages;
+		};
 
-			axios
-				.post(
-					`${domain}/upload`,
-					{ buffer: attachment },
-					{ maxBodyLength: 104857600, maxContentLength: 104857600 }
-				)
-				.then((res) => {
-					close(res);
-				});
-		} else {
-			axios
-				.post(
-					`${domain}/upload`,
-					{ buffer: attachment },
-					{ maxBodyLength: 104857600, maxContentLength: 104857600 }
-				)
-				.then((res) => {
-					close(res);
-				})
-				.catch(async () => {
-					attachment = await discordTranscripts.createTranscript(
-						interaction.channel,
-						{
-							returnType: "buffer",
-							fileName: "transcript.html",
-							minify: true,
-							saveImages: false,
-							useCDN: true,
-							poweredBy: false,
-						}
-					);
+		const messages = await fetchAll();
+		const premiumKey = "";
 
-					axios
-						.post(
-							`${domain}/upload`,
-							{ buffer: attachment },
-							{
-								maxBodyLength: 1024 * 1024 * 1024,
-								maxContentLength: 1024 * 1024 * 1024,
-							}
-						)
-						.then((res) => {
-							close(res);
-						});
-				});
-		}
+		const messagesJSON = await generateMessages(messages, premiumKey, "https://m.ticket.pm");
+		zlib.gzip(JSON.stringify(messagesJSON), async (err, compressed) => {
+			if (err) {
+				console.error(err);
+			} else {
+				const ts = await axios.post(`${domain}upload?key=${premiumKey}`, JSON.stringify(compressed), {
+					headers: {
+						"Content-Type": "application/json"
+					}
+				}).catch(console.error);
+				close(ts.data);
+			};
+		});
 	},
 };
 

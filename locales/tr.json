@@ -63,6 +63,7 @@
     "deleteTicketButtonMSG": "Destek talebini sil",
     "selectTicketTypePlaceholder": "Destek talebi türü seçin",
     "claimedBy": "USER **tarafından alındı**",
-    "noReasonGiven": "Sebep belirtilmedi."
+    "noReasonGiven": "Sebep belirtilmedi.",
+		"unavailable": "Unavailable"
   }
 }

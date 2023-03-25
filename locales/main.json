@@ -63,6 +63,7 @@
     "deleteTicketButtonMSG": "Delete ticket",
     "selectTicketTypePlaceholder": "Select a ticket type",
     "claimedBy": "**Claimed By**: USER",
-    "noReasonGiven": "No reason given"
+    "noReasonGiven": "No reason given",
+		"unavailable": "Unavailable"
   }
 }

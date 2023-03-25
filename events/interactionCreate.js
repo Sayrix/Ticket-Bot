@@ -21,15 +21,33 @@ module.exports = {
 	name: "interactionCreate",
 	once: false,
 	async execute(interaction, client) {
-		async function createTicket(ticketType, reason) {
+		async function createTicket(ticketType, reasons) {
 			await interaction
 				.deferReply({ ephemeral: true })
 				.catch((e) => console.log(e));
 
-			const ticketName = client.config.ticketNameOption
-				.replace("USERNAME", interaction.user.username)
-				.replace("USERID", interaction.user.id)
-				.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0);
+			let reason = [];
+			let allReasons;
+			if ((typeof reasons) === "object") {
+				reasons.forEach(async r => {
+					reason.push(r.value);
+				});
+	
+				allReasons = reason.map((r, i) => `Question ${i+1}: ${r}`).join(", ");
+			};
+			let ticketName = new String();
+
+			if (ticketType.ticketNameOption) {
+				ticketName = ticketType.ticketNameOption
+					.replace("USERNAME", interaction.user.username)
+					.replace("USERID", interaction.user.id)
+					.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0);
+			} else {
+				ticketName = client.config.ticketNameOption
+					.replace("USERNAME", interaction.user.username)
+					.replace("USERID", interaction.user.id)
+					.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0);
+			}
 
 			client.guilds.cache
 				.get(client.config.guildId)
@@ -52,7 +70,7 @@ module.exports = {
 								id: interaction.user.id,
 								avatarURL: interaction.user.displayAvatarURL(),
 							},
-							reason: reason,
+							reason: allReasons,
 							ticketChannelId: channel.id,
 						},
 						client
@@ -63,7 +81,7 @@ module.exports = {
 					await client.db.set(`tickets_${channel.id}`, {
 						id: ticketId - 1,
 						category: ticketType,
-						reason: reason,
+						reason: allReasons,
 						creator: interaction.user.id,
 						invited: [],
 						createdAt: Date.now(),
@@ -112,14 +130,34 @@ module.exports = {
 							)
 						)
 						.setDescription(
-							ticketType.customDescription
-								? ticketType.customDescription
+							ticketType.customDescription ? ticketType.customDescription
+								.replace("CATEGORYNAME", ticketType.name)
+								.replace("USERNAME", interaction.user.username)
+								.replace("USERID", interaction.user.id)
+								.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
+								.replace("REASON1", reason[0])
+								.replace("REASON2", reason[1])
+								.replace("REASON3", reason[2])
+								.replace("REASON4", reason[3])
+								.replace("REASON5", reason[4])
+								.replace("REASON6", reason[5])
+								.replace("REASON7", reason[6])
+								.replace("REASON8", reason[7])
+								.replace("REASON9", reason[8]) :
+								client.embeds.ticketOpened.description
 									.replace("CATEGORYNAME", ticketType.name)
-									.replace("REASON", reason)
-								: client.embeds.ticketOpened.description
-									.replace("CATEGORYNAME", ticketType.name)
-									.replace("REASON", reason)
-						)
+									.replace("USERNAME", interaction.user.username)
+									.replace("USERID", interaction.user.id)
+									.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
+									.replace("REASON1", reason[0])
+									.replace("REASON2", reason[1])
+									.replace("REASON3", reason[2])
+									.replace("REASON4", reason[3])
+									.replace("REASON5", reason[4])
+									.replace("REASON6", reason[5])
+									.replace("REASON7", reason[6])
+									.replace("REASON8", reason[7])
+									.replace("REASON9", reason[8]))
 					/*
 				Copyright 2023 Sayrix (github.com/Sayrix)
 
@@ -361,23 +399,24 @@ module.exports = {
 					return console.error(
 						`Ticket type ${interaction.values[0]} not found!`
 					);
-				if (ticketType.askReason) {
-					const modal = new Discord.ModalBuilder()
+				if (ticketType.askQuestions) {
+					const modal = new client.discord.ModalBuilder()
 						.setCustomId("askReason")
 						.setTitle(client.locales.modals.reasonTicketOpen.title);
 
-					const input = new Discord.TextInputBuilder()
-						.setCustomId("input_" + interaction.values[0])
-						.setLabel(client.locales.modals.reasonTicketOpen.label)
-						.setStyle(Discord.TextInputStyle.Paragraph)
-						.setPlaceholder(client.locales.modals.reasonTicketOpen.placeholder)
-						.setMaxLength(256);
+					ticketType.questions.forEach((x, i) => {
+						const input = new client.discord.TextInputBuilder()
+							.setCustomId(`input_${interaction.values[0]}_${i}`)
+							.setLabel(x.label)
+							.setStyle(x.style == "SHORT" ? client.discord.TextInputStyle.Short : client.discord.TextInputStyle.Paragraph)
+							.setPlaceholder(x.placeholder)
+							.setMaxLength(x.maxLength);
+						
+						const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
+						modal.addComponents(firstActionRow);
+					});
 
-					const firstActionRow = new Discord.ActionRowBuilder().addComponents(
-						input
-					);
-					modal.addComponents(firstActionRow);
-					await interaction.showModal(modal).catch((e) => console.log(e));
+					await interaction.showModal(modal).catch(e => console.log(e));
 				} else {
 					createTicket(ticketType, client.locales.other.noReasonGiven);
 				}
@@ -438,7 +477,7 @@ module.exports = {
 					return console.error(
 						`Ticket type ${interaction.values[0]} not found!`
 					);
-				createTicket(ticketType, interaction.fields.fields.first().value);
+				createTicket(ticketType, interaction.fields.fields);
 			}
 
 			if (interaction.customId === "askReasonClose") {

@@ -63,6 +63,7 @@
     "deleteTicketButtonMSG": "Ticket löschen",
     "selectTicketTypePlaceholder": "Wähle einen Typ",
     "claimedBy": "**Beansprucht von**: USER",
-    "noReasonGiven": "Kein Grund angegeben"
+    "noReasonGiven": "Kein Grund angegeben",
+		"unavailable": "Unavailable"
   }
 }
