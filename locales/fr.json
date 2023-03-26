@@ -20,7 +20,7 @@
     },
     "ticketClosedDM": {
       "title": "Ticket fermé",
-      "description": "Le ticket n°TICKETCOUNT a été fermé par CLOSERNAME avec comme raison: `REASON`\n\nVoice une transcript du ticket: TRANSCRIPTURL",
+      "description": "Le ticket n°TICKETCOUNT a été fermé par CLOSERNAME avec comme raison: `REASON`\n\nVoici une transcript du ticket: TRANSCRIPTURL",
       "footer": {
         "text": "is.gd/ticketbot"
       }
@@ -30,12 +30,12 @@
     "reasonTicketOpen": {
       "title": "Ouvrir un ticket",
       "label": "La raison de votre ticket",
-      "placeholder": "Veuillez entrer la raison de votre ticket"
+      "placeholder": "Veuillez entrer la raison de votre ticket."
     },
     "reasonTicketClose": {
       "title": "Fermer un ticket",
       "label": "La raison de la fermeture du ticket",
-      "placeholder": "Veuillez entrer la raison de pourquoi vous fermez le ticket"
+      "placeholder": "Veuillez entrer la raison de pourquoi vous fermez le ticket."
     }
   },
   "buttons": {
@@ -49,14 +49,14 @@
     }
   },
   "ticketOpenedMessage": "Ticket ouvert! TICKETCHANNEL",
-  "ticketOnlyClaimableByStaff": "Seul les staffs peuvent claim un ticket!",
+  "ticketOnlyClaimableByStaff": "Seuls les staffs peuvent claim un ticket !",
   "ticketAlreadyClaimed": "Le ticket est déjà claim!",
   "ticketClaimedMessage": "> Ticket claim par USER",
-  "ticketOnlyClosableByStaff": "Seul les staff peuvent fermer le ticket!",
-  "ticketAlreadyClosed": "Ticket déjà fermé!",
+  "ticketOnlyClosableByStaff": "Seuls les staffs peuvent fermer le ticket !",
+  "ticketAlreadyClosed": "Ticket déjà fermé !",
   "ticketCreatingTranscript": "> Création du transcript...",
-  "ticketTranscriptCreated": "> Transcript créée! TRANSCRIPTURL",
-  "ticketLimitReached": "Vous pouvez seulement avoir TICKETLIMIT ticket ouvert!",
+  "ticketTranscriptCreated": "> Transcript créée ! TRANSCRIPTURL",
+  "ticketLimitReached": "Vous pouvez seulement avoir TICKETLIMIT ticket ouvert !",
 
   "other": {
     "openTicketButtonMSG": "Ouvrir un ticket",
