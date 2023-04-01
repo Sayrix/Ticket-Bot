@@ -47,7 +47,7 @@ module.exports = {
 			const embedMessageId = await client.db.get("temp.openTicketMessageId");
 			await client.channels
 				.fetch(client.config.openTicketChannelId)
-				.catch((e) => {
+				.catch(() => {
 					console.error("The channel to open tickets is not found!");
 					process.exit(0);
 				});
@@ -171,21 +171,21 @@ module.exports = {
 				
 			client.on("connectFailed", (e) => {
 				setTimeout(connect, 10000);
-				// console.log(`❌  WebSocket Error: ${e.toString()}`);
+				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 		
 			client.on("connect", (connection) => {
 				connection.on("error", (e) => {
 					setTimeout(connect, 10000);
-					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 		
 				connection.on("close", (e) => {
 					setTimeout(connect, 10000);
-					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 		
-				// console.log("✅  Connected to WebSocket server.");
+				console.log("✅  Connected to WebSocket server.");
 		
 				setInterval(() => {
 					connection.sendUTF("heartbeat");
