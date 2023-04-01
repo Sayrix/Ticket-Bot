@@ -74,7 +74,10 @@ if (client.config.mysql?.enabled) {
 
 		await mysql.connect();
 
-		db = new QuickDB({ driver: mysql });
+		db = new QuickDB({ 
+			driver: mysql,
+			table: client.config.mysql?.table ?? "json"
+		});
 		client.db = db;
 	})();
 } else {
