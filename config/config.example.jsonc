@@ -9,7 +9,8 @@
 		"host": "mysql.example.com", // The host of the MySQL database
 		"user": "mysql", // The user of the MySQL database
 		"password": "password", // The password of the MySQL database
-		"database": "ticketbot" // The name of the MySQL database
+		"database": "ticketbot", // The name of the MySQL database
+		"table": "json", // The name of the table where the tickets will be saved
 	},
 
 	"closeTicketCategoryId": "", // The id of the category where a closed ticket will be moved to. Leave blank to disable this feature
