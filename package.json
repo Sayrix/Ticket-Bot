@@ -1,6 +1,6 @@
 {
   "name": "ticket-bot",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Bot with a ticket system using Discord.js v14",
   "main": "index.js",
   "scripts": {
