@@ -20,6 +20,10 @@ limitations under the License.
 module.exports = {
 	name: "interactionCreate",
 	once: false,
+	/**
+	 * @param {Discord.Interaction} interaction
+	 * @param {Discord.Client} client
+	 */
 	async execute(interaction, client) {
 		async function createTicket(ticketType, reasons) {
 			await interaction
@@ -314,22 +318,38 @@ module.exports = {
 
 				// Make a select menus of all tickets types
 
+				let options = [];
+
+				for (let x of client.config.ticketTypes) {
+					// x.cantAccess is an array of roles id
+					// If the user has one of the roles, he can't access to this ticket type
+
+					const a = {
+						label: x.name,
+						value: x.codeName,
+					};
+					if (x.description) a.description = x.description;
+					if (x.emoji) a.emoji = x.emoji;
+					options.push(a);
+				};
+
+				for (let x of options) {
+					let option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
+					if (option.cantAccess) {
+						for (let role of option.cantAccess) {
+							if (role && interaction.member.roles.cache.has(role)) {
+								options = options.filter((y) => y.value !== x.value);
+							};
+						};
+					};
+				};
+
 				const row = new Discord.ActionRowBuilder().addComponents(
 					new Discord.StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
 						.setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
 						.setMaxValues(1)
-						.addOptions(
-							client.config.ticketTypes.map((x) => {
-								const a = {
-									label: x.name,
-									value: x.codeName,
-								};
-								if (x.description) a.description = x.description;
-								if (x.emoji) a.emoji = x.emoji;
-								return a;
-							})
-						)
+						.addOptions(options)
 				);
 
 				interaction
