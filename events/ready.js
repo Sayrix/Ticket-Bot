@@ -1,3 +1,4 @@
+/* eslint-disable no-process-exit */
 /* eslint-disable no-unused-vars */
 const readline = require("readline");
 const axios = require("axios");
@@ -26,7 +27,7 @@ module.exports = {
 	async execute(client) {
 		if (!client.config.guildId) {
 			console.log("⚠️⚠️⚠️ Please add the guild id in the config.jsonc file. ⚠️⚠️⚠️");
-			throw 0;
+			process.exit(0);
 		}
 
 		await client.guilds.fetch(client.config.guildId);
@@ -39,27 +40,28 @@ module.exports = {
 			console.log(
 				"\n⚠️⚠️⚠️ I don't have the Administrator permission, to prevent any issues please add the Administrator permission to me. ⚠️⚠️⚠️"
 			);
-			throw 0;
-		}
+			process.exit(0);
+		};
 
 		async function sendEmbedToOpen() {
 			const embedMessageId = await client.db.get("temp.openTicketMessageId");
 			await client.channels
 				.fetch(client.config.openTicketChannelId)
-				.catch((e) =>
-					console.error("The channel to open tickets is not found!\n", e)
-				);
+				.catch(() => {
+					console.error("The channel to open tickets is not found!");
+					process.exit(0);
+				});
 			const openTicketChannel = await client.channels.cache.get(
 				client.config.openTicketChannelId
 			);
 			if (!openTicketChannel) {
 				console.error("The channel to open tickets is not found!");
-				throw 0;
+				process.exit(0);
 			}
 
 			if (!openTicketChannel.isTextBased()) {
 				console.error("The channel to open tickets is not a channel!");
-				throw 0;
+				process.exit(0);
 			}
 
 			let embed = client.embeds.openTicket;
@@ -169,21 +171,21 @@ module.exports = {
 				
 			client.on("connectFailed", (e) => {
 				setTimeout(connect, 10000);
-				// console.log(`❌  WebSocket Error: ${e.toString()}`);
+				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 		
 			client.on("connect", (connection) => {
 				connection.on("error", (e) => {
 					setTimeout(connect, 10000);
-					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 		
 				connection.on("close", (e) => {
 					setTimeout(connect, 10000);
-					// console.log(`❌  WebSocket Error: ${e.toString()}`);
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 		
-				// console.log("✅  Connected to WebSocket server.");
+				console.log("✅  Connected to WebSocket server.");
 		
 				setInterval(() => {
 					connection.sendUTF("heartbeat");
