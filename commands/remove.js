@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	ActionRowBuilder,
-	StringSelectMenuBuilder,
-} = require("discord.js");
+const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -21,27 +17,17 @@ limitations under the License.
 */
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName("remove")
-		.setDescription("Remove someone from the ticket"),
+	data: new SlashCommandBuilder().setName("remove").setDescription("Remove someone from the ticket"),
 	async execute(interaction, client) {
 		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-		if (!ticket)
-			return interaction
-				.reply({ content: "Ticket not found", ephemeral: true })
-				.catch((e) => console.log(e));
-		if (ticket.invited.length < 1)
-			return interaction
-				.reply({ content: "There are no users to remove", ephemeral: true })
-				.catch((e) => console.log(e));
+		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+		if (ticket.invited.length < 1) return interaction.reply({ content: "There are no users to remove", ephemeral: true }).catch((e) => console.log(e));
 
 		for (let i = 0; i < ticket.invited.length; i++) {
 			await client.users.fetch(ticket.invited[i]);
 		}
 
-		const addedUsers = ticket.invited.map((user) =>
-			client.users.cache.get(user)
-		);
+		const addedUsers = ticket.invited.map((user) => client.users.cache.get(user));
 
 		const row = new ActionRowBuilder().addComponents(
 			new StringSelectMenuBuilder()

@@ -39,19 +39,12 @@ Connecting to Discord...
 `);
 
 const client = new Client({
-	intents: [
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildMembers,
-	],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers]
 });
 
 // All variables stored in the client object
 client.discord = require("discord.js");
-client.config = jsonc.parse(
-	fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8")
-);
+client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
 
 let db = null;
 
@@ -59,7 +52,7 @@ if (client.config.mysql?.enabled) {
 	(async () => {
 		try {
 			require.resolve("mysql2");
-		} catch(e) {
+		} catch (e) {
 			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
 			throw e.code;
 		}
@@ -74,7 +67,7 @@ if (client.config.mysql?.enabled) {
 
 		await mysql.connect();
 
-		db = new QuickDB({ 
+		db = new QuickDB({
 			driver: mysql,
 			table: client.config.mysql?.table ?? "json"
 		});
@@ -83,7 +76,7 @@ if (client.config.mysql?.enabled) {
 } else {
 	db = new QuickDB();
 	client.db = db;
-};
+}
 
 client.locales = require(`./locales/${client.config.lang}.json`);
 client.embeds = client.locales.embeds;
@@ -107,9 +100,7 @@ client.msToHm = function dhm(ms) {
 // Command handler
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs
-	.readdirSync(commandsPath)
-	.filter((file) => file.endsWith(".js"));
+const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
@@ -129,16 +120,14 @@ client.on("interactionCreate", async (interaction) => {
 		console.error(error);
 		await interaction.reply({
 			content: "There was an error while executing this command!",
-			ephemeral: true,
+			ephemeral: true
 		});
 	}
 });
 
 // Event handler
 const eventsPath = path.join(__dirname, "events");
-const eventFiles = fs
-	.readdirSync(eventsPath)
-	.filter((file) => file.endsWith(".js"));
+const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);

@@ -22,11 +22,8 @@ module.exports = {
 		if (!client.config.logsChannelId) return;
 		const channel = await client.channels
 			.fetch(client.config.logsChannelId)
-			.catch((e) =>
-				console.error("The channel to log events is not found!\n", e)
-			);
-		if (!channel)
-			return console.error("The channel to log events is not found!");
+			.catch((e) => console.error("The channel to log events is not found!\n", e));
+		if (!channel) return console.error("The channel to log events is not found!");
 
 		let webhooks = await channel.fetchWebhooks();
 		if (webhooks.size === 0) {
@@ -39,9 +36,7 @@ module.exports = {
 			const embed = new Discord.EmbedBuilder()
 				.setColor("3ba55c")
 				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
-				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Created a ticket (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\``
-				);
+				.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Created a ticket (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\``);
 
 			webhook
 				.send({
@@ -57,9 +52,7 @@ module.exports = {
 				.setColor("faa61a")
 				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${
-						logs.ticketId
-					} (<#${logs.ticketChannelId}>) after ${client.msToHm(
+					`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) after ${client.msToHm(
 						new Date(Date.now() - logs.ticketCreatedAt)
 					)} of creation`
 				);
@@ -78,13 +71,9 @@ module.exports = {
 				.setColor("ed4245")
 				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${
-						logs.ticketId
-					} (<#${logs.ticketChannelId}>) with the reason: \`${
+					`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) with the reason: \`${
 						logs.reason
-					}\` after ${client.msToHm(
-						new Date(Date.now() - logs.ticketCreatedAt)
-					)} of creation`
+					}\` after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`
 				);
 
 			webhook
@@ -101,9 +90,7 @@ module.exports = {
 				.setColor("ed4245")
 				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
 				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${
-						logs.ticketId
-					} after ${client.msToHm(
+					`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${logs.ticketId} after ${client.msToHm(
 						new Date(Date.now() - logs.ticketCreatedAt)
 					)} of creation\n\nTranscript: ${logs.transcriptURL}`
 				);

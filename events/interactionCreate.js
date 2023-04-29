@@ -26,19 +26,17 @@ module.exports = {
 	 */
 	async execute(interaction, client) {
 		async function createTicket(ticketType, reasons) {
-			await interaction
-				.deferReply({ ephemeral: true })
-				.catch((e) => console.log(e));
+			await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
 			let reason = [];
 			let allReasons;
-			if ((typeof reasons) === "object") {
-				reasons.forEach(async r => {
+			if (typeof reasons === "object") {
+				reasons.forEach(async (r) => {
 					reason.push(r.value);
 				});
-	
-				allReasons = reason.map((r, i) => `Question ${i+1}: ${r}`).join(", ");
-			};
+
+				allReasons = reason.map((r, i) => `Question ${i + 1}: ${r}`).join(", ");
+			}
 			let ticketName = new String();
 
 			if (ticketType.ticketNameOption) {
@@ -61,9 +59,9 @@ module.exports = {
 					permissionOverwrites: [
 						{
 							id: interaction.guild.roles.everyone,
-							deny: [PermissionFlagsBits.ViewChannel],
-						},
-					],
+							deny: [PermissionFlagsBits.ViewChannel]
+						}
+					]
 				})
 				.then(async (channel) => {
 					client.log(
@@ -72,10 +70,10 @@ module.exports = {
 							user: {
 								tag: interaction.user.tag,
 								id: interaction.user.id,
-								avatarURL: interaction.user.displayAvatarURL(),
+								avatarURL: interaction.user.displayAvatarURL()
 							},
 							reason: allReasons,
-							ticketChannelId: channel.id,
+							ticketChannelId: channel.id
 						},
 						client
 					);
@@ -94,7 +92,7 @@ module.exports = {
 						claimedAt: null,
 						closed: false,
 						closedBy: null,
-						closedAt: null,
+						closedAt: null
 					});
 
 					channel.permissionOverwrites
@@ -103,52 +101,30 @@ module.exports = {
 							AddReactions: true,
 							ReadMessageHistory: true,
 							AttachFiles: true,
-							ViewChannel: true,
+							ViewChannel: true
 						})
 						.catch((e) => console.log(e));
 
 					if (client.config.rolesWhoHaveAccessToTheTickets.length > 0) {
-						client.config.rolesWhoHaveAccessToTheTickets.forEach(
-							async (role) => {
-								channel.permissionOverwrites
-									.edit(role, {
-										SendMessages: true,
-										AddReactions: true,
-										ReadMessageHistory: true,
-										AttachFiles: true,
-										ViewChannel: true,
-									})
-									.catch((e) => console.log(e));
-							}
-						);
+						client.config.rolesWhoHaveAccessToTheTickets.forEach(async (role) => {
+							channel.permissionOverwrites
+								.edit(role, {
+									SendMessages: true,
+									AddReactions: true,
+									ReadMessageHistory: true,
+									AttachFiles: true,
+									ViewChannel: true
+								})
+								.catch((e) => console.log(e));
+						});
 					}
 
 					const ticketOpenedEmbed = new Discord.EmbedBuilder()
-						.setColor(
-							ticketType.color ? ticketType.color : client.config.mainColor
-						)
-						.setTitle(
-							client.embeds.ticketOpened.title.replace(
-								"CATEGORYNAME",
-								ticketType.name
-							)
-						)
+						.setColor(ticketType.color ? ticketType.color : client.config.mainColor)
+						.setTitle(client.embeds.ticketOpened.title.replace("CATEGORYNAME", ticketType.name))
 						.setDescription(
-							ticketType.customDescription ? ticketType.customDescription
-								.replace("CATEGORYNAME", ticketType.name)
-								.replace("USERNAME", interaction.user.username)
-								.replace("USERID", interaction.user.id)
-								.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
-								.replace("REASON1", reason[0])
-								.replace("REASON2", reason[1])
-								.replace("REASON3", reason[2])
-								.replace("REASON4", reason[3])
-								.replace("REASON5", reason[4])
-								.replace("REASON6", reason[5])
-								.replace("REASON7", reason[6])
-								.replace("REASON8", reason[7])
-								.replace("REASON9", reason[8]) :
-								client.embeds.ticketOpened.description
+							ticketType.customDescription
+								? ticketType.customDescription
 									.replace("CATEGORYNAME", ticketType.name)
 									.replace("USERNAME", interaction.user.username)
 									.replace("USERID", interaction.user.id)
@@ -161,8 +137,23 @@ module.exports = {
 									.replace("REASON6", reason[5])
 									.replace("REASON7", reason[6])
 									.replace("REASON8", reason[7])
-									.replace("REASON9", reason[8]))
-					/*
+									.replace("REASON9", reason[8])
+								: client.embeds.ticketOpened.description
+									.replace("CATEGORYNAME", ticketType.name)
+									.replace("USERNAME", interaction.user.username)
+									.replace("USERID", interaction.user.id)
+									.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || 0)
+									.replace("REASON1", reason[0])
+									.replace("REASON2", reason[1])
+									.replace("REASON3", reason[2])
+									.replace("REASON4", reason[3])
+									.replace("REASON5", reason[4])
+									.replace("REASON6", reason[5])
+									.replace("REASON7", reason[6])
+									.replace("REASON8", reason[7])
+									.replace("REASON9", reason[8])
+						)
+						/*
 				Copyright 2023 Sayrix (github.com/Sayrix)
 
 				Licensed under the Apache License, Version 2.0 (the "License");
@@ -179,14 +170,9 @@ module.exports = {
 				*/
 						.setFooter({
 							// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-							text:
-                "is.gd/ticketbot" +
-                client.embeds.ticketOpened.footer.text.replace(
-                	"is.gd/ticketbot",
-                	""
-                ), // Please respect the LICENSE :D
+							text: "is.gd/ticketbot" + client.embeds.ticketOpened.footer.text.replace("is.gd/ticketbot", ""), // Please respect the LICENSE :D
 							// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-							iconUrl: client.embeds.ticketOpened.footer.iconUrl,
+							iconUrl: client.embeds.ticketOpened.footer.iconUrl
 						});
 					/*
 				Copyright 2023 Sayrix (github.com/Sayrix)
@@ -238,12 +224,8 @@ module.exports = {
 					const body = {
 						embeds: [ticketOpenedEmbed],
 						content: `<@${interaction.user.id}> ${
-							client.config.pingRoleWhenOpened
-								? client.config.roleToPingWhenOpenedId
-									.map((x) => `<@&${x}>`)
-									.join(", ")
-								: ""
-						}`,
+							client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
+						}`
 					};
 
 					if (row.components.length > 0) body.components = [row];
@@ -257,12 +239,9 @@ module.exports = {
 							});
 							interaction
 								.editReply({
-									content: client.locales.ticketOpenedMessage.replace(
-										"TICKETCHANNEL",
-										`<#${channel.id}>`
-									),
+									content: client.locales.ticketOpenedMessage.replace("TICKETCHANNEL", `<#${channel.id}>`),
 									components: [],
-									ephemeral: true,
+									ephemeral: true
 								})
 								.catch((e) => console.log(e));
 						})
@@ -272,9 +251,7 @@ module.exports = {
 
 		if (interaction.isButton()) {
 			if (interaction.customId === "openTicket") {
-				await interaction
-					.deferReply({ ephemeral: true })
-					.catch((e) => console.log(e));
+				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
 				// Max ticket opened
 
@@ -282,35 +259,22 @@ module.exports = {
 					if (role && interaction.member.roles.cache.has(role)) {
 						return interaction
 							.editReply({
-								content:
-                  "You can't create a ticket because you are blacklisted",
-								ephemeral: true,
+								content: "You can't create a ticket because you are blacklisted",
+								ephemeral: true
 							})
 							.catch((e) => console.log(e));
 					}
 				}
 
-				const all = (await client.db.all()).filter((data) =>
-					data.id.startsWith("tickets_")
-				);
-				const ticketsOpened = all.filter(
-					(data) =>
-						data.value.creator === interaction.user.id &&
-            data.value.closed === false
-				).length;
+				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
+				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (
-						ticketsOpened > client.config.maxTicketOpened ||
-            ticketsOpened === client.config.maxTicketOpened
-					) {
+					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
 						return interaction
 							.editReply({
-								content: client.locales.ticketLimitReached.replace(
-									"TICKETLIMIT",
-									client.config.maxTicketOpened
-								),
-								ephemeral: true,
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+								ephemeral: true
 							})
 							.catch((e) => console.log(e));
 					}
@@ -326,12 +290,12 @@ module.exports = {
 
 					const a = {
 						label: x.name,
-						value: x.codeName,
+						value: x.codeName
 					};
 					if (x.description) a.description = x.description;
 					if (x.emoji) a.emoji = x.emoji;
 					options.push(a);
-				};
+				}
 
 				for (let x of options) {
 					let option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
@@ -339,10 +303,10 @@ module.exports = {
 						for (let role of option.cantAccess) {
 							if (role && interaction.member.roles.cache.has(role)) {
 								options = options.filter((y) => y.value !== x.value);
-							};
-						};
-					};
-				};
+							}
+						}
+					}
+				}
 
 				const row = new Discord.ActionRowBuilder().addComponents(
 					new Discord.StringSelectMenuBuilder()
@@ -355,7 +319,7 @@ module.exports = {
 				interaction
 					.editReply({
 						ephemeral: true,
-						components: [row],
+						components: [row]
 					})
 					.catch((e) => console.log(e));
 			}
@@ -366,9 +330,7 @@ module.exports = {
 			}
 
 			if (interaction.customId === "close") {
-				await interaction
-					.deferReply({ ephemeral: true })
-					.catch((e) => console.log(e));
+				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 				const { close } = require("../utils/close.js");
 				close(interaction, client, client.locales.other.noReasonGiven);
 			}
@@ -386,43 +348,24 @@ module.exports = {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
-				const all = (await client.db.all()).filter((data) =>
-					data.id.startsWith("tickets_")
-				);
-				const ticketsOpened = all.filter(
-					(data) =>
-						data.value.creator === interaction.user.id &&
-            data.value.closed === false
-				).length;
+				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
+				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (
-						ticketsOpened > client.config.maxTicketOpened ||
-            ticketsOpened === client.config.maxTicketOpened
-					) {
+					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
 						return interaction
 							.reply({
-								content: client.locales.ticketLimitReached.replace(
-									"TICKETLIMIT",
-									client.config.maxTicketOpened
-								),
-								ephemeral: true,
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+								ephemeral: true
 							})
 							.catch((e) => console.log(e));
 					}
 				}
 
-				const ticketType = client.config.ticketTypes.find(
-					(x) => x.codeName === interaction.values[0]
-				);
-				if (!ticketType)
-					return console.error(
-						`Ticket type ${interaction.values[0]} not found!`
-					);
+				const ticketType = client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
+				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askQuestions) {
-					const modal = new client.discord.ModalBuilder()
-						.setCustomId("askReason")
-						.setTitle(client.locales.modals.reasonTicketOpen.title);
+					const modal = new client.discord.ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
 
 					ticketType.questions.forEach((x, i) => {
 						const input = new client.discord.TextInputBuilder()
@@ -431,30 +374,23 @@ module.exports = {
 							.setStyle(x.style == "SHORT" ? client.discord.TextInputStyle.Short : client.discord.TextInputStyle.Paragraph)
 							.setPlaceholder(x.placeholder)
 							.setMaxLength(x.maxLength);
-						
+
 						const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
 						modal.addComponents(firstActionRow);
 					});
 
-					await interaction.showModal(modal).catch(e => console.log(e));
+					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {
 					createTicket(ticketType, client.locales.other.noReasonGiven);
 				}
 			}
 
 			if (interaction.customId === "removeUser") {
-				const ticket = await client.db.get(
-					`tickets_${interaction.message.channelId}`
-				);
-				client.db.pull(
-					`tickets_${interaction.message.channel.id}.invited`,
-					interaction.values
-				);
+				const ticket = await client.db.get(`tickets_${interaction.message.channelId}`);
+				client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
 
 				interaction.values.forEach((value) => {
-					interaction.channel.permissionOverwrites
-						.delete(value)
-						.catch((e) => console.log(e));
+					interaction.channel.permissionOverwrites.delete(value).catch((e) => console.log(e));
 
 					client.log(
 						"userRemoved",
@@ -462,13 +398,13 @@ module.exports = {
 							user: {
 								tag: interaction.user.tag,
 								id: interaction.user.id,
-								avatarURL: interaction.user.displayAvatarURL(),
+								avatarURL: interaction.user.displayAvatarURL()
 							},
 							ticketId: ticket.id,
 							ticketChannelId: interaction.channel.id,
 							removed: {
-								id: value,
-							},
+								id: value
+							}
 						},
 						client
 					);
@@ -477,11 +413,9 @@ module.exports = {
 				interaction
 					.update({
 						content: `> Removed ${
-							interaction.values.length < 1
-								? interaction.values
-								: interaction.values.map((a) => `<@${a}>`).join(", ")
+							interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
 						} from the ticket`,
-						components: [],
+						components: []
 					})
 					.catch((e) => console.log(e));
 			}
@@ -490,13 +424,8 @@ module.exports = {
 		if (interaction.isModalSubmit()) {
 			if (interaction.customId === "askReason") {
 				const type = interaction.fields.fields.first().customId.split("_")[1];
-				const ticketType = client.config.ticketTypes.find(
-					(x) => x.codeName === type
-				);
-				if (!ticketType)
-					return console.error(
-						`Ticket type ${interaction.values[0]} not found!`
-					);
+				const ticketType = client.config.ticketTypes.find((x) => x.codeName === type);
+				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				createTicket(ticketType, interaction.fields.fields);
 			}
 
@@ -506,7 +435,7 @@ module.exports = {
 				close(interaction, client, interaction.fields.fields.first().value);
 			}
 		}
-	},
+	}
 };
 
 /*

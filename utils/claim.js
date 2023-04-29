@@ -23,9 +23,7 @@ module.exports = {
 				ephemeral: true,
 			});
 
-		const canClaim = interaction.member.roles.cache.some((r) =>
-			client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)
-		);
+		const canClaim = interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
 
 		if (!canClaim)
 			return interaction
@@ -67,28 +65,15 @@ module.exports = {
 		);
 
 		await client.db.set(`tickets_${interaction.channel.id}.claimed`, true);
-		await client.db.set(
-			`tickets_${interaction.channel.id}.claimedBy`,
-			interaction.user.id
-		);
-		await client.db.set(
-			`tickets_${interaction.channel.id}.claimedAt`,
-			Date.now()
-		);
+		await client.db.set(`tickets_${interaction.channel.id}.claimedBy`, interaction.user.id);
+		await client.db.set(`tickets_${interaction.channel.id}.claimedAt`, Date.now());
 
 		await interaction.channel.messages.fetch();
-		const messageId = await client.db.get(
-			`tickets_${interaction.channel.id}.messageId`
-		);
+		const messageId = await client.db.get(`tickets_${interaction.channel.id}.messageId`);
 		const msg = interaction.channel.messages.cache.get(messageId);
 
 		const embed = msg.embeds[0].data;
-		embed.description =
-      embed.description +
-      `\n\n ${client.locales.other.claimedBy.replace(
-      	"USER",
-      	`<@${interaction.user.id}>`
-      )}`;
+		embed.description = embed.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`;
 
 		msg.components[0].components.map((x) => {
 			if (x.data.custom_id === "claim") x.data.disabled = true;
@@ -104,10 +89,7 @@ module.exports = {
 
 		interaction
 			.reply({
-				content: client.locales.ticketClaimedMessage.replace(
-					"USER",
-					`<@${interaction.user.id}>`
-				),
+				content: client.locales.ticketClaimedMessage.replace("USER", `<@${interaction.user.id}>`),
 				ephemeral: false,
 			})
 			.catch((e) => console.log(e));
