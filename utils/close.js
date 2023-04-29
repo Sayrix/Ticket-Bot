@@ -160,7 +160,7 @@ module.exports = {
 						.replace("CLOSERNAME", interaction.user.tag)
 				)
 
-				/*
+			/*
 			Copyright 2023 Sayrix (github.com/Sayrix)
 						
 			Licensed under the Apache License, Version 2.0 (the "License");

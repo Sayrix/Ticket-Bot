@@ -39,7 +39,7 @@ Connecting to Discord...
 `);
 
 const client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers]
 });
 
 // All variables stored in the client object
@@ -53,7 +53,7 @@ if (client.config.mysql?.enabled) {
 		try {
 			require.resolve("mysql2");
 		} catch (e) {
-			console.error('mysql2 is not installed!\n\nPlease run "npm i mysql2" in the console!');
+			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
 			throw e.code;
 		}
 
@@ -62,14 +62,14 @@ if (client.config.mysql?.enabled) {
 			user: client.config.mysql?.user,
 			password: client.config.mysql?.password,
 			database: client.config.mysql?.database,
-			charset: "utf8mb4",
+			charset: "utf8mb4"
 		});
 
 		await mysql.connect();
 
 		db = new QuickDB({
 			driver: mysql,
-			table: client.config.mysql?.table ?? "json",
+			table: client.config.mysql?.table ?? "json"
 		});
 		client.db = db;
 	})();
@@ -120,7 +120,7 @@ client.on("interactionCreate", async (interaction) => {
 		console.error(error);
 		await interaction.reply({
 			content: "There was an error while executing this command!",
-			ephemeral: true,
+			ephemeral: true
 		});
 	}
 });
