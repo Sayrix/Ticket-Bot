@@ -24,6 +24,9 @@ limitations under the License.
 module.exports = {
 	name: "ready",
 	once: true,
+	/*
+	 * @param {Discord.Client} client
+	 */
 	async execute(client) {
 		if (!client.config.guildId) {
 			console.log("⚠️⚠️⚠️ Please add the guild id in the config.jsonc file. ⚠️⚠️⚠️");
@@ -139,33 +142,75 @@ module.exports = {
 			process.stdout.write(`\x1b[0m💖  Thanks to our sponsors: ${sponsorsList}\n`);
 		}
 
-		async function connect() {
-			let client = new WebSocketClient();
+		let connected;
 
-			client.on("connectFailed", (e) => {
+		function telemetry(connection) {
+			connection.sendUTF(
+				JSON.stringify({
+					type: "telemetry",
+					data: {
+						stats: {
+							guilds: client?.guilds?.cache?.size,
+							users: client?.users?.cache?.size
+						},
+						infos: {
+							ticketbotVersion: require("../package.json").version,
+							nodeVersion: process.version,
+							os: require("os").platform(),
+							osVersion1: require("os").release(),
+							osVersion2: require("os").version(),
+							uptime: process.uptime(),
+							ram: {
+								total: require("os").totalmem(),
+								free: require("os").freemem()
+							},
+							cpu: {
+								model: require("os").cpus()[0].model,
+								cores: require("os").cpus().length,
+								arch: require("os").arch()
+							}
+						},
+						clientName: client?.user?.tag,
+						clientId: client?.user?.id,
+						guildId: client?.config?.guildId
+					}
+				})
+			);
+		}
+
+		async function connect() {
+			if (connected) return;
+			let ws = new WebSocketClient();
+
+			ws.on("connectFailed", (e) => {
+				connected = false;
 				setTimeout(connect, Math.random() * 1e4);
 				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
-			client.on("connect", (connection) => {
+			ws.on("connect", (connection) => {
 				connection.on("error", (e) => {
+					connected = false;
 					setTimeout(connect, Math.random() * 1e4);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 
 				connection.on("close", (e) => {
+					connected = false;
 					setTimeout(connect, Math.random() * 1e4);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 
+				connected = true;
 				console.log("✅  Connected to WebSocket server.");
+				telemetry(connection);
 
 				setInterval(() => {
-					connection.sendUTF("heartbeat");
+					telemetry(connection);
 				}, 120_000);
 			});
 
-			client.connect("wss://ws.ticket.pm/", "echo-protocol");
+			ws.connect("wss://ws.ticket.pm/", "echo-protocol");
 		}
 
 		connect();
