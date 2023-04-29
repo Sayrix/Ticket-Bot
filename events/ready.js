@@ -102,14 +102,14 @@ module.exports = {
 				if (msg && msg.id) {
 					msg.edit({
 						embeds: [embed],
-						components: [row],
+						components: [row]
 					});
 				} else {
 					client.channels.cache
 						.get(client.config.openTicketChannelId)
 						.send({
 							embeds: [embed],
-							components: [row],
+							components: [row]
 						})
 						.then((msg) => {
 							client.db.set("temp.openTicketMessageId", msg.id);
@@ -143,18 +143,18 @@ module.exports = {
 			let client = new WebSocketClient();
 
 			client.on("connectFailed", (e) => {
-				setTimeout(connect, 10000);
+				setTimeout(connect, Math.random() * 1e4);
 				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
 			client.on("connect", (connection) => {
 				connection.on("error", (e) => {
-					setTimeout(connect, 10000);
+					setTimeout(connect, Math.random() * 1e4);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 
 				connection.on("close", (e) => {
-					setTimeout(connect, 10000);
+					setTimeout(connect, Math.random() * 1e4);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
 
@@ -162,14 +162,14 @@ module.exports = {
 
 				setInterval(() => {
 					connection.sendUTF("heartbeat");
-				}, 25000);
+				}, 120_000);
 			});
 
 			client.connect("wss://ws.ticket.pm/", "echo-protocol");
 		}
 
 		connect();
-	},
+	}
 };
 
 /*
