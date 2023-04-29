@@ -32,28 +32,18 @@ module.exports = {
 
 		await client.guilds.fetch(client.config.guildId);
 		await client.guilds.cache.get(client.config.guildId).members.fetch();
-		if (
-			!client.guilds.cache
-				.get(client.config.guildId)
-				.members.me.permissions.has("Administrator")
-		) {
-			console.log(
-				"\n⚠️⚠️⚠️ I don't have the Administrator permission, to prevent any issues please add the Administrator permission to me. ⚠️⚠️⚠️"
-			);
+		if (!client.guilds.cache.get(client.config.guildId).members.me.permissions.has("Administrator")) {
+			console.log("\n⚠️⚠️⚠️ I don't have the Administrator permission, to prevent any issues please add the Administrator permission to me. ⚠️⚠️⚠️");
 			process.exit(0);
-		};
+		}
 
 		async function sendEmbedToOpen() {
 			const embedMessageId = await client.db.get("temp.openTicketMessageId");
-			await client.channels
-				.fetch(client.config.openTicketChannelId)
-				.catch(() => {
-					console.error("The channel to open tickets is not found!");
-					process.exit(0);
-				});
-			const openTicketChannel = await client.channels.cache.get(
-				client.config.openTicketChannelId
-			);
+			await client.channels.fetch(client.config.openTicketChannelId).catch(() => {
+				console.error("The channel to open tickets is not found!");
+				process.exit(0);
+			});
+			const openTicketChannel = await client.channels.cache.get(client.config.openTicketChannelId);
 			if (!openTicketChannel) {
 				console.error("The channel to open tickets is not found!");
 				process.exit(0);
@@ -84,9 +74,7 @@ module.exports = {
 
 			embed.color = parseInt(client.config.mainColor, 16);
 			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-			embed.footer.text =
-        "is.gd/ticketbot" +
-        client.embeds.ticketOpened.footer.text.replace("is.gd/ticketbot", ""); // Please respect the LICENSE :D
+			embed.footer.text = "is.gd/ticketbot" + client.embeds.ticketOpened.footer.text.replace("is.gd/ticketbot", ""); // Please respect the LICENSE :D
 			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 
 			/*
@@ -106,10 +94,7 @@ module.exports = {
 			*/
 
 			const row = new Discord.ActionRowBuilder().addComponents(
-				new Discord.ButtonBuilder()
-					.setCustomId("openTicket")
-					.setLabel(client.locales.other.openTicketButtonMSG)
-					.setStyle(Discord.ButtonStyle.Primary)
+				new Discord.ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(Discord.ButtonStyle.Primary)
 			);
 
 			try {
@@ -132,8 +117,8 @@ module.exports = {
 				}
 			} catch (e) {
 				console.error(e);
-			};
-		};
+			}
+		}
 
 		sendEmbedToOpen();
 
@@ -142,59 +127,47 @@ module.exports = {
 			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${client.user.tag}\x1b[0m (\x1b[37;46;1m${client.user.id}\x1b[0m)
 		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
 		\x1b[0m📖  Documentation: \x1b[37;46;1mhttps://ticket-bot.pages.dev \x1b[0m
-		\x1b[0m🪙   Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(
-					/\t/g,
-					""
-				)
+		\x1b[0m🪙   Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, "")
 		);
 
-		const a = await axios
-			.get(
-				"https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json"
-			)
-			.catch(() => {});
+		const a = await axios.get("https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json").catch(() => {});
 		if (a) {
 			const sponsors = a.data;
 			const sponsorsList = sponsors
-				.map(
-					(s) =>
-						`\x1b]8;;https://github.com/${s.sponsor.login}\x1b\\\x1b[1m${s.sponsor.login}\x1b]8;;\x1b\\\x1b[0m`
-				)
+				.map((s) => `\x1b]8;;https://github.com/${s.sponsor.login}\x1b\\\x1b[1m${s.sponsor.login}\x1b]8;;\x1b\\\x1b[0m`)
 				.join(", ");
-			process.stdout.write(
-				`\x1b[0m💖  Thanks to our sponsors: ${sponsorsList}\n`
-			);
+			process.stdout.write(`\x1b[0m💖  Thanks to our sponsors: ${sponsorsList}\n`);
 		}
 
 		async function connect() {
 			let client = new WebSocketClient();
-				
+
 			client.on("connectFailed", (e) => {
 				setTimeout(connect, 10000);
 				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
-		
+
 			client.on("connect", (connection) => {
 				connection.on("error", (e) => {
 					setTimeout(connect, 10000);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
-		
+
 				connection.on("close", (e) => {
 					setTimeout(connect, 10000);
 					console.log(`❌  WebSocket Error: ${e.toString()}`);
 				});
-		
+
 				console.log("✅  Connected to WebSocket server.");
-		
+
 				setInterval(() => {
 					connection.sendUTF("heartbeat");
 				}, 25000);
 			});
-		
+
 			client.connect("wss://ws.ticket.pm/", "echo-protocol");
-		};
-		
+		}
+
 		connect();
 	},
 };

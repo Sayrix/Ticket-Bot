@@ -25,16 +25,11 @@ module.exports = {
 		if (!client.config.createTranscript) domain = client.locales.other.unavailable;
 
 		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-		if (!ticket)
-			return interaction
-				.editReply({ content: "Ticket not found" })
-				.catch((e) => console.log(e));
+		if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
 
 		if (
 			client.config.whoCanCloseTicket === "STAFFONLY" &&
-			!interaction.member.roles.cache.some((r) =>
-				client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)
-			)
+			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
 				.editReply({
@@ -67,33 +62,17 @@ module.exports = {
 			client
 		);
 
-		await client.db.set(
-			`tickets_${interaction.channel.id}.closedBy`,
-			interaction.user.id
-		);
-		await client.db.set(
-			`tickets_${interaction.channel.id}.closedAt`,
-			Date.now()
-		);
+		await client.db.set(`tickets_${interaction.channel.id}.closedBy`, interaction.user.id);
+		await client.db.set(`tickets_${interaction.channel.id}.closedAt`, Date.now());
 
 		if (reason) {
-			await client.db.set(
-				`tickets_${interaction.channel.id}.closeReason`,
-				reason
-			);
+			await client.db.set(`tickets_${interaction.channel.id}.closeReason`, reason);
 		} else {
-			await client.db.set(
-				`tickets_${interaction.channel.id}.closeReason`,
-				client.locales.other.noReasonGiven
-			);
+			await client.db.set(`tickets_${interaction.channel.id}.closeReason`, client.locales.other.noReasonGiven);
 		}
 
-		const creator = await client.db.get(
-			`tickets_${interaction.channel.id}.creator`
-		);
-		const invited = await client.db.get(
-			`tickets_${interaction.channel.id}.invited`
-		);
+		const creator = await client.db.get(`tickets_${interaction.channel.id}.creator`);
+		const invited = await client.db.get(`tickets_${interaction.channel.id}.invited`);
 
 		interaction.channel.permissionOverwrites
 			.edit(creator, {
@@ -118,22 +97,17 @@ module.exports = {
 		await interaction.channel.messages.fetch();
 
 		async function close(id) {
-			if (client.config.closeTicketCategoryId)
-				interaction.channel
-					.setParent(client.config.closeTicketCategoryId)
-					.catch((e) => console.log(e));
+			if (client.config.closeTicketCategoryId) interaction.channel.setParent(client.config.closeTicketCategoryId).catch((e) => console.log(e));
 
-			const messageId = await client.db.get(
-				`tickets_${interaction.channel.id}.messageId`
-			);
+			const messageId = await client.db.get(`tickets_${interaction.channel.id}.messageId`);
 			const msg = interaction.channel.messages.cache.get(messageId);
 			const embed = msg.embeds[0].data;
-			
+
 			msg.components[0]?.components?.map((x) => {
 				if (x.data.custom_id === "close") x.data.disabled = true;
 				if (x.data.custom_id === "close_askReason") x.data.disabled = true;
 			});
-			
+
 			msg
 				.edit({
 					content: msg.content,
@@ -159,10 +133,7 @@ module.exports = {
 			const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 
 			const row = new Discord.ActionRowBuilder().addComponents(
-				new Discord.ButtonBuilder()
-					.setCustomId("deleteTicket")
-					.setLabel(client.locales.other.deleteTicketButtonMSG)
-					.setStyle(Discord.ButtonStyle.Danger)
+				new Discord.ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.other.deleteTicketButtonMSG).setStyle(Discord.ButtonStyle.Danger)
 			);
 
 			interaction.channel
@@ -180,20 +151,16 @@ module.exports = {
 				.catch((e) => console.log(e));
 
 			const tiketClosedDMEmbed = new Discord.EmbedBuilder()
-				.setColor(
-					client.embeds.ticketClosedDM.color
-						? client.embeds.ticketClosedDM.color
-						: client.config.mainColor
-				)
+				.setColor(client.embeds.ticketClosedDM.color ? client.embeds.ticketClosedDM.color : client.config.mainColor)
 				.setDescription(
 					client.embeds.ticketClosedDM.description
 						.replace("TICKETCOUNT", ticket.id)
-						.replace("TRANSCRIPTURL", `${domain}${id}`)
+						.replace("TRANSCRIPTURL", `[\`${domain}${id}\`](${domain}${id})`)
 						.replace("REASON", ticket.closeReason)
 						.replace("CLOSERNAME", interaction.user.tag)
 				)
 
-			/*
+				/*
 			Copyright 2023 Sayrix (github.com/Sayrix)
 						
 			Licensed under the Apache License, Version 2.0 (the "License");
@@ -211,12 +178,7 @@ module.exports = {
 
 				.setFooter({
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-					text:
-            "is.gd/ticketbot" +
-            client.embeds.ticketClosedDM.footer.text.replace(
-            	"is.gd/ticketbot",
-            	""
-            ), // Please respect the LICENSE :D
+					text: "is.gd/ticketbot" + client.embeds.ticketClosedDM.footer.text.replace("is.gd/ticketbot", ""), // Please respect the LICENSE :D
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 					iconUrl: client.embeds.ticketClosedDM.footer.iconUrl,
 				});
@@ -244,7 +206,7 @@ module.exports = {
 					})
 					.catch((e) => console.log(e));
 			});
-		};
+		}
 
 		if (!client.config.createTranscript) {
 			close("");
@@ -268,7 +230,7 @@ module.exports = {
 			}
 			const messages = collArray[0].concat(...collArray.slice(1));
 			return messages;
-		};
+		}
 
 		const messages = await fetchAll();
 		const premiumKey = "";
@@ -278,13 +240,15 @@ module.exports = {
 			if (err) {
 				console.error(err);
 			} else {
-				const ts = await axios.post(`${domain}upload?key=${premiumKey}`, JSON.stringify(compressed), {
-					headers: {
-						"Content-Type": "application/json"
-					}
-				}).catch(console.error);
+				const ts = await axios
+					.post(`${domain}upload?key=${premiumKey}`, JSON.stringify(compressed), {
+						headers: {
+							"Content-Type": "application/json",
+						},
+					})
+					.catch(console.error);
 				close(ts.data);
-			};
+			}
 		});
 	},
 };

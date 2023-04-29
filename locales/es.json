@@ -1,69 +1,69 @@
 {
-  "embeds": {
-    "openTicket": {
-      "title": "Abrir un tique",
-      "description": "Presiona el botón de abajo para abrir un tique",
-      "footer": {
-        "text": "is.gd/ticketbot"
-      }
-    },
-    "ticketOpened": {
-      "title": "Tique CATEGORYNAME",
-      "description": "Un miembro del equipo te responderá dentro de un momento",
-      "footer": {
-        "text": "is.gd/ticketbot"
-      }
-    },
-    "ticketClosed": {
-      "title": "Tique cerrado",
-      "description": "El tique fue cerrado por CLOSERNAME con la razón: `REASON`"
-    },
-    "ticketClosedDM": {
-      "title": "Tique cerrado",
-      "description": "El tique n°TICKETCOUNT se cerró por CLOSERNAME con la siguiente razón: `REASON`\n\nAquí tienes la traducción: TRANSCRIPTURL",
-      "footer": {
-        "text": "is.gd/ticketbot"
-      }
-    }
-  },
-  "modals": {
-    "reasonTicketOpen": {
-      "title": "Abrir tique",
-      "label": "Razón por que abres",
-      "placeholder": "Ingresa la razón"
-    },
-    "reasonTicketClose": {
-      "title": "Cerrar tique",
-      "label": "Razón del cierre",
-      "placeholder": "Ingresa la razón"
-    }
-  },
-  "buttons": {
-    "close": {
-      "label": "Cerrar tique",
-      "emoji": "🔒"
-    },
-    "claim": {
-      "label": "Reclamar",
-      "emoji": "🙋"
-    }
-  },
-  "ticketOpenedMessage": "¡Tique abierto! --> TICKETCHANNEL",
-  "ticketOnlyClaimableByStaff": "¡El tique solo puede ser reclamado por un miembro del equipo!",
-  "ticketAlreadyClaimed": "¡Ya se reclamó el tique!",
-  "ticketClaimedMessage": "> Tique reclamado por USER",
-  "ticketOnlyClosableByStaff": "¡El tique solo puede ser cerrado por un miembro del equipo!",
-  "ticketAlreadyClosed": "¡El tique ya estaba cerrado!",
-  "ticketCreatingTranscript": "> Transcribiendo...",
-  "ticketTranscriptCreated": "> ¡Tique transcripto! TRANSCRIPTURL",
-  "ticketLimitReached": "Solo puedes tener TICKETLIMIT tiques abiertos al mismo tiempo!",
+	"embeds": {
+		"openTicket": {
+			"title": "Abrir un tique",
+			"description": "Presiona el botón de abajo para abrir un tique",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		},
+		"ticketOpened": {
+			"title": "Tique CATEGORYNAME",
+			"description": "Un miembro del equipo te responderá dentro de un momento",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		},
+		"ticketClosed": {
+			"title": "Tique cerrado",
+			"description": "El tique fue cerrado por CLOSERNAME con la razón: `REASON`"
+		},
+		"ticketClosedDM": {
+			"title": "Tique cerrado",
+			"description": "El tique n°TICKETCOUNT se cerró por CLOSERNAME con la siguiente razón: `REASON`\n\nAquí tienes la traducción: TRANSCRIPTURL",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		}
+	},
+	"modals": {
+		"reasonTicketOpen": {
+			"title": "Abrir tique",
+			"label": "Razón por que abres",
+			"placeholder": "Ingresa la razón"
+		},
+		"reasonTicketClose": {
+			"title": "Cerrar tique",
+			"label": "Razón del cierre",
+			"placeholder": "Ingresa la razón"
+		}
+	},
+	"buttons": {
+		"close": {
+			"label": "Cerrar tique",
+			"emoji": "🔒"
+		},
+		"claim": {
+			"label": "Reclamar",
+			"emoji": "🙋"
+		}
+	},
+	"ticketOpenedMessage": "¡Tique abierto! --> TICKETCHANNEL",
+	"ticketOnlyClaimableByStaff": "¡El tique solo puede ser reclamado por un miembro del equipo!",
+	"ticketAlreadyClaimed": "¡Ya se reclamó el tique!",
+	"ticketClaimedMessage": "> Tique reclamado por USER",
+	"ticketOnlyClosableByStaff": "¡El tique solo puede ser cerrado por un miembro del equipo!",
+	"ticketAlreadyClosed": "¡El tique ya estaba cerrado!",
+	"ticketCreatingTranscript": "> Transcribiendo...",
+	"ticketTranscriptCreated": "> ¡Tique transcripto! TRANSCRIPTURL",
+	"ticketLimitReached": "Solo puedes tener TICKETLIMIT tiques abiertos al mismo tiempo!",
 
-  "other": {
-    "openTicketButtonMSG": "Abrir un tique",
-    "deleteTicketButtonMSG": "Eliminar tique",
-    "selectTicketTypePlaceholder": "Elegir el tipo de tique",
-    "claimedBy": "**Reclamado por**: USER",
-    "noReasonGiven": ":x: No se dio una razón",
+	"other": {
+		"openTicketButtonMSG": "Abrir un tique",
+		"deleteTicketButtonMSG": "Eliminar tique",
+		"selectTicketTypePlaceholder": "Elegir el tipo de tique",
+		"claimedBy": "**Reclamado por**: USER",
+		"noReasonGiven": ":x: No se dio una razón",
 		"unavailable": "Unavailable"
-  }
+	}
 }

@@ -17,15 +17,11 @@ limitations under the License.
 */
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName("close")
-		.setDescription("Close the ticket"),
+	data: new SlashCommandBuilder().setName("close").setDescription("Close the ticket"),
 	async execute(interaction, client) {
 		if (
 			client.config.whoCanCloseTicket === "STAFFONLY" &&
-      !interaction.member.roles.cache.some((r) =>
-      	client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)
-      )
+			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
 				.reply({

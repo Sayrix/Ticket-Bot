@@ -1,70 +1,69 @@
 {
-    "embeds": {
-      "openTicket": {
-        "title": "Otevřít ticket",
-        "description": "Kliknutím na tlačítko otevřete ticket",
-        "footer": {
-          "text": "is.gd/ticketbot"
-        }
-      },
-      "ticketOpened": {
-        "title": "Ticket CATEGORYNAME",
-        "description": "Náš tým vám brzy odpoví!",
-        "footer": {
-          "text": "is.gd/ticketbot"
-        }
-      },
-      "ticketClosed": {
-        "title": "Ticket byl uzavřen",
-        "description": "Ticket uzavřel CLOSERNAME z důvodu: `REASON`"
-      },
-      "ticketClosedDM": {
-        "title": "Ticket byl uzavřen",
-        "description": "Ticket n°TICKETCOUNT byl uzavřen. Uzavřel ho CLOSERNAME z důvodu: `REASON`\n\nZde máš přepis ticketu: TRANSCRIPTURL",
-        "footer": {
-          "text": "is.gd/ticketbot"
-        }
-      }
-    },
-    "modals": {
-      "reasonTicketOpen": {
-        "title": "Otevřít ticket",
-        "label": "Zadej důvod k otevření ticketu",
-        "placeholder": "Prosím zadej důvod k otevření ticketu"
-      },
-      "reasonTicketClose": {
-        "title": "Zavřít ticket",
-        "label": "Zadej důvod k zavření ticketu",
-        "placeholder": "Prosím zadej důvod k zavření ticketu"
-      }
-    },
-    "buttons": {
-      "close": {
-        "label": "Zavřít ticket",
-        "emoji": "🔒"
-      },
-      "claim": {
-        "label": "Vzít",
-        "emoji": "🙋"
-      }
-    },
-    "ticketOpenedMessage": "Ticket byl otevřen! TICKETCHANNEL",
-    "ticketOnlyClaimableByStaff": "Pouze admin půže vzít ticket",
-    "ticketAlreadyClaimed": "Ticket už je sebrán jiným adminem!",
-    "ticketClaimedMessage": "> Ticket vzal USER",
-    "ticketOnlyClosableByStaff": "Pouze admin může zavřít ticket!",
-    "ticketAlreadyClosed": "Ticket už je uzavřen!",
-    "ticketCreatingTranscript": "> Vytvářím přepis...",
-    "ticketTranscriptCreated": "> Přepis byl vytvořen! TRANSCRIPTURL",
-    "ticketLimitReached": "Můžeš mít pouze TICKETLIMIT otevřených ticketu!",
-  
-    "other": {
-      "openTicketButtonMSG": "Otevřít ticket",
-      "deleteTicketButtonMSG": "Smazat ticket",
-      "selectTicketTypePlaceholder": "Vyber typ ticketu",
-      "claimedBy": "**Tento ticket vzal**: USER",
-      "noReasonGiven": "Důvod nebyl udán!",
-          "unavailable": "Nedostupné"
-    }
-  }
-  
+	"embeds": {
+		"openTicket": {
+			"title": "Otevřít ticket",
+			"description": "Kliknutím na tlačítko otevřete ticket",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		},
+		"ticketOpened": {
+			"title": "Ticket CATEGORYNAME",
+			"description": "Náš tým vám brzy odpoví!",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		},
+		"ticketClosed": {
+			"title": "Ticket byl uzavřen",
+			"description": "Ticket uzavřel CLOSERNAME z důvodu: `REASON`"
+		},
+		"ticketClosedDM": {
+			"title": "Ticket byl uzavřen",
+			"description": "Ticket n°TICKETCOUNT byl uzavřen. Uzavřel ho CLOSERNAME z důvodu: `REASON`\n\nZde máš přepis ticketu: TRANSCRIPTURL",
+			"footer": {
+				"text": "is.gd/ticketbot"
+			}
+		}
+	},
+	"modals": {
+		"reasonTicketOpen": {
+			"title": "Otevřít ticket",
+			"label": "Zadej důvod k otevření ticketu",
+			"placeholder": "Prosím zadej důvod k otevření ticketu"
+		},
+		"reasonTicketClose": {
+			"title": "Zavřít ticket",
+			"label": "Zadej důvod k zavření ticketu",
+			"placeholder": "Prosím zadej důvod k zavření ticketu"
+		}
+	},
+	"buttons": {
+		"close": {
+			"label": "Zavřít ticket",
+			"emoji": "🔒"
+		},
+		"claim": {
+			"label": "Vzít",
+			"emoji": "🙋"
+		}
+	},
+	"ticketOpenedMessage": "Ticket byl otevřen! TICKETCHANNEL",
+	"ticketOnlyClaimableByStaff": "Pouze admin půže vzít ticket",
+	"ticketAlreadyClaimed": "Ticket už je sebrán jiným adminem!",
+	"ticketClaimedMessage": "> Ticket vzal USER",
+	"ticketOnlyClosableByStaff": "Pouze admin může zavřít ticket!",
+	"ticketAlreadyClosed": "Ticket už je uzavřen!",
+	"ticketCreatingTranscript": "> Vytvářím přepis...",
+	"ticketTranscriptCreated": "> Přepis byl vytvořen! TRANSCRIPTURL",
+	"ticketLimitReached": "Můžeš mít pouze TICKETLIMIT otevřených ticketu!",
+
+	"other": {
+		"openTicketButtonMSG": "Otevřít ticket",
+		"deleteTicketButtonMSG": "Smazat ticket",
+		"selectTicketTypePlaceholder": "Vyber typ ticketu",
+		"claimedBy": "**Tento ticket vzal**: USER",
+		"noReasonGiven": "Důvod nebyl udán!",
+		"unavailable": "Nedostupné"
+	}
+}

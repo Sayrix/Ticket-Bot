@@ -17,10 +17,7 @@ limitations under the License.
 module.exports = {
 	async deleteTicket(interaction, client) {
 		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-		if (!ticket)
-			return interaction
-				.reply({ content: "Ticket not found", ephemeral: true })
-				.catch((e) => console.log(e));
+		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 
 		client.log(
 			"ticketDelete",

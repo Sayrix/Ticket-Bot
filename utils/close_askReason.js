@@ -20,9 +20,7 @@ module.exports = {
 	async closeAskReason(interaction, client) {
 		if (
 			client.config.whoCanCloseTicket === "STAFFONLY" &&
-      !interaction.member.roles.cache.some((r) =>
-      	client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)
-      )
+			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
 				.reply({
@@ -31,9 +29,7 @@ module.exports = {
 				})
 				.catch((e) => console.log(e));
 
-		const modal = new Discord.ModalBuilder()
-			.setCustomId("askReasonClose")
-			.setTitle(client.locales.modals.reasonTicketClose.title);
+		const modal = new Discord.ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
 
 		const input = new Discord.TextInputBuilder()
 			.setCustomId("reason")
