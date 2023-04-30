@@ -4,14 +4,14 @@
 			"title": "Open a ticket",
 			"description": "Click on the button to start opening a ticket",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketOpened": {
 			"title": "Ticket CATEGORYNAME",
 			"description": "A staff will reply you as soon as possible!",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketClosed": {
@@ -22,7 +22,7 @@
 			"title": "Ticket closed",
 			"description": "The ticket n°TICKETCOUNT has been closed by CLOSERNAME with the following reason: `REASON`\n\nHere is the transcript of the ticket: TRANSCRIPTURL",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		}
 	},
@@ -56,6 +56,8 @@
 	"ticketAlreadyClosed": "The ticket is already closed!",
 	"ticketCreatingTranscript": "> Creating transcript...",
 	"ticketTranscriptCreated": "> Transcript created! TRANSCRIPTURL",
+	"ticketOnlyRenamableByStaff": "Only staff can rename tickets!",
+	"ticketRenamed": "> Ticket renamed to NEWNAME",
 	"ticketLimitReached": "You can only have TICKETLIMIT tickets opened at the same time!",
 
 	"other": {

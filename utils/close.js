@@ -178,7 +178,7 @@ module.exports = {
 
 				.setFooter({
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-					text: "is.gd/ticketbot" + client.embeds.ticketClosedDM.footer.text.replace("is.gd/ticketbot", ""), // Please respect the LICENSE :D
+					text: "ticket.pm" + client.embeds.ticketClosedDM.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 					iconUrl: client.embeds.ticketClosedDM.footer.iconUrl,
 				});

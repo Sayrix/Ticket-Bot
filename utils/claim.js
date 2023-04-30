@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-unused-vars
+const Discord = require("discord.js");
+
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
 
@@ -15,6 +18,10 @@ limitations under the License.
 */
 
 module.exports = {
+	/**
+	 * @param {Discord.CommandInteraction} interaction
+	 * @param {Discord.Client} client
+	 */
 	async claim(interaction, client) {
 		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
 		if (!ticket)
@@ -26,14 +33,6 @@ module.exports = {
 		const canClaim = interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
 
 		if (!canClaim)
-			return interaction
-				.reply({
-					content: client.locales.ticketOnlyClaimableByStaff,
-					ephemeral: true,
-				})
-				.catch((e) => console.log(e));
-
-		if (interaction.user.id === ticket.creator)
 			return interaction
 				.reply({
 					content: client.locales.ticketOnlyClaimableByStaff,
@@ -93,6 +92,10 @@ module.exports = {
 				ephemeral: false,
 			})
 			.catch((e) => console.log(e));
+
+		if (client.config.ticketNamePrefixWhenClaimed) {
+			interaction.channel.setName(`${client.config.ticketNamePrefixWhenClaimed}${interaction.channel.name}`).catch((e) => console.log(e));
+		}
 	},
 };
 
