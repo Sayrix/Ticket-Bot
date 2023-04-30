@@ -4,14 +4,14 @@
 			"title": "Öffne ein Ticket",
 			"description": "Klicke auf den Button, um ein Ticket zu öffnen",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketOpened": {
 			"title": "Ticket CATEGORYNAME",
 			"description": "Ein Teammitglied wird sich in Kürze um dich kümmern!",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketClosed": {
@@ -22,7 +22,7 @@
 			"title": "Ticket geschlossen",
 			"description": "Das Ticket n°TICKETCOUNT wurde von CLOSERNAME mit folgendem Grund geschlossen: `REASON`\n\nHier findest du das Transkript: TRANSCRIPTURL",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		}
 	},

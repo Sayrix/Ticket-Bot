@@ -4,14 +4,14 @@
 			"title": "Abrir un tique",
 			"description": "Presiona el botón de abajo para abrir un tique",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketOpened": {
 			"title": "Tique CATEGORYNAME",
 			"description": "Un miembro del equipo te responderá dentro de un momento",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketClosed": {
@@ -22,7 +22,7 @@
 			"title": "Tique cerrado",
 			"description": "El tique n°TICKETCOUNT se cerró por CLOSERNAME con la siguiente razón: `REASON`\n\nAquí tienes la traducción: TRANSCRIPTURL",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		}
 	},

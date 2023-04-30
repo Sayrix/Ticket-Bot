@@ -4,14 +4,14 @@
 			"title": "Destek Talebi Başlatın",
 			"description": "Destek talebi başlatmak için butona basın",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketOpened": {
 			"title": "Destek Talebi CATEGORYNAME",
 			"description": "Bir yetkili sizinle en hızlı şekilde iletişime geçecek!",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketClosed": {
@@ -22,7 +22,7 @@
 			"title": "Destek talebiniz kapatıldı",
 			"description": "TICKETCOUNT nolu destek talebiniz, CLOSERNAME tarafından şu sebeple kapatıldı: `REASON`\n\nDestek talebinizin bir transkripti: TRANSCRIPTURL",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		}
 	},

@@ -77,7 +77,7 @@ module.exports = {
 
 			embed.color = parseInt(client.config.mainColor, 16);
 			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-			embed.footer.text = "is.gd/ticketbot" + client.embeds.ticketOpened.footer.text.replace("is.gd/ticketbot", ""); // Please respect the LICENSE :D
+			embed.footer.text = "ticket.pm" + client.embeds.ticketOpened.footer.text.replace("ticket.pm", ""); // Please respect the LICENSE :D
 			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 
 			/*

@@ -4,14 +4,14 @@
 			"title": "Otevřít ticket",
 			"description": "Kliknutím na tlačítko otevřete ticket",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketOpened": {
 			"title": "Ticket CATEGORYNAME",
 			"description": "Náš tým vám brzy odpoví!",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		},
 		"ticketClosed": {
@@ -22,7 +22,7 @@
 			"title": "Ticket byl uzavřen",
 			"description": "Ticket n°TICKETCOUNT byl uzavřen. Uzavřel ho CLOSERNAME z důvodu: `REASON`\n\nZde máš přepis ticketu: TRANSCRIPTURL",
 			"footer": {
-				"text": "is.gd/ticketbot"
+				"text": "ticket.pm"
 			}
 		}
 	},
