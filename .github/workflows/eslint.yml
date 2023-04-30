@@ -34,9 +34,9 @@ jobs:
           path: node_modules
           key: node_modules-${{ matrix.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
 
-      - name: npm ci
+      - name: npm i
         if: steps.cache-node_modules.outputs.cache-hit != 'true'
-        run: npm ci --no-audit
+        run: npm i --no-audit
 
       - name: ESLint
         run: npx --no-install eslint .
