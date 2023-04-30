@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
 const Discord = require("discord.js");
 
 /*
@@ -35,7 +36,7 @@ module.exports = {
 			return interaction
 				.reply({
 					content: client.locales.ticketOnlyRenamableByStaff,
-					ephemeral: true
+					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
@@ -43,7 +44,7 @@ module.exports = {
 		interaction
 			.reply({ content: client.locales.ticketRenamed.replace("NEWNAME", interaction.channel.toString()), ephemeral: false })
 			.catch((e) => console.log(e));
-	}
+	},
 };
 
 /*

@@ -57,9 +57,9 @@ module.exports = {
 				permissionOverwrites: [
 					{
 						id: interaction.guild.roles.everyone,
-						deny: [Discord.PermissionFlagsBits.ViewChannel]
-					}
-				]
+						deny: [Discord.PermissionFlagsBits.ViewChannel],
+					},
+				],
 			});
 
 			if (!channel) return reject("Couldn't create the ticket channel.");
@@ -70,10 +70,10 @@ module.exports = {
 					user: {
 						tag: interaction.user.tag,
 						id: interaction.user.id,
-						avatarURL: interaction.user.displayAvatarURL()
+						avatarURL: interaction.user.displayAvatarURL(),
 					},
 					reason: allReasons,
-					ticketChannelId: channel.id
+					ticketChannelId: channel.id,
 				},
 				client
 			);
@@ -92,7 +92,7 @@ module.exports = {
 				claimedAt: null,
 				closed: false,
 				closedBy: null,
-				closedAt: null
+				closedAt: null,
 			});
 
 			channel.permissionOverwrites
@@ -101,7 +101,7 @@ module.exports = {
 					AddReactions: true,
 					ReadMessageHistory: true,
 					AttachFiles: true,
-					ViewChannel: true
+					ViewChannel: true,
 				})
 				.catch((e) => console.log(e));
 
@@ -113,7 +113,7 @@ module.exports = {
 							AddReactions: true,
 							ReadMessageHistory: true,
 							AttachFiles: true,
-							ViewChannel: true
+							ViewChannel: true,
 						})
 						.catch((e) => console.log(e));
 				});
@@ -172,7 +172,7 @@ module.exports = {
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 					text: "ticket.pm" + client.embeds.ticketOpened.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-					iconUrl: client.embeds.ticketOpened.footer.iconUrl
+					iconUrl: client.embeds.ticketOpened.footer.iconUrl,
 				});
 			/*
 				Copyright 2023 Sayrix (github.com/Sayrix)
@@ -225,7 +225,7 @@ module.exports = {
 				embeds: [ticketOpenedEmbed],
 				content: `<@${interaction.user.id}> ${
 					client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
-				}`
+				}`,
 			};
 
 			if (row.components.length > 0) body.components = [row];
@@ -241,7 +241,7 @@ module.exports = {
 						.editReply({
 							content: client.locales.ticketOpenedMessage.replace("TICKETCHANNEL", `<#${channel.id}>`),
 							components: [],
-							ephemeral: true
+							ephemeral: true,
 						})
 						.catch((e) => console.log(e));
 
@@ -249,5 +249,5 @@ module.exports = {
 				})
 				.catch((e) => console.log(e));
 		});
-	}
+	},
 };

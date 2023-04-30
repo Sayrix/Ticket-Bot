@@ -35,7 +35,7 @@ module.exports = {
 						return interaction
 							.editReply({
 								content: "You can't create a ticket because you are blacklisted",
-								ephemeral: true
+								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
 					}
@@ -49,7 +49,7 @@ module.exports = {
 						return interaction
 							.editReply({
 								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
-								ephemeral: true
+								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
 					}
@@ -65,7 +65,7 @@ module.exports = {
 
 					const a = {
 						label: x.name,
-						value: x.codeName
+						value: x.codeName,
 					};
 					if (x.description) a.description = x.description;
 					if (x.emoji) a.emoji = x.emoji;
@@ -94,7 +94,7 @@ module.exports = {
 				interaction
 					.editReply({
 						ephemeral: true,
-						components: [row]
+						components: [row],
 					})
 					.catch((e) => console.log(e));
 			}
@@ -131,7 +131,7 @@ module.exports = {
 						return interaction
 							.reply({
 								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
-								ephemeral: true
+								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
 					}
@@ -173,13 +173,13 @@ module.exports = {
 							user: {
 								tag: interaction.user.tag,
 								id: interaction.user.id,
-								avatarURL: interaction.user.displayAvatarURL()
+								avatarURL: interaction.user.displayAvatarURL(),
 							},
 							ticketId: ticket.id,
 							ticketChannelId: interaction.channel.id,
 							removed: {
-								id: value
-							}
+								id: value,
+							},
 						},
 						client
 					);
@@ -190,7 +190,7 @@ module.exports = {
 						content: `> Removed ${
 							interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
 						} from the ticket`,
-						components: []
+						components: [],
 					})
 					.catch((e) => console.log(e));
 			}
@@ -210,7 +210,7 @@ module.exports = {
 				close(interaction, client, interaction.fields.fields.first().value);
 			}
 		}
-	}
+	},
 };
 
 /*

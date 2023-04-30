@@ -27,7 +27,7 @@ module.exports = {
 		if (!ticket)
 			return interaction.reply({
 				content: "Ticket not found",
-				ephemeral: true
+				ephemeral: true,
 			});
 
 		const canClaim = interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
@@ -36,7 +36,7 @@ module.exports = {
 			return interaction
 				.reply({
 					content: client.locales.ticketOnlyClaimableByStaff,
-					ephemeral: true
+					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
@@ -44,7 +44,7 @@ module.exports = {
 			return interaction
 				.reply({
 					content: client.locales.ticketAlreadyClaimed,
-					ephemeral: true
+					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
@@ -54,11 +54,11 @@ module.exports = {
 				user: {
 					tag: interaction.user.tag,
 					id: interaction.user.id,
-					avatarURL: interaction.user.displayAvatarURL()
+					avatarURL: interaction.user.displayAvatarURL(),
 				},
 				ticketId: ticket.id,
 				ticketChannelId: interaction.channel.id,
-				ticketCreatedAt: ticket.createdAt
+				ticketCreatedAt: ticket.createdAt,
 			},
 			client
 		);
@@ -82,21 +82,21 @@ module.exports = {
 			.edit({
 				content: msg.content,
 				embeds: [embed],
-				components: msg.components
+				components: msg.components,
 			})
 			.catch((e) => console.log(e));
 
 		interaction
 			.reply({
 				content: client.locales.ticketClaimedMessage.replace("USER", `<@${interaction.user.id}>`),
-				ephemeral: false
+				ephemeral: false,
 			})
 			.catch((e) => console.log(e));
 
 		if (client.config.ticketNamePrefixWhenClaimed) {
 			interaction.channel.setName(`${client.config.ticketNamePrefixWhenClaimed}${interaction.channel.name}`).catch((e) => console.log(e));
 		}
-	}
+	},
 };
 
 /*

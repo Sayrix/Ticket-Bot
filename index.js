@@ -43,8 +43,8 @@ const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.j
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 	presence: {
-		status: config.status?.status ?? "online"
-	}
+		status: config.status?.status ?? "online",
+	},
 });
 
 // All variables stored in the client object
@@ -67,14 +67,14 @@ if (client.config.mysql?.enabled) {
 			user: client.config.mysql?.user,
 			password: client.config.mysql?.password,
 			database: client.config.mysql?.database,
-			charset: "utf8mb4"
+			charset: "utf8mb4",
 		});
 
 		await mysql.connect();
 
 		db = new QuickDB({
 			driver: mysql,
-			table: client.config.mysql?.table ?? "json"
+			table: client.config.mysql?.table ?? "json",
 		});
 		client.db = db;
 	})();
@@ -125,7 +125,7 @@ client.on("interactionCreate", async (interaction) => {
 		console.error(error);
 		await interaction.reply({
 			content: "There was an error while executing this command!",
-			ephemeral: true
+			ephemeral: true,
 		});
 	}
 });
