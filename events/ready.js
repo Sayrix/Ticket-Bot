@@ -129,8 +129,8 @@ module.exports = {
 		process.stdout.write(
 			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${client.user.tag}\x1b[0m (\x1b[37;46;1m${client.user.id}\x1b[0m)
 		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
-		\x1b[0m📖  Documentation: \x1b[37;46;1mhttps://ticket-bot.pages.dev \x1b[0m
-		\x1b[0m🪙   Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, "")
+		\x1b[0m📖  Documentation: \x1b[37;46;1mhttps://doc.ticket.pm \x1b[0m
+		\x1b[0m⛅  Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, "")
 		);
 
 		const a = await axios.get("https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json").catch(() => {});
