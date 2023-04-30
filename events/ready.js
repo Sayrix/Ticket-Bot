@@ -40,26 +40,25 @@ module.exports = {
 			process.exit(0);
 		}
 
-		async function sendEmbedToOpen() {
-			const embedMessageId = await client.db.get("temp.openTicketMessageId");
-			await client.channels.fetch(client.config.openTicketChannelId).catch(() => {
-				console.error("The channel to open tickets is not found!");
-				process.exit(0);
-			});
-			const openTicketChannel = await client.channels.cache.get(client.config.openTicketChannelId);
-			if (!openTicketChannel) {
-				console.error("The channel to open tickets is not found!");
-				process.exit(0);
-			}
+		const embedMessageId = await client.db.get("temp.openTicketMessageId");
+		await client.channels.fetch(client.config.openTicketChannelId).catch(() => {
+			console.error("The channel to open tickets is not found!");
+			process.exit(0);
+		});
+		const openTicketChannel = await client.channels.cache.get(client.config.openTicketChannelId);
+		if (!openTicketChannel) {
+			console.error("The channel to open tickets is not found!");
+			process.exit(0);
+		}
 
-			if (!openTicketChannel.isTextBased()) {
-				console.error("The channel to open tickets is not a channel!");
-				process.exit(0);
-			}
+		if (!openTicketChannel.isTextBased()) {
+			console.error("The channel to open tickets is not a channel!");
+			process.exit(0);
+		}
 
-			let embed = client.embeds.openTicket;
+		let embed = client.embeds.openTicket;
 
-			/*
+		/*
 			Copyright 2023 Sayrix (github.com/Sayrix)
 
 			Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,12 +74,12 @@ module.exports = {
 			limitations under the License.
 			*/
 
-			embed.color = parseInt(client.config.mainColor, 16);
-			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-			embed.footer.text = "ticket.pm" + client.embeds.ticketOpened.footer.text.replace("ticket.pm", ""); // Please respect the LICENSE :D
-			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		embed.color = parseInt(client.config.mainColor, 16);
+		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		embed.footer.text = "ticket.pm" + client.embeds.ticketOpened.footer.text.replace("ticket.pm", ""); // Please respect the LICENSE :D
+		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 
-			/*
+		/*
 			Copyright 2023 Sayrix (github.com/Sayrix)
 
 			Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,34 +95,56 @@ module.exports = {
 			limitations under the License.
 			*/
 
-			const row = new Discord.ActionRowBuilder().addComponents(
-				new Discord.ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(Discord.ButtonStyle.Primary)
-			);
+		const row = new Discord.ActionRowBuilder().addComponents(
+			new Discord.ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(Discord.ButtonStyle.Primary)
+		);
 
-			try {
-				const msg = await openTicketChannel?.messages?.fetch(embedMessageId).catch(() => {});
-				if (msg && msg.id) {
-					msg.edit({
+		try {
+			const msg = await openTicketChannel?.messages?.fetch(embedMessageId).catch(() => {});
+			if (msg && msg.id) {
+				msg.edit({
+					embeds: [embed],
+					components: [row]
+				});
+			} else {
+				client.channels.cache
+					.get(client.config.openTicketChannelId)
+					.send({
 						embeds: [embed],
 						components: [row]
+					})
+					.then((msg) => {
+						client.db.set("temp.openTicketMessageId", msg.id);
 					});
-				} else {
-					client.channels.cache
-						.get(client.config.openTicketChannelId)
-						.send({
-							embeds: [embed],
-							components: [row]
-						})
-						.then((msg) => {
-							client.db.set("temp.openTicketMessageId", msg.id);
-						});
+			}
+		} catch (e) {
+			console.error(e);
+		}
+
+		function setStatus() {
+			if (client.config.status) {
+				if (!client.config.status.enabled) return;
+
+				let type = client.config.status.type;
+				if (type === "PLAYING") type = 0;
+				if (type === "STREAMING") type = 1;
+				if (type === "LISTENING") type = 2;
+				if (type === "WATCHING") type = 3;
+				if (type === "COMPETING") type = 5;
+
+				if (client.config.status.type && client.config.status.text) {
+					// If the user just want to set the status but not the activity
+					client.user.setPresence({
+						activities: [{ name: client.config.status.text, type: type, url: client.config.status.url }],
+						status: client.config.status.status
+					});
 				}
-			} catch (e) {
-				console.error(e);
+				client.user.setStatus(client.config.status.status);
 			}
 		}
 
-		sendEmbedToOpen();
+		setStatus();
+		setInterval(setStatus, 9e5); // 15 minutes
 
 		readline.cursorTo(process.stdout, 0);
 		process.stdout.write(

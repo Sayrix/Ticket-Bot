@@ -86,5 +86,13 @@
 
 	"createTranscript": true, // If set to true, when the ticket is closed a transcript will be generated and sent in the logs channel
 
+	"status": {
+		"enabled": true, // If you want to enable the status of the bot
+		"text": "github.com/Sayrix", // The text of the status
+		"type": "PLAYING", // PLAYING, WATCHING, LISTENING, STREAMING, COMPETING
+		"url": "https://twitch.tv/grimkujow", // The url of the status if the type is STREAMING (can be blank)
+		"status": "online" // online, idle, dnd, invisible set to online if the type is STREAMING
+	},
+
 	"maxTicketOpened": 0 // The number of tickets the user can open while another one is already open. Set to 0 to unlimited
 }
