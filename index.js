@@ -43,7 +43,7 @@ const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.j
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 	presence: {
-		status: config.status?.status ?? 'online'
+		status: config.status?.status ?? "online"
 	}
 });
 
