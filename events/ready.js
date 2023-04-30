@@ -235,6 +235,7 @@ module.exports = {
 		}
 
 		connect();
+		require("../deploy-commands").deployCommands(client);
 	}
 };
 

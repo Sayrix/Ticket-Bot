@@ -68,7 +68,7 @@
 	],
 	"ticketNameOption": "Ticket-TICKETCOUNT", // Here is all parameter: USERNAME, USERID, TICKETCOUNT
 
-	"rolesWhoHaveAccessToTheTickets": ["1111111111111111111", "2222222222222222222"], // Roles who can access to the tickets
+	"rolesWhoHaveAccessToTheTickets": ["1111111111111111111", "2222222222222222222"], // Roles who can access to the tickets (Like the staff)
 
 	"rolesWhoCanNotCreateTickets": [], // Roles who can	not create a tickets (Like a blacklist)
 

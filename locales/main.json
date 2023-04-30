@@ -56,6 +56,8 @@
 	"ticketAlreadyClosed": "The ticket is already closed!",
 	"ticketCreatingTranscript": "> Creating transcript...",
 	"ticketTranscriptCreated": "> Transcript created! TRANSCRIPTURL",
+	"ticketOnlyRenamableByStaff": "Only staff can rename tickets!",
+	"ticketRenamed": "> Ticket renamed to NEWNAME",
 	"ticketLimitReached": "You can only have TICKETLIMIT tickets opened at the same time!",
 
 	"other": {
