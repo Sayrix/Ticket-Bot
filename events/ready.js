@@ -24,7 +24,7 @@ limitations under the License.
 module.exports = {
 	name: "ready",
 	once: true,
-	/*
+	/**
 	 * @param {Discord.Client} client
 	 */
 	async execute(client) {
