@@ -21,6 +21,7 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const { token } = require("./config/token.json");
 const { QuickDB, MySQLDriver } = require("quick.db");
 const jsonc = require("jsonc");
+const { exec } = require("child_process");
 
 process.on("unhandledRejection", (reason, promise, a) => {
 	console.log(reason, promise, a);
@@ -37,6 +38,15 @@ process.stdout.write(`
 
 Connecting to Discord...
 `);
+
+exec("git fetch",()=>{
+	exec("git show origin/main --format=%h -s", (_,remHash) => {
+		exec("git show main --format=%h -s", (_, locHash) => {
+			if(remHash.toString() !== locHash.toString())
+				console.log("There is a new update available! Please run \"git pull\" to update the bot!");	
+		});
+	});
+});
 
 const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
 
