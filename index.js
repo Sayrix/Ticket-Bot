@@ -21,6 +21,7 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const { token } = require("./config/token.json");
 const { QuickDB, MySQLDriver } = require("quick.db");
 const jsonc = require("jsonc");
+const { exec } = require("child_process");
 
 process.on("unhandledRejection", (reason, promise, a) => {
 	console.log(reason, promise, a);
@@ -37,6 +38,20 @@ process.stdout.write(`
 
 Connecting to Discord...
 `);
+
+fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res)=> {
+	if(Math.floor(res.status / 100) !== 2) return console.warn("[Version Check] Failed to pull latest version from server");
+	res.json().then((json) => {
+		// Assumign the format stays consistent (i.e. x.x.x)
+		const latest = json[0].name.split(".").map(k=>parseInt(k));
+		const current = require("./package.json").version.split(".").map(k=>parseInt(k));
+		if(latest[0] > current[0] ||
+		(latest[0] === current[0] && latest[1] > current[1]) ||
+		(latest[0] === current[0] && latest[1] === current[1] && latest[2] > current[2]))
+			console.warn(`[Version Check] New version available: ${json[0].name}; Current Version: ${current.join(".")}`);
+		else console.log("[Version Check] Up to date");
+	});
+});
 
 const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
 
