@@ -19,7 +19,7 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 const { token } = require("./config/token.json");
-const { QuickDB, MySQLDriver } = require("quick.db");// Remove this once the driver is published to the package (quick.db)
+const { QuickDB, MySQLDriver } = require("quick.db");
 const jsonc = require("jsonc");
 
 process.on("unhandledRejection", (reason, promise, a) => {
