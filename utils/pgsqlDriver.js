@@ -3,6 +3,7 @@
  * Why add this? PostgreSQL is a better database than MySQL. Alternative would be to use Prisma,
  * but I don't want to esentially re-write the database logic and cause confusions.
  * Source: https://github.com/plexidev/quick.db/blob/dev/src/drivers/PostgresDriver.ts
+ * LICENSE: https://github.com/plexidev/quick.db/blob/dev/LICENSE.md
  */
 
 const { Client } = require("pg");
