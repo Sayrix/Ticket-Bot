@@ -19,9 +19,8 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 const { token } = require("./config/token.json");
-const { QuickDB, MySQLDriver } = require("quick.db");
+const { QuickDB, MySQLDriver } = require("quick.db");// Remove this once the driver is published to the package (quick.db)
 const jsonc = require("jsonc");
-const { exec } = require("child_process");
 
 process.on("unhandledRejection", (reason, promise, a) => {
 	console.log(reason, promise, a);
@@ -39,6 +38,7 @@ process.stdout.write(`
 Connecting to Discord...
 `);
 
+// Update Detector
 fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res)=> {
 	if(Math.floor(res.status / 100) !== 2) return console.warn("[Version Check] Failed to pull latest version from server");
 	res.json().then((json) => {
@@ -68,7 +68,33 @@ client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.
 
 let db = null;
 
-if (client.config.mysql?.enabled) {
+if(client.config.postgre?.enabled) {
+	// PostgreSQL Support.
+	(async () => {
+		try {
+			require.resolve("pg");
+		} catch (e) {
+			console.error("pg driver is not installed!\n\nPlease run \"npm i pg\" in the console!");
+			throw e.code;
+		}
+		const PostgresDriver = require("./utils/pgsqlDriver"); 
+		const pgsql = new PostgresDriver({
+			host: client.config.postgre?.host,
+			user: client.config.postgre?.user,
+			password: client.config.postgre?.password,
+			database: client.config.postgre?.database,
+		});
+
+		await pgsql.connect();
+
+		db = new QuickDB({
+			driver: pgsql,
+			table: client.config.postgre?.table ?? "json"
+		});
+		client.db = db;
+	})();
+} else if (client.config.mysql?.enabled) {
+	// MySQL Support
 	(async () => {
 		try {
 			require.resolve("mysql2");
@@ -94,6 +120,7 @@ if (client.config.mysql?.enabled) {
 		client.db = db;
 	})();
 } else {
+	// SQLite Support
 	db = new QuickDB();
 	client.db = db;
 }
