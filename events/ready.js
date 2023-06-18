@@ -133,9 +133,10 @@ module.exports = {
 
 				if (client.config.status.type && client.config.status.text) {
 					// If the user just want to set the status but not the activity
+					const url = client.config.status.url;
 					client.user.setPresence({
-						activities: [{ name: client.config.status.text, type: type, url: client.config.status.url }],
-						status: client.config.status.status
+						activities: [{ name: client.config.status.text, type: type, url: (url && url.trim() !== "") ? url : undefined }],
+						status: client.config.status.status,
 					});
 				}
 				client.user.setStatus(client.config.status.status);
