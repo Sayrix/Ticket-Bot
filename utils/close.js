@@ -34,7 +34,7 @@ module.exports = {
 			return interaction
 				.editReply({
 					content: client.locales.ticketOnlyClosableByStaff,
-					ephemeral: true,
+					ephemeral: true
 				})
 				.catch((e) => console.log(e));
 
@@ -42,7 +42,7 @@ module.exports = {
 			return interaction
 				.editReply({
 					content: client.locales.ticketAlreadyClosed,
-					ephemeral: true,
+					ephemeral: true
 				})
 				.catch((e) => console.log(e));
 
@@ -52,12 +52,12 @@ module.exports = {
 				user: {
 					tag: interaction.user.tag,
 					id: interaction.user.id,
-					avatarURL: interaction.user.displayAvatarURL(),
+					avatarURL: interaction.user.displayAvatarURL()
 				},
 				ticketId: ticket.id,
 				ticketChannelId: interaction.channel.id,
 				ticketCreatedAt: ticket.createdAt,
-				reason: reason,
+				reason: reason
 			},
 			client
 		);
@@ -76,21 +76,21 @@ module.exports = {
 
 		interaction.channel.permissionOverwrites
 			.edit(creator, {
-				ViewChannel: false,
+				ViewChannel: false
 			})
 			.catch((e) => console.log(e));
 
 		invited.forEach(async (user) => {
 			interaction.channel.permissionOverwrites
 				.edit(user, {
-					ViewChannel: false,
+					ViewChannel: false
 				})
 				.catch((e) => console.log(e));
 		});
 
 		interaction
 			.editReply({
-				content: client.locales.ticketCreatingTranscript,
+				content: client.locales.ticketCreatingTranscript
 			})
 			.catch((e) => console.log(e));
 
@@ -112,7 +112,7 @@ module.exports = {
 				.edit({
 					content: msg.content,
 					embeds: [embed],
-					components: msg.components,
+					components: msg.components
 				})
 				.catch((e) => console.log(e));
 
@@ -123,7 +123,7 @@ module.exports = {
 					content: client.locales.ticketTranscriptCreated.replace(
 						"TRANSCRIPTURL",
 						domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
-					),
+					)
 				})
 				.catch((e) => console.log(e));
 			await client.db.set(
@@ -144,9 +144,9 @@ module.exports = {
 								.replace("TICKETCOUNT", ticket.id)
 								.replace("REASON", ticket.closeReason.replace(/[\n\r]/g, "\\n"))
 								.replace("CLOSERNAME", interaction.user.tag)
-						),
+						)
 					],
-					components: [row],
+					components: [row]
 				})
 				.catch((e) => console.log(e));
 
@@ -180,7 +180,7 @@ module.exports = {
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 					text: "ticket.pm" + client.embeds.ticketClosedDM.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
 					// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-					iconUrl: client.embeds.ticketClosedDM.footer.iconUrl,
+					iconUrl: client.embeds.ticketClosedDM.footer.iconUrl
 				});
 
 			/*
@@ -202,7 +202,7 @@ module.exports = {
 			client.users.fetch(creator).then((user) => {
 				user
 					.send({
-						embeds: [tiketClosedDMEmbed],
+						embeds: [tiketClosedDMEmbed]
 					})
 					.catch((e) => console.log(e));
 			});
@@ -243,14 +243,14 @@ module.exports = {
 				const ts = await axios
 					.post(`${domain}upload?key=${premiumKey}`, JSON.stringify(compressed), {
 						headers: {
-							"Content-Type": "application/json",
-						},
+							"Content-Type": "application/json"
+						}
 					})
 					.catch(console.error);
 				close(ts.data);
 			}
 		});
-	},
+	}
 };
 
 /*

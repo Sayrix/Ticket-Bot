@@ -1,4 +1,3 @@
-/* eslint-disable no-process-exit */
 /* eslint-disable no-unused-vars */
 const readline = require("readline");
 const axios = require("axios");
@@ -104,14 +103,14 @@ module.exports = {
 			if (msg && msg.id) {
 				msg.edit({
 					embeds: [embed],
-					components: [row],
+					components: [row]
 				});
 			} else {
 				client.channels.cache
 					.get(client.config.openTicketChannelId)
 					.send({
 						embeds: [embed],
-						components: [row],
+						components: [row]
 					})
 					.then((msg) => {
 						client.db.set("temp.openTicketMessageId", msg.id);
@@ -136,7 +135,7 @@ module.exports = {
 					// If the user just want to set the status but not the activity
 					client.user.setPresence({
 						activities: [{ name: client.config.status.text, type: type, url: client.config.status.url }],
-						status: client.config.status.status,
+						status: client.config.status.status
 					});
 				}
 				client.user.setStatus(client.config.status.status);
@@ -172,7 +171,7 @@ module.exports = {
 					data: {
 						stats: {
 							guilds: client?.guilds?.cache?.size,
-							users: client?.users?.cache?.size,
+							users: client?.users?.cache?.size
 						},
 						infos: {
 							ticketbotVersion: require("../package.json").version,
@@ -183,18 +182,18 @@ module.exports = {
 							uptime: process.uptime(),
 							ram: {
 								total: require("os").totalmem(),
-								free: require("os").freemem(),
+								free: require("os").freemem()
 							},
 							cpu: {
 								model: require("os").cpus()[0].model,
 								cores: require("os").cpus().length,
-								arch: require("os").arch(),
-							},
+								arch: require("os").arch()
+							}
 						},
 						clientName: client?.user?.tag,
 						clientId: client?.user?.id,
-						guildId: client?.config?.guildId,
-					},
+						guildId: client?.config?.guildId
+					}
 				})
 			);
 		}
@@ -231,12 +230,12 @@ module.exports = {
 				}, 120_000);
 			});
 
-			ws.connect("wss://ws.ticket.pm/", "echo-protocol");
+			ws.connect("wss://ws.ticket.pm", "echo-protocol");
 		}
 
 		connect();
 		require("../deploy-commands").deployCommands(client);
-	},
+	}
 };
 
 /*
