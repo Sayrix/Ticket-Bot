@@ -11,11 +11,11 @@
 	*/
 	"postgre": {
 		"enabled": false,
-		"host": "postgresql.example.com",
-		"user": "postgres",
-		"password": "password",
-		"database": "postgres",
-		"table": "json"
+		"host": "postgresql.example.com", // The host of the PostgreSQL database
+		"user": "postgres", // The user of the PostgreSQL database
+		"password": "password", // The password of the PostgreSQL database
+		"database": "postgres", // The name of the PostgreSQL database
+		"table": "json" // The name of the table where the tickets will be saved
 	},
 	"mysql": {
 		"enabled": false,
