@@ -18,5 +18,6 @@ module.exports = {
 		"semi": ["error", "always"],
 		"quotes": [2, "double"],
 		"semi-style": ["error", "last"],
+		"no-process-exit": "off",
 	},
 };
