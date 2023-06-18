@@ -15,7 +15,7 @@
 		"user": "postgres",
 		"password": "password",
 		"database": "postgres",
-		"table": "table"
+		"table": "json"
 	},
 	"mysql": {
 		"enabled": false,
