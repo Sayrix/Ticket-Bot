@@ -2,7 +2,8 @@
   "name": "ticket-bot",
   "version": "2.5.0",
   "description": "Bot with a ticket system using Discord.js v14",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "type":"module",
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
@@ -44,6 +45,8 @@
     "@types/better-sqlite3": "^7.6.4",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.60.0",
+    "@typescript-eslint/parser": "^5.60.0",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
