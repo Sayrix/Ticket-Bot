@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
-        "rootDir": "./src",
         "allowJs": true,
         "module": "CommonJS",
         "target": "ESNext",
@@ -13,5 +12,8 @@
         "sourceMap": true,
         "inlineSources": true,
         "sourceRoot": "/"
-    }
+    },
+    "include": [
+        "./src/**/*",
+    ]
 }

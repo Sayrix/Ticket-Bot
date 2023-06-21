@@ -14,15 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const fs = require("fs-extra");
-const path = require("node:path");
-const { Client, Collection, GatewayIntentBits } = require("discord.js");
+import { Interaction } from "discord.js";
+import fs from 'fs-extra';
+import path from 'node:path';
+import { Client, Collection, GatewayIntentBits } from 'discord.js'
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
-const { token } = require("./config/token.json");
-const { QuickDB, MySQLDriver } = require("quick.db");
-const jsonc = require("jsonc");
+import { token } from '../config/token.json'
+import {QuickDB, MySQLDriver } from 'quick.db'
+import { jsonc } from 'jsonc';
+import { DiscordClient, config, locale } from "./Types";
 
-process.on("unhandledRejection", (reason, promise, a) => {
+// Although invalid type, it should be good enough for now until more stuff needs to be handled here
+process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
 	console.log(reason, promise, a);
 });
 
@@ -43,10 +46,11 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 	if (Math.floor(res.status / 100) !== 2) return console.warn("[Version Check] Failed to pull latest version from server");
 	res.json().then((json) => {
 		// Assumign the format stays consistent (i.e. x.x.x)
-		const latest = json[0].name.split(".").map((k) => parseInt(k));
-		const current = require("./package.json")
+		const latest = json[0].name.split(".").map((k: string) => parseInt(k));
+		//@ts-ignore allow access to package.json for version check
+		const current = require("../package.json")
 			.version.split(".")
-			.map((k) => parseInt(k));
+			.map((k: string) => parseInt(k));
 		if (
 			latest[0] > current[0] ||
 			(latest[0] === current[0] && latest[1] > current[1]) ||
@@ -57,20 +61,21 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 	});
 });
 
-const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
+
+
+const config: config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 	presence: {
 		status: config.status?.status ?? "online"
 	}
-});
+}) as DiscordClient;
 
 // All variables stored in the client object
-client.discord = require("discord.js");
-client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
+client.config = config
 
-let db = null;
+let db: QuickDB<any> | undefined;
 
 if (client.config.postgre?.enabled) {
 	// PostgreSQL Support.
@@ -80,7 +85,7 @@ if (client.config.postgre?.enabled) {
 			require.resolve("pg");
 		} catch (e) {
 			console.error("pg driver is not installed!\n\nPlease run \"npm i pg\" in the console!");
-			throw e.code;
+			throw e;
 		}
 		const PostgresDriver = require("./utils/pgsqlDriver");
 		const pgsql = new PostgresDriver({
@@ -106,7 +111,7 @@ if (client.config.postgre?.enabled) {
 			require.resolve("mysql2");
 		} catch (e) {
 			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
-			throw e.code;
+			throw e;
 		}
 
 		const mysql = new MySQLDriver({
@@ -131,10 +136,8 @@ if (client.config.postgre?.enabled) {
 	client.db = db;
 }
 
-client.locales = require(`./locales/${client.config.lang}.json`);
-client.embeds = client.locales.embeds;
-client.log = require("./utils/logs.js").log;
-client.msToHm = function dhm(ms) {
+client.locales = require(`./locales/${client.config.lang}.json`) as locale;
+client.msToHm = function dhm(ms: number) {
 	const days = Math.floor(ms / (24 * 60 * 60 * 1000));
 	const daysms = ms % (24 * 60 * 60 * 1000);
 	const hours = Math.floor(daysms / (60 * 60 * 1000));
@@ -162,7 +165,7 @@ for (const file of commandFiles) {
 }
 
 // Execute commands
-client.on("interactionCreate", async (interaction) => {
+client.on("interactionCreate", async (interaction: Interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 	const command = client.commands.get(interaction.commandName);
 	if (!command) return;

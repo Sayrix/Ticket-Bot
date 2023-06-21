@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.4",
+    "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.3.1",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
