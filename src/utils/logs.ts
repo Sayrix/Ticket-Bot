@@ -1,4 +1,5 @@
-const Discord = require("discord.js");
+import Discord, { ChannelType, TextChannel, User } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -16,22 +17,56 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
-	async log(logsType, logs, client) {
+type log = {
+	LogType: "ticketCreate"
+	user: User
+	ticketChannelId?: string;
+	reason: string;
+} | {
+	LogType: "ticketClaim" | "ticketClose"
+	user: User
+	ticketChannelId?: string;
+	ticketId?: string;
+	reason?: string;
+	ticketCreatedAt: number;
+} | {
+	LogType: "ticketDelete"
+	user: User
+	ticketChannelId?: string;
+	ticketId?: string;
+	reason?: string;
+	ticketCreatedAt: number;
+	transcriptURL?: string;
+
+} | {
+	LogType: "userAdded" | "userRemoved"
+	user: User;
+	target: User;
+	ticketChannelId?: string;
+	reason?: string;
+	ticketId?: string;
+}
+
+
+export const log = async(logs: log, client: DiscordClient) => {
 		if (!client.config.logs) return;
 		if (!client.config.logsChannelId) return;
 		const channel = await client.channels
 			.fetch(client.config.logsChannelId)
 			.catch((e) => console.error("The channel to log events is not found!\n", e));
 		if (!channel) return console.error("The channel to log events is not found!");
+		if (!channel.isTextBased() ||
+		channel.type === ChannelType.DM ||
+		channel.type === ChannelType.PrivateThread ||
+		channel.type === ChannelType.PublicThread) return console.error("Invalid Channel!");
 
-		const webhook = (await channel.fetchWebhooks()).find((wh) => wh.token) ?? 
-		await channel.createWebhook({ name: "Ticket Bot Logs" });
+		const webhook = (await (channel as TextChannel).fetchWebhooks()).find((wh) => wh.token) ?? 
+		await (channel as TextChannel).createWebhook({ name: "Ticket Bot Logs" });
 
-		if (logsType === "ticketCreate") {
+		if (logs.LogType === "ticketCreate") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("3ba55c")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#3ba55c")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(`${logs.user.tag} (<@${logs.user.id}>) Created a ticket (<#${logs.ticketChannelId}>) with the reason: \`${logs.reason}\``);
 
 			webhook
@@ -43,10 +78,10 @@ module.exports = {
 				.catch((e) => console.log(e));
 		}
 
-		if (logsType === "ticketClaim") {
+		if (logs.LogType === "ticketClaim") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("faa61a")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#faa61a")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(
 					`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) after ${client.msToHm(
 						new Date(Date.now() - logs.ticketCreatedAt)
@@ -62,10 +97,10 @@ module.exports = {
 				.catch((e) => console.log(e));
 		}
 
-		if (logsType === "ticketClose") {
+		if (logs.LogType === "ticketClose") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("ed4245")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#ed4245")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(
 					`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) with the reason: \`${
 						logs.reason
@@ -81,10 +116,10 @@ module.exports = {
 				.catch((e) => console.log(e));
 		}
 
-		if (logsType === "ticketDelete") {
+		if (logs.LogType === "ticketDelete") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("ed4245")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#ed4245")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(
 					`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${logs.ticketId} after ${client.msToHm(
 						new Date(Date.now() - logs.ticketCreatedAt)
@@ -100,12 +135,12 @@ module.exports = {
 				.catch((e) => console.log(e));
 		}
 
-		if (logsType === "userAdded") {
+		if (logs.LogType === "userAdded") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("3ba55c")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#3ba55c")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Added <@${logs.added.id}> (${logs.added.id}) to the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`
+					`${logs.user.tag} (<@${logs.user.id}>) Added <@${logs.target.id}> (${logs.target.id}) to the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`
 				);
 
 			webhook
@@ -117,12 +152,12 @@ module.exports = {
 				.catch((e) => console.log(e));
 		}
 
-		if (logsType === "userRemoved") {
+		if (logs.LogType === "userRemoved") {
 			const embed = new Discord.EmbedBuilder()
-				.setColor("ed4245")
-				.setAuthor({ name: logs.user.tag, iconURL: logs.user.avatarURL })
+				.setColor("#ed4245")
+				.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 				.setDescription(
-					`${logs.user.tag} (<@${logs.user.id}>) Removed <@${logs.removed.id}> (${logs.removed.id}) from the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`
+					`${logs.user.tag} (<@${logs.user.id}>) Removed <@${logs.target.id}> (${logs.target.id}) from the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>)`
 				);
 
 			webhook
@@ -133,8 +168,7 @@ module.exports = {
 				})
 				.catch((e) => console.log(e));
 		}
-	},
-};
+	}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

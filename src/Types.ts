@@ -1,5 +1,7 @@
-import { Client, Collection, Interaction, SlashCommandBuilder } from "discord.js";
-import { QuickDB } from "quick.db";
+/* Licensed under Apache License 2.0: https://github.com/Sayrix/Ticket-Bot/blob/typescript/LICENSE */
+
+import type { Client, Collection, Interaction, SlashCommandBuilder } from "discord.js";
+import type { QuickDB } from "quick.db";
 
 // Config types and setups
 type TicketQuestion = {
@@ -115,6 +117,9 @@ export type locale = {
 	ticketAlreadyClaimed: string,
 	ticketClaimedMessage: string,
 	ticketOnlyClosableByStaff: string,
+	ticketOnlyRenamableByStaff: string;
+	ticketRenamed: string;
+	noTickets: string;
 	ticketAlreadyClosed: string,
 	ticketCreatingTranscript: string,
 	ticketTranscriptCreated: string,
@@ -139,6 +144,6 @@ export interface DiscordClient extends Client<boolean> {
 	config: config;
 	db: QuickDB<any>;
 	locales: locale;
-	msToHm: (ms: number) => string;
+	msToHm: (ms: number | Date) => string;
 	commands: Collection<string, command>;
 }

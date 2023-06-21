@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require("discord.js");
+import { CommandInteraction, GuildMember, SlashCommandBuilder, TextChannel } from 'discord.js';
+import { DiscordClient } from '../Types';
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -17,27 +18,31 @@ limitations under the License.
 */
 
 module.exports = {
-	data: new SlashCommandBuilder().setName("close").setDescription("Close the ticket"),
-	async execute(interaction, client) {
-		if (
-			client.config.whoCanCloseTicket === "STAFFONLY" &&
-			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
-		)
+	data: new SlashCommandBuilder()
+		.setName("rename")
+		.setDescription("Rename the ticket")
+		.addStringOption((option) => option.setName("name").setDescription("The new name of the ticket").setRequired(true)),
+	/**
+	 *
+	 * @param {Discord.Interaction} interaction
+	 * @param {Discord.Client} client
+	 * @returns
+	 */
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
 			return interaction
 				.reply({
-					content: client.locales.ticketOnlyClosableByStaff,
+					content: client.locales.ticketOnlyRenamableByStaff,
 					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
-		if (client.config.askReasonWhenClosing) {
-			const { closeAskReason } = require("../utils/close_askReason.js");
-			closeAskReason(interaction, client);
-		} else {
-			await interaction.deferReply().catch((e) => console.log(e));
-			const { close } = require("../utils/close.js");
-			close(interaction, client);
-		}
+		(interaction.channel as TextChannel)?.setName(interaction.options.get("name", true).value as string).catch((e) => console.log(e));
+		interaction
+			.reply({ content: client.locales.ticketRenamed.replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
+			.catch((e) => console.log(e));
 	},
 };
 

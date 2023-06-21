@@ -137,7 +137,9 @@ if (client.config.postgre?.enabled) {
 }
 
 client.locales = require(`./locales/${client.config.lang}.json`) as locale;
-client.msToHm = function dhm(ms: number) {
+client.msToHm = function dhm(ms: number | Date) {
+	if(ms instanceof Date) ms = ms.getTime();
+	
 	const days = Math.floor(ms / (24 * 60 * 60 * 1000));
 	const daysms = ms % (24 * 60 * 60 * 1000);
 	const hours = Math.floor(daysms / (60 * 60 * 1000));

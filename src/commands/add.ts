@@ -1,4 +1,6 @@
-const { SlashCommandBuilder } = require("discord.js");
+import {CommandInteraction, SlashCommandBuilder, TextChannel} from "discord.js";
+import { DiscordClient } from "../Types";
+import { log } from "../utils/logs";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -21,18 +23,18 @@ module.exports = {
 		.setName("add")
 		.setDescription("Add someone to the ticket")
 		.addUserOption((input) => input.setName("user").setDescription("The user to add").setRequired(true)),
-	async execute(interaction, client) {
-		const added = interaction.options.getUser("user");
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		const added = interaction.options.getUser("user", true);
+		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 		if (ticket.invited.includes(added.id)) return interaction.reply({ content: "User already added", ephemeral: true }).catch((e) => console.log(e));
 
 		if (ticket.invited.lenght >= 25)
 			return interaction.reply({ content: "You can't add more than 25 users", ephemeral: true }).catch((e) => console.log(e));
 
-		client.db.push(`tickets_${interaction.channel.id}.invited`, added.id);
+		client.db.push(`tickets_${interaction.channel?.id}.invited`, added.id);
 
-		await interaction.channel.permissionOverwrites
+		await (interaction.channel as TextChannel | null)?.permissionOverwrites
 			.edit(added, {
 				SendMessages: true,
 				AddReactions: true,
@@ -44,19 +46,13 @@ module.exports = {
 
 		interaction.reply({ content: `> Added <@${added.id}> to the ticket` }).catch((e) => console.log(e));
 
-		client.log(
-			"userAdded",
+		log(
 			{
-				user: {
-					tag: interaction.user.tag,
-					id: interaction.user.id,
-					avatarURL: interaction.user.displayAvatarURL(),
-				},
+				LogType: "userAdded",
+				user: interaction.user,
 				ticketId: ticket.id,
-				ticketChannelId: interaction.channel.id,
-				added: {
-					id: added.id,
-				},
+				ticketChannelId: interaction.channel?.id,
+				target: added,
 			},
 			client
 		);

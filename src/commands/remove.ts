@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
+import { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, CommandInteraction, User } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -18,8 +19,9 @@ limitations under the License.
 
 module.exports = {
 	data: new SlashCommandBuilder().setName("remove").setDescription("Remove someone from the ticket"),
-	async execute(interaction, client) {
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
+	// @TODO: Fix type definitions when I figure it out via ORM migration. For now assign a random type that gets the error removed.
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 		if (ticket.invited.length < 1) return interaction.reply({ content: "There are no users to remove", ephemeral: true }).catch((e) => console.log(e));
 
@@ -27,9 +29,9 @@ module.exports = {
 			await client.users.fetch(ticket.invited[i]);
 		}
 
-		const addedUsers = ticket.invited.map((user) => client.users.cache.get(user));
+		const addedUsers: User[] = ticket.invited.map((user: string) => client.users.cache.get(user));
 
-		const row = new ActionRowBuilder().addComponents(
+		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId("removeUser")
 				.setPlaceholder("Please select a user to remove")
