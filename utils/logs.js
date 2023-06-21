@@ -26,7 +26,7 @@ module.exports = {
 		if (!channel) return console.error("The channel to log events is not found!");
 
 		const webhook = (await channel.fetchWebhooks()).find((wh) => wh.token) ?? 
-		await channel.channel.createWebhook({ name: "Ticket Bot Logs" });
+		await channel.createWebhook({ name: "Ticket Bot Logs" });
 
 		if (logsType === "ticketCreate") {
 			const embed = new Discord.EmbedBuilder()
