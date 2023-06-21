@@ -3,3 +3,4 @@ json.sqlite
 package-lock.json
 config.jsonc
 token.json
+dist

@@ -1,10 +1,11 @@
 {
   "name": "ticket-bot",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Bot with a ticket system using Discord.js v14",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "build": "tsc",
     "format:fix": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:fix": "eslint --fix .",
@@ -31,6 +32,7 @@
     "discord.js": "^14.11.0",
     "fs-extra": "^11.1.1",
     "jsonc": "^2.0.0",
+    "mongoose": "^7.3.0",
     "mysql2": "^3.3.5",
     "pg": "^8.11.0",
     "quick.db": "^9.1.6",
@@ -39,12 +41,15 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.4",
+    "@types/node": "^20.3.1",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.3"
   }
 }
