@@ -5,7 +5,9 @@ module.exports = {
 		es2021: true,
 	},
 	overrides: [],
-	extends: ["eslint:recommended", "plugin:node/recommended", "prettier"],
+	extends: ["eslint:recommended", "plugin:node/recommended", "prettier", "plugin:@typescript-eslint/recommended"],
+	parser: "@typescript-eslint/parser",
+	plugins: ["@typescript-eslint"],
 	parserOptions: {
 		ecmaVersion: "latest",
 	},
@@ -18,6 +20,6 @@ module.exports = {
 		"semi": ["error", "always"],
 		"quotes": [2, "double"],
 		"semi-style": ["error", "last"],
-		"no-process-exit": "off",
+		"no-process-exit": "off"
 	},
 };

@@ -1,15 +1,14 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const jsonc = require("jsonc");
+import fs from "node:fs";
+import path from "node:path";
+import { jsonc } from "jsonc";
 // eslint-disable-next-line node/no-extraneous-require
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord.js");
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord.js";
 // eslint-disable-next-line no-unused-vars
-const Discord = require("discord.js");
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
-const { token } = require("./config/token.json");
+import { token } from "../config/token.json";
 
-module.exports = {
+export default {
 	/**
 	 * @param {Discord.Client} client
 	 */
