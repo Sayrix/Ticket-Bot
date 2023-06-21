@@ -83,6 +83,11 @@ module.exports = {
 					}
 				}
 
+				if (options.length <= 0) return interaction.editReply({
+					ephemeral: true,
+					content: client.locales.noTickets
+				})
+
 				const row = new Discord.ActionRowBuilder().addComponents(
 					new Discord.StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
