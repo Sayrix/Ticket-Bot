@@ -3,7 +3,7 @@
   "version": "2.5.0",
   "description": "Bot with a ticket system using Discord.js v14",
   "main": "dist/index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
@@ -45,6 +45,7 @@
     "@types/better-sqlite3": "^7.6.4",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.3.1",
+    "@types/pg": "^8.10.2",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "eslint": "^8.43.0",
