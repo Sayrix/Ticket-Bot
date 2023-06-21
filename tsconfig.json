@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "allowJs": true,
+        "module": "CommonJS",
+        "target": "ES2016",
+        "strict": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "skipLibCheck": false,
+        "sourceMap": true,
+        "inlineSources": true,
+        "sourceRoot": "/"
+    }
+}
