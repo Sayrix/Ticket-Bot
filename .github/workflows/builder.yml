@@ -1,4 +1,4 @@
-name: ESLint Check
+name: Source Check
 
 on:
   push:
@@ -40,3 +40,6 @@ jobs:
 
       - name: ESLint
         run: npx --no-install eslint .
+
+      - name: build
+        run: npm run build --if-present
