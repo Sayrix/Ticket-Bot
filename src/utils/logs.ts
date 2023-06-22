@@ -49,7 +49,7 @@ type log = {
 	ticketId?: string;
 }
 
-
+// eslint-disable-next-line no-unused-vars 
 export const log = async(logs: log, client: DiscordClient) => {
 	if (!client.config.logs) return;
 	if (!client.config.logsChannelId) return;
