@@ -1,4 +1,8 @@
-const Discord = require("discord.js");
+import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { DiscordClient } from "../Types";
+import { log } from "../utils/logs";
+import {createTicket} from '../utils/createTicket';
+import { close } from '../utils/close';
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -23,7 +27,7 @@ module.exports = {
 	 * @param {Discord.Interaction} interaction
 	 * @param {Discord.Client} client
 	 */
-	async execute(interaction, client) {
+	async execute(interaction: Interaction, client: DiscordClient) {
 		if (interaction.isButton()) {
 			if (interaction.customId === "openTicket") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
@@ -31,11 +35,10 @@ module.exports = {
 				// Max ticket opened
 
 				for (let role of client.config.rolesWhoCanNotCreateTickets) {
-					if (role && interaction.member.roles.cache.has(role)) {
+					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 						return interaction
 							.editReply({
-								content: "You can't create a ticket because you are blacklisted",
-								ephemeral: true,
+								content: "You can't create a ticket because you are blacklisted"
 							})
 							.catch((e) => console.log(e));
 					}
@@ -48,8 +51,7 @@ module.exports = {
 					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
 						return interaction
 							.editReply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
-								ephemeral: true,
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
 							})
 							.catch((e) => console.log(e));
 					}
@@ -63,7 +65,7 @@ module.exports = {
 					// x.cantAccess is an array of roles id
 					// If the user has one of the roles, he can't access to this ticket type
 
-					const a = {
+					const a: {[key: string]: string} = {
 						label: x.name,
 						value: x.codeName,
 					};
@@ -76,7 +78,7 @@ module.exports = {
 					let option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
 					if (option.cantAccess) {
 						for (let role of option.cantAccess) {
-							if (role && interaction.member.roles.cache.has(role)) {
+							if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 								options = options.filter((y) => y.value !== x.value);
 							}
 						}
@@ -84,7 +86,6 @@ module.exports = {
 				}
 
 				if (options.length <= 0) return interaction.editReply({
-					ephemeral: true,
 					content: client.locales.noTickets
 				});
 
@@ -98,7 +99,6 @@ module.exports = {
 
 				interaction
 					.editReply({
-						ephemeral: true,
 						components: [row],
 					})
 					.catch((e) => console.log(e));
@@ -135,7 +135,7 @@ module.exports = {
 					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
 						return interaction
 							.reply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
 								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
@@ -145,17 +145,17 @@ module.exports = {
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askQuestions) {
-					const modal = new client.discord.ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
+					const modal = new ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
 
 					ticketType.questions.forEach((x, i) => {
-						const input = new client.discord.TextInputBuilder()
+						const input = new TextInputBuilder()
 							.setCustomId(`input_${interaction.values[0]}_${i}`)
 							.setLabel(x.label)
-							.setStyle(x.style == "SHORT" ? client.discord.TextInputStyle.Short : client.discord.TextInputStyle.Paragraph)
+							.setStyle(x.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
 							.setPlaceholder(x.placeholder)
 							.setMaxLength(x.maxLength);
 
-						const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
+						const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
 						modal.addComponents(firstActionRow);
 					});
 
@@ -170,19 +170,15 @@ module.exports = {
 				client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
 
 				interaction.values.forEach((value) => {
-					interaction.channel.permissionOverwrites.delete(value).catch((e) => console.log(e));
+					(interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
 
-					client.log(
-						"userRemoved",
+					log(
 						{
-							user: {
-								tag: interaction.user.tag,
-								id: interaction.user.id,
-								avatarURL: interaction.user.displayAvatarURL(),
-							},
+							LogType: "userRemoved",
+							user: interaction.user,
 							ticketId: ticket.id,
-							ticketChannelId: interaction.channel.id,
-							removed: {
+							ticketChannelId: interaction.channel?.id,
+							target: {
 								id: value,
 							},
 						},
@@ -203,16 +199,16 @@ module.exports = {
 
 		if (interaction.isModalSubmit()) {
 			if (interaction.customId === "askReason") {
-				const type = interaction.fields.fields.first().customId.split("_")[1];
+				const type = interaction.fields.fields.first()?.customId.split("_")[1];
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === type);
+				//@ts-ignore Remove illegal usages without breaking compatibility
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
-				require("../utils/createTicket.js").createTicket(interaction, client, ticketType, interaction.fields.fields);
+				createTicket(interaction, client, ticketType, interaction.fields.fields);
 			}
 
 			if (interaction.customId === "askReasonClose") {
 				await interaction.deferReply().catch((e) => console.log(e));
-				const { close } = require("../utils/close.js");
-				close(interaction, client, interaction.fields.fields.first().value);
+				close(interaction, client, interaction.fields.fields.first()?.value);
 			}
 		}
 	},

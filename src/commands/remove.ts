@@ -19,7 +19,7 @@ limitations under the License.
 
 module.exports = {
 	data: new SlashCommandBuilder().setName("remove").setDescription("Remove someone from the ticket"),
-	// @TODO: Fix type definitions when I figure it out via ORM migration. For now assign a random type that gets the error removed.
+	
 	async execute(interaction: CommandInteraction, client: DiscordClient) {
 		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
@@ -28,7 +28,7 @@ module.exports = {
 		for (let i = 0; i < ticket.invited.length; i++) {
 			await client.users.fetch(ticket.invited[i]);
 		}
-
+		// @TODO: Fix type definitions when I figure it out via ORM migration. For now assign a random type that gets the error removed.
 		const addedUsers: User[] = ticket.invited.map((user: string) => client.users.cache.get(user));
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -38,6 +38,7 @@ module.exports = {
 				.setMinValues(1)
 				.setMaxValues(ticket.invited.length)
 				.addOptions(
+					// @TODO: Fix type definitions when I figure it out via ORM migration. For now assign a random type that gets the error removed.
 					addedUsers.map((user) => {
 						return {
 							label: user.tag,

@@ -21,7 +21,7 @@ type log = {
 	LogType: "ticketCreate"
 	user: User
 	ticketChannelId?: string;
-	reason: string;
+	reason?: string;
 } | {
 	LogType: "ticketClaim" | "ticketClose"
 	user: User
@@ -41,7 +41,9 @@ type log = {
 } | {
 	LogType: "userAdded" | "userRemoved"
 	user: User;
-	target: User;
+	target: {
+		id?: string
+	};
 	ticketChannelId?: string;
 	reason?: string;
 	ticketId?: string;

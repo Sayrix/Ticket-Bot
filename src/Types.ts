@@ -10,15 +10,17 @@ type TicketQuestion = {
     style: string;
     maxLength: number;
 }
-type TicketType = {
+export type TicketType = {
     codeName: string;
     name: string;
     description: string;
+	emoji: string;
+	color: string;
     categoryId: string;
     ticketNameOption: string;
     customDescription: string;
     cantAccess: string[];
-    askQuestion: boolean;
+    askQuestions: boolean;
     questions: TicketQuestion[];
 }
 type dbConn = {
@@ -32,14 +34,14 @@ type dbConn = {
 export type config = {
 	clientId: string;
 	guildId: string;
-	maincolor: string;
+	mainColor: string;
 	lang: string; // Tho can be cs/de/es/fr/main/tr type but we can't guarantee what users put
 	// Database credentials are deprecated, will be removed when Prisma are in-place.
 	postgre?: dbConn;
 	mysql?: dbConn;
 	closeTicketCategoryId: string;
 	openTicketChannelId: string;
-	TicketTypes: TicketType[];
+	ticketTypes: TicketType[];
     ticketNameOption: string;
     ticketNamePrefixWhenClaimed: string;
     rolesWhoHaveAccessToTheTickets: string[];
@@ -75,7 +77,8 @@ export type locale = {
 			title: string,
 			description: string,
 			footer: {
-				text: string
+				text: string,
+				iconUrl?: string
 			}
 		},
 		ticketClosed: {
@@ -84,9 +87,11 @@ export type locale = {
 		},
 		ticketClosedDM: {
 			title: string,
+			color?: string,
 			description: string,
 			footer: {
-				text: string
+				text: string,
+				iconUrl?: string
 			}
 		}
 	},

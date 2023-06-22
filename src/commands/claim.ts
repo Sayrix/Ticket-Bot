@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require("discord.js");
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -18,7 +19,7 @@ limitations under the License.
 
 module.exports = {
 	data: new SlashCommandBuilder().setName("claim").setDescription("Set the ticket as claimed."),
-	async execute(interaction, client) {
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
 		const { claim } = require("../utils/claim.js");
 		claim(interaction, client);
 	},

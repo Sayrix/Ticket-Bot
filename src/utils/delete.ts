@@ -14,30 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
-	async deleteTicket(interaction, client) {
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+import { ButtonInteraction } from "discord.js";
+import { DiscordClient } from "../Types";
+import { log } from "./logs";
 
-		client.log(
-			"ticketDelete",
-			{
-				user: {
-					tag: interaction.user.tag,
-					id: interaction.user.id,
-					avatarURL: interaction.user.displayAvatarURL(),
-				},
-				ticketId: ticket.id,
-				ticketCreatedAt: ticket.createdAt,
-				transcriptURL: ticket.transcriptURL,
-			},
-			client
-		);
-
-		await interaction.deferUpdate();
-		interaction.channel.delete().catch((e) => console.log(e));
-	},
-};
+export const deleteTicket = async (interaction: ButtonInteraction, client: DiscordClient) => {
+	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e))
+	log(
+		{
+			LogType: "ticketDelete",
+			user: interaction.user,
+			ticketId: ticket.id,
+			ticketCreatedAt: ticket.createdAt,
+			transcriptURL: ticket.transcriptURL,
+		},
+		client
+	);
+	await interaction.deferUpdate();
+	interaction.channel?.delete().catch((e) => console.log(e));
+}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
