@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, Collection, CommandInteraction, ComponentBuilder, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, StringSelectMenuBuilder, TextChannel } from "discord.js";
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, ButtonStyle, Collection, CommandInteraction, ComponentBuilder, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, StringSelectMenuBuilder, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 let domain = "https://ticket.pm/";
@@ -128,8 +128,8 @@ export async function close(interaction: ModalSubmitInteraction | CommandInterac
 		);
 		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
 
-		const row = new Discord.ActionRowBuilder().addComponents(
-			new Discord.ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.other.deleteTicketButtonMSG).setStyle(Discord.ButtonStyle.Danger)
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.other.deleteTicketButtonMSG).setStyle(ButtonStyle.Danger)
 		);
 		const lEmbed = client.locales.embeds;
 		interaction.channel?.send({
@@ -145,8 +145,8 @@ export async function close(interaction: ModalSubmitInteraction | CommandInterac
 		})
 			.catch((e) => console.log(e));
 
-		const tiketClosedDMEmbed = new Discord.EmbedBuilder()
-			.setColor(lEmbed.ticketClosedDM.color ? lEmbed.ticketClosedDM.color : client.config.mainColor)
+		const tiketClosedDMEmbed = new EmbedBuilder()
+			.setColor(`#${lEmbed.ticketClosedDM.color ? lEmbed.ticketClosedDM.color : client.config.mainColor}`)
 			.setDescription(
 				client.locales.embeds.ticketClosedDM.description
 					.replace("TICKETCOUNT", ticket.id)
@@ -175,7 +175,7 @@ export async function close(interaction: ModalSubmitInteraction | CommandInterac
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: "ticket.pm" + lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconUrl: lEmbed.ticketClosedDM.footer.iconUrl
+				iconURL: lEmbed.ticketClosedDM.footer.iconUrl
 			});
 
 		/*
