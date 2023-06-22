@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ButtonInteraction, CommandInteraction, GuildMember } from "discord.js";
+import { ActionRowBuilder, CommandInteraction, GuildMember, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DiscordClient } from "../Types";
 
 export const closeAskReason = async(interaction: CommandInteraction, client: DiscordClient) => {
@@ -29,16 +29,16 @@ export const closeAskReason = async(interaction: CommandInteraction, client: Dis
 			})
 			.catch((e) => console.log(e));
 
-	const modal = new Discord.ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
+	const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
 
-	const input = new Discord.TextInputBuilder()
+	const input = new TextInputBuilder()
 		.setCustomId("reason")
 		.setLabel(client.locales.modals.reasonTicketClose.label)
-		.setStyle(Discord.TextInputStyle.Paragraph)
+		.setStyle(TextInputStyle.Paragraph)
 		.setPlaceholder(client.locales.modals.reasonTicketClose.placeholder)
 		.setMaxLength(256);
 
-	const firstActionRow = new Discord.ActionRowBuilder().addComponents(input);
+	const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
 	modal.addComponents(firstActionRow);
 	await interaction.showModal(modal).catch((e) => console.log(e));
 };

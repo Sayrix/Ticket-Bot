@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ButtonInteraction, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 
@@ -24,16 +24,16 @@ import { log } from "./logs";
 * @param {Discord.Client} client
 */
 export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: DiscordClient) => {
-   const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
-   if (!ticket)
+	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+	if (!ticket)
 	   return interaction.reply({
 		   content: "Ticket not found",
 		   ephemeral: true,
 	   });
 
-   const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
+	const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
 
-   if (!canClaim)
+	if (!canClaim)
 	   return interaction
 		   .reply({
 			   content: client.locales.ticketOnlyClaimableByStaff,
@@ -41,7 +41,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		   })
 		   .catch((e) => console.log(e));
 
-   if (ticket.claimed)
+	if (ticket.claimed)
 	   return interaction
 		   .reply({
 			   content: client.locales.ticketAlreadyClaimed,
@@ -49,54 +49,52 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		   })
 		   .catch((e) => console.log(e));
 
-   log(
+	log(
 	   {
-		LogType: "ticketClaim",
-		   user: interaction.user,
-		   ticketId: ticket.id,
-		   ticketChannelId: interaction.channel?.id,
-		   ticketCreatedAt: ticket.createdAt,
+			LogType: "ticketClaim",
+		    user: interaction.user,
+		    ticketId: ticket.id,
+		    ticketChannelId: interaction.channel?.id,
+		    ticketCreatedAt: ticket.createdAt,
 	   },
 	   client
-   );
+	);
 
-   await client.db.set(`tickets_${interaction.channel?.id}.claimed`, true);
-   await client.db.set(`tickets_${interaction.channel?.id}.claimedBy`, interaction.user.id);
-   await client.db.set(`tickets_${interaction.channel?.id}.claimedAt`, Date.now());
+	await client.db.set(`tickets_${interaction.channel?.id}.claimed`, true);
+	await client.db.set(`tickets_${interaction.channel?.id}.claimedBy`, interaction.user.id);
+	await client.db.set(`tickets_${interaction.channel?.id}.claimedAt`, Date.now());
 
-   //await interaction.channel?.messages.fetch(); // Commented bc it seems useless
-   const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
-   const msg = interaction.channel?.messages.cache.get(messageId);
-   const oldEmbed = msg?.embeds[0].data;
-   const newEmbed = new EmbedBuilder(oldEmbed)
-	   .setDescription(oldEmbed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`)
+	//await interaction.channel?.messages.fetch(); // Commented bc it seems useless
+	const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
+	const msg = interaction.channel?.messages.cache.get(messageId);
+	const oldEmbed = msg?.embeds[0].data;
+	const newEmbed = new EmbedBuilder(oldEmbed)
+		.setDescription(oldEmbed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`);
 
-	new Compoenent
-	await msg?.edit({content: msg.content, embeds: msg.embeds, components:[]})
-   msg?.components[0].components.map((x) => {
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	msg?.components[0].components.map((x) => {
+		const btnBuilder = new ButtonBuilder(x.data);
+	   	if (x.customId === "claim") btnBuilder.setDisabled(true);
+		row.addComponents(btnBuilder);
+	});
 
-	   //if (x.customId === "claim") 
-   });
-   msg?.components[0].data.
-
-   msg?.edit({
+   	msg?.edit({
 		   content: msg.content,
 		   embeds: [newEmbed],
-		   components: msg.components,
-	   })
-	   .catch((e) => console.log(e));
+		   components: [row],
+	}).catch((e) => console.log(e));
 
-   interaction
+   	interaction
 	   .reply({
 		   content: client.locales.ticketClaimedMessage.replace("USER", `<@${interaction.user.id}>`),
 		   ephemeral: false,
 	   })
 	   .catch((e) => console.log(e));
 
-   if (client.config.ticketNamePrefixWhenClaimed) {
+   	if (client.config.ticketNamePrefixWhenClaimed) {
 	   (interaction.channel as TextChannel | null)?.setName(`${client.config.ticketNamePrefixWhenClaimed}${(interaction.channel as TextChannel | null)?.name}`).catch((e) => console.log(e));
-   }
-}
+   	}
+};
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
 
