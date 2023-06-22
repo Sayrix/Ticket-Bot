@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { Collection, CommandInteraction, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, Collection, CommandInteraction, ComponentBuilder, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, StringSelectMenuBuilder, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 let domain = "https://ticket.pm/";
@@ -95,20 +95,21 @@ export async function close(interaction: ModalSubmitInteraction | CommandInterac
 
 		const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
 		const msg = interaction.channel?.messages.cache.get(messageId);
-		const embed = msg?.embeds[0].data;
+		const embed = new EmbedBuilder(msg?.embeds[0].data);
 
+		const rowAction = new ActionRowBuilder<ButtonBuilder>();
 		msg?.components[0]?.components?.map((x) => {
-			//@ts-ignore TODO: Remove this illegal usage without breaking code
-			if (x.data.custom_id === "close") x.data.disabled = true;
-			//@ts-ignore TODO: Remove this illegal usage without breaking code
-			if (x.data.custom_id === "close_askReason") x.data.disabled = true;
+			if(x.type !== ComponentType.Button) return;
+			const builder = new ButtonBuilder(x.data);
+			if (x.customId === "close") builder.setDisabled(true);
+			if (x.customId === "close_askReason") builder.setDisabled(true);
+			rowAction.addComponents(builder);
 		});
 
 		msg?.edit({
 			content: msg.content,
-			//@ts-ignore TODO: Remove this illegal usage without breaking code
 			embeds: [embed],
-			components: msg.components
+			components: [rowAction]
 		})
 			.catch((e) => console.log(e));
 
