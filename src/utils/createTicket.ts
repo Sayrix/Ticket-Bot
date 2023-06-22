@@ -1,6 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, TextInputComponent } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, TextInputComponent } from "discord.js";
 import { DiscordClient } from "../Types";
-import {TicketType} from '../Types';
+import {TicketType} from "../Types";
 import { log } from "./logs";
 
 /*
@@ -30,8 +30,8 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 	return new Promise(async function (resolve, reject) {
 		await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
-		let reason: string[] = [];
-		let allReasons: string = "";
+		const reason: string[] = [];
+		let allReasons = "";
 
 		if (typeof reasons === "object") {
 			reasons.forEach(async (r) => {
@@ -60,7 +60,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 			permissionOverwrites: [
 				{
 					id: interaction.guild!.roles.everyone,
-					deny: [Discord.PermissionFlagsBits.ViewChannel],
+					deny: [PermissionFlagsBits.ViewChannel],
 				},
 			],
 		});

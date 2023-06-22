@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, ButtonStyle, Collection, CommandInteraction, ComponentBuilder, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, StringSelectMenuBuilder, TextChannel } from "discord.js";
+import {  ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 let domain = "https://ticket.pm/";
