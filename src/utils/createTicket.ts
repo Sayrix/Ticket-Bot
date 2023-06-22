@@ -54,13 +54,14 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				.replace("USERID", interaction.user.id)
 				.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) ?? "0");
 		}
-
+		if(!interaction.guild) return console.error("Interaction createTicket was not executed in a guild");
+		
 		const channel = await client.guilds.cache.get(client.config.guildId)?.channels.create({
 			name: ticketName,
 			parent: ticketType.categoryId,
 			permissionOverwrites: [
 				{
-					id: interaction.guild!.roles.everyone,
+					id: interaction.guild.roles.everyone,
 					deny: [PermissionFlagsBits.ViewChannel],
 				},
 			],
