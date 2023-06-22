@@ -58,16 +58,18 @@ export type config = {
     status: {
         enabled: boolean;
         text: string;
-        type: "PLAYING" | "WATCHING" | "LISTENING" | "STREAMING" | "COMPETING",
+        type: "PLAYING" | "STREAMING"| "LISTENING" | "WATCHING" | "COMPETING",
         url?: string,
         status: "online"
     },
     maxTicketOpened: number;
+	disableTelemetry: boolean;
 }
 export type locale = {
     embeds: {
 		openTicket: {
 			title: string,
+			color?: number,
 			description: string,
 			footer: {
 				text: string
@@ -151,4 +153,24 @@ export interface DiscordClient extends Client<boolean> {
 	locales: locale;
 	msToHm: (ms: number | Date) => string;
 	commands: Collection<string, command>;
+}
+
+export type SayrixSponsorData = {
+	sponsor: {
+		login: string;
+		name: string;
+		avatarUrl: string;
+		websiteUrl?: string;
+		linkUrl: string;
+		type: string;
+		avatarUrlHighRes: string;
+		avatarUrlMediumRes: string;
+		avatarUrlLowRes: string;
+	},
+	isOneTime: boolean;
+	monthlyDollars: number;
+	privacyLevel: string;
+	tierName: string;
+	createdAt: string;
+	provider: string;
 }

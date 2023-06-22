@@ -4,7 +4,6 @@ import { jsonc } from "jsonc";
 // eslint-disable-next-line node/no-extraneous-require
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
-// eslint-disable-next-line no-unused-vars
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 import { token } from "../config/token.json";
 
