@@ -1,8 +1,11 @@
-import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, SelectMenuComponentOptionData, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "../utils/logs";
-import {createTicket} from '../utils/createTicket';
-import { close } from '../utils/close';
+import {createTicket} from "../utils/createTicket";
+import { close } from "../utils/close";
+import { claim } from "../utils/claim";
+import { closeAskReason } from "../utils/close_askReason";
+import { deleteTicket } from "../utils/delete";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -20,7 +23,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default {
 	name: "interactionCreate",
 	once: false,
 	/**
@@ -34,7 +37,7 @@ module.exports = {
 
 				// Max ticket opened
 
-				for (let role of client.config.rolesWhoCanNotCreateTickets) {
+				for (const role of client.config.rolesWhoCanNotCreateTickets) {
 					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 						return interaction
 							.editReply({
@@ -58,14 +61,13 @@ module.exports = {
 				}
 
 				// Make a select menus of all tickets types
+				let options: SelectMenuComponentOptionData[] = [];
 
-				let options = [];
-
-				for (let x of client.config.ticketTypes) {
+				for (const x of client.config.ticketTypes) {
 					// x.cantAccess is an array of roles id
 					// If the user has one of the roles, he can't access to this ticket type
 
-					const a: {[key: string]: string} = {
+					const a: SelectMenuComponentOptionData = {
 						label: x.name,
 						value: x.codeName,
 					};
@@ -74,10 +76,10 @@ module.exports = {
 					options.push(a);
 				}
 
-				for (let x of options) {
-					let option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
+				for (const x of options) {
+					const option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
 					if (option.cantAccess) {
-						for (let role of option.cantAccess) {
+						for (const role of option.cantAccess) {
 							if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 								options = options.filter((y) => y.value !== x.value);
 							}
@@ -89,8 +91,8 @@ module.exports = {
 					content: client.locales.noTickets
 				});
 
-				const row = new Discord.ActionRowBuilder().addComponents(
-					new Discord.StringSelectMenuBuilder()
+				const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					new StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
 						.setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
 						.setMaxValues(1)
@@ -105,23 +107,19 @@ module.exports = {
 			}
 
 			if (interaction.customId === "claim") {
-				const { claim } = require("../utils/claim.js");
 				claim(interaction, client);
 			}
 
 			if (interaction.customId === "close") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				const { close } = require("../utils/close.js");
 				close(interaction, client, client.locales.other.noReasonGiven);
 			}
 
 			if (interaction.customId === "close_askReason") {
-				const { closeAskReason } = require("../utils/close_askReason.js");
 				closeAskReason(interaction, client);
 			}
 
 			if (interaction.customId === "deleteTicket") {
-				const { deleteTicket } = require("../utils/delete.js");
 				deleteTicket(interaction, client);
 			}
 		}
@@ -161,7 +159,7 @@ module.exports = {
 
 					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {
-					require("../utils/createTicket.js").createTicket(interaction, client, ticketType, client.locales.other.noReasonGiven);
+					createTicket(interaction, client, ticketType, client.locales.other.noReasonGiven);
 				}
 			}
 
@@ -201,8 +199,8 @@ module.exports = {
 			if (interaction.customId === "askReason") {
 				const type = interaction.fields.fields.first()?.customId.split("_")[1];
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === type);
-				//@ts-ignore Remove illegal usages without breaking compatibility
-				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
+				// Using customId until the value can be figured out
+				if (!ticketType) return console.error(`Ticket type ${interaction.customId} not found!`);
 				createTicket(interaction, client, ticketType, interaction.fields.fields);
 			}
 

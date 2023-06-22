@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, TextInputComponent } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, StringSelectMenuInteraction, TextInputComponent } from "discord.js";
 import { DiscordClient } from "../Types";
 import {TicketType} from "../Types";
 import { log } from "./logs";
@@ -25,7 +25,7 @@ limitations under the License.
  * @param {Object} ticketType
  * @param {Object|string} reasons
  */
-export const createTicket = async (interaction: ModalSubmitInteraction, client: DiscordClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent>) => {
+export const createTicket = async (interaction: StringSelectMenuInteraction | ModalSubmitInteraction, client: DiscordClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent> | string) => {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise(async function (resolve, reject) {
 		await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
@@ -39,6 +39,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 			});
 			allReasons = reason.map((r, i) => `Question ${i + 1}: ${r}`).join(", ");
 		}
+		if(typeof reasons === "string") allReasons = reasons;
 
 		let ticketName = "";
 

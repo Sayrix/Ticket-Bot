@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 let domain = "https://ticket.pm/";
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-export async function close(interaction: ModalSubmitInteraction | CommandInteraction, client: DiscordClient, reason?: string) {
+export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: DiscordClient, reason?: string) {
 	if (!client.config.createTranscript) domain = client.locales.other.unavailable;
 
 	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);

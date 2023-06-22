@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ActionRowBuilder, CommandInteraction, GuildMember, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, CommandInteraction, GuildMember, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DiscordClient } from "../Types";
 
-export const closeAskReason = async(interaction: CommandInteraction, client: DiscordClient) => {
+export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: DiscordClient) => {
 	if (
 		client.config.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
