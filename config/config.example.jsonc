@@ -108,5 +108,7 @@
 		"status": "online" // online, idle, dnd, invisible set to online if the type is STREAMING
 	},
 
-	"maxTicketOpened": 0 // The number of tickets the user can open while another one is already open. Set to 0 to unlimited
+	"maxTicketOpened": 0, // The number of tickets the user can open while another one is already open. Set to 0 to unlimited
+	
+	"disableTelemetry": false
 }
