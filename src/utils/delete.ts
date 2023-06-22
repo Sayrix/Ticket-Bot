@@ -20,7 +20,7 @@ import { log } from "./logs";
 
 export const deleteTicket = async (interaction: ButtonInteraction, client: DiscordClient) => {
 	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
-	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e))
+	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 	log(
 		{
 			LogType: "ticketDelete",
@@ -33,7 +33,7 @@ export const deleteTicket = async (interaction: ButtonInteraction, client: Disco
 	);
 	await interaction.deferUpdate();
 	interaction.channel?.delete().catch((e) => console.log(e));
-}
+};
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

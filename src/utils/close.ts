@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { Collection, GuildMember, Message, ModalSubmitInteraction, TextBasedChannel, TextChannel, TextChannelType } from "discord.js";
+import { Collection, CommandInteraction, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 let domain = "https://ticket.pm/";
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-export async function close(interaction: ModalSubmitInteraction, client: DiscordClient, reason?: string) {
+export async function close(interaction: ModalSubmitInteraction | CommandInteraction, client: DiscordClient, reason?: string) {
 	if (!client.config.createTranscript) domain = client.locales.other.unavailable;
 
 	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
@@ -105,21 +105,21 @@ export async function close(interaction: ModalSubmitInteraction, client: Discord
 		});
 
 		msg?.edit({
-				content: msg.content,
-				//@ts-ignore TODO: Remove this illegal usage without breaking code
-				embeds: [embed],
-				components: msg.components
-			})
+			content: msg.content,
+			//@ts-ignore TODO: Remove this illegal usage without breaking code
+			embeds: [embed],
+			components: msg.components
+		})
 			.catch((e) => console.log(e));
 
 		await client.db.set(`tickets_${interaction.channel?.id}.closed`, true);
 
 		interaction.channel?.send({
-				content: client.locales.ticketTranscriptCreated.replace(
-					"TRANSCRIPTURL",
-					domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
-				)
-			})
+			content: client.locales.ticketTranscriptCreated.replace(
+				"TRANSCRIPTURL",
+				domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
+			)
+		})
 			.catch((e) => console.log(e));
 		await client.db.set(
 			`tickets_${interaction.channel?.id}.transcriptURL`,
@@ -132,16 +132,16 @@ export async function close(interaction: ModalSubmitInteraction, client: Discord
 		);
 		const lEmbed = client.locales.embeds;
 		interaction.channel?.send({
-				embeds: [
-					JSON.parse(
-						JSON.stringify(lEmbed.ticketClosed)
-							.replace("TICKETCOUNT", ticket.id)
-							.replace("REASON", ticket.closeReason.replace(/[\n\r]/g, "\\n"))
-							.replace("CLOSERNAME", interaction.user.tag)
-					)
-				],
-				components: [row]
-			})
+			embeds: [
+				JSON.parse(
+					JSON.stringify(lEmbed.ticketClosed)
+						.replace("TICKETCOUNT", ticket.id)
+						.replace("REASON", ticket.closeReason.replace(/[\n\r]/g, "\\n"))
+						.replace("CLOSERNAME", interaction.user.tag)
+				)
+			],
+			components: [row]
+		})
 			.catch((e) => console.log(e));
 
 		const tiketClosedDMEmbed = new Discord.EmbedBuilder()
@@ -208,7 +208,7 @@ export async function close(interaction: ModalSubmitInteraction, client: Discord
 	}
 
 	async function fetchAll() {
-		let collArray: Collection<string, Message<true | false>>[] = [];
+		const collArray: Collection<string, Message<true | false>>[] = [];
 		let lastID = (interaction.channel as TextChannel | null)?.lastMessageId;
 		// eslint-disable-next-line no-constant-condition
 		while (true) {

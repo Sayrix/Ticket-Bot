@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ButtonInteraction, GuildMember } from "discord.js";
+import { ButtonInteraction, CommandInteraction, GuildMember } from "discord.js";
 import { DiscordClient } from "../Types";
 
-export const closeAskReason = async(interaction: ButtonInteraction, client: DiscordClient) => {
+export const closeAskReason = async(interaction: CommandInteraction, client: DiscordClient) => {
 	if (
 		client.config.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
@@ -41,7 +41,7 @@ export const closeAskReason = async(interaction: ButtonInteraction, client: Disc
 	const firstActionRow = new Discord.ActionRowBuilder().addComponents(input);
 	modal.addComponents(firstActionRow);
 	await interaction.showModal(modal).catch((e) => console.log(e));
-}
+};
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

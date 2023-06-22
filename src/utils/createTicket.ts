@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, Collection, EmbedBuilder, ModalSubmitInteraction, TextInputComponent } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, TextInputComponent } from "discord.js";
 import { DiscordClient } from "../Types";
 import {TicketType} from '../Types';
 import { log } from "./logs";
@@ -116,7 +116,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 					.catch((e) => console.log(e));
 			});
 		}
-		const lEmbeds = client.locales.embeds
+		const lEmbeds = client.locales.embeds;
 		const ticketOpenedEmbed = new EmbedBuilder()
 			.setColor(`#${ticketType.color ? ticketType.color : client.config.mainColor}`)
 			.setTitle(lEmbeds.ticketOpened.title.replace("CATEGORYNAME", ticketType.name))
@@ -196,7 +196,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 						.setCustomId("close_askReason")
 						.setLabel(client.locales.buttons.close.label)
 						.setEmoji(client.locales.buttons.close.emoji)
-						.setStyle(Discord.ButtonStyle.Danger)
+						.setStyle(ButtonStyle.Danger)
 				);
 			} else {
 				row.addComponents(
@@ -204,7 +204,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 						.setCustomId("close")
 						.setLabel(client.locales.buttons.close.label)
 						.setEmoji(client.locales.buttons.close.emoji)
-						.setStyle(Discord.ButtonStyle.Danger)
+						.setStyle(ButtonStyle.Danger)
 				);
 			}
 		}
@@ -215,7 +215,7 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 					.setCustomId("claim")
 					.setLabel(client.locales.buttons.claim.label)
 					.setEmoji(client.locales.buttons.claim.emoji)
-					.setStyle(Discord.ButtonStyle.Primary)
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
@@ -248,4 +248,4 @@ export const createTicket = async (interaction: ModalSubmitInteraction, client: 
 			})
 			.catch((e) => console.log(e));
 	});
-}
+};

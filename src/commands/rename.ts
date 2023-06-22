@@ -1,5 +1,5 @@
-import { CommandInteraction, GuildMember, SlashCommandBuilder, TextChannel } from 'discord.js';
-import { DiscordClient } from '../Types';
+import { CommandInteraction, GuildMember, SlashCommandBuilder, TextChannel } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName("rename")
 		.setDescription("Rename the ticket")

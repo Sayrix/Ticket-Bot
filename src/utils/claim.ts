@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ButtonInteraction, GuildMember, TextChannel } from "discord.js";
+import { ButtonInteraction, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 
@@ -23,7 +23,7 @@ import { log } from "./logs";
 * @param {Discord.CommandInteraction} interaction
 * @param {Discord.Client} client
 */
-export const claim = async(interaction: ButtonInteraction, client: DiscordClient) => {
+export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: DiscordClient) => {
    const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
    if (!ticket)
 	   return interaction.reply({
@@ -67,19 +67,21 @@ export const claim = async(interaction: ButtonInteraction, client: DiscordClient
    //await interaction.channel?.messages.fetch(); // Commented bc it seems useless
    const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
    const msg = interaction.channel?.messages.cache.get(messageId);
-   const embed = msg?.embeds[0].data;
-   //@ts-ignore TODO: Remove this illegal usage without breaking code
-   embed.description = embed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`;
+   const oldEmbed = msg?.embeds[0].data;
+   const newEmbed = new EmbedBuilder(oldEmbed)
+	   .setDescription(oldEmbed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`)
 
+	new Compoenent
+	await msg?.edit({content: msg.content, embeds: msg.embeds, components:[]})
    msg?.components[0].components.map((x) => {
-	//@ts-ignore TODO: Remove this illegal usage without breaking code
-	   if (x.data.custom_id === "claim") x.data.disabled = true;
+
+	   //if (x.customId === "claim") 
    });
+   msg?.components[0].data.
 
    msg?.edit({
 		   content: msg.content,
-		   //@ts-ignore TODO: Remove this illegal usage without breaking code
-		   embeds: [embed],
+		   embeds: [newEmbed],
 		   components: msg.components,
 	   })
 	   .catch((e) => console.log(e));
