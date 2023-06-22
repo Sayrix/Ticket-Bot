@@ -15,13 +15,13 @@ limitations under the License.
 */
 
 import { Interaction } from "discord.js";
-import fs from 'fs-extra';
-import path from 'node:path';
-import { Client, Collection, GatewayIntentBits } from 'discord.js'
+import fs from "fs-extra";
+import path from "node:path";
+import { Client, Collection, GatewayIntentBits } from "discord.js";
 // eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
-import { token } from '../config/token.json'
-import {QuickDB, MySQLDriver } from 'quick.db'
-import { jsonc } from 'jsonc';
+import { token } from "../config/token.json";
+import {QuickDB, MySQLDriver } from "quick.db";
+import { jsonc } from "jsonc";
 import { DiscordClient, config, locale } from "./Types";
 
 // Although invalid type, it should be good enough for now until more stuff needs to be handled here
@@ -73,7 +73,7 @@ const client = new Client({
 }) as DiscordClient;
 
 // All variables stored in the client object
-client.config = config
+client.config = config;
 
 let db: QuickDB<any> | undefined;
 
