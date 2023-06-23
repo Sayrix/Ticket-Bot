@@ -18,11 +18,12 @@ import { Interaction } from "discord.js";
 import fs from "fs-extra";
 import path from "node:path";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-// eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 import { token } from "../config/token.json";
 import {QuickDB, MySQLDriver } from "quick.db";
 import { jsonc } from "jsonc";
 import { DiscordClient, config, locale } from "./Types";
+import {version} from "../package.json";
+import {PostgresDriver} from "./utils/pgsqlDriver";
 
 // Although invalid type, it should be good enough for now until more stuff needs to be handled here
 process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
@@ -47,9 +48,7 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 	res.json().then((json) => {
 		// Assumign the format stays consistent (i.e. x.x.x)
 		const latest = json[0].name.split(".").map((k: string) => parseInt(k));
-		//@ts-ignore allow access to package.json for version check
-		const current = require("../package.json")
-			.version.split(".")
+		const current = version.split(".")
 			.map((k: string) => parseInt(k));
 		if (
 			latest[0] > current[0] ||
@@ -75,19 +74,17 @@ const client = new Client({
 // All variables stored in the client object
 client.config = config;
 
-let db: QuickDB<any> | undefined;
+let db: QuickDB | undefined;
 
 if (client.config.postgre?.enabled) {
 	// PostgreSQL Support.
 	(async () => {
 		try {
-			// eslint-disable-next-line node/no-missing-require
 			require.resolve("pg");
 		} catch (e) {
 			console.error("pg driver is not installed!\n\nPlease run \"npm i pg\" in the console!");
 			throw e;
 		}
-		const PostgresDriver = require("./utils/pgsqlDriver");
 		const pgsql = new PostgresDriver({
 			host: client.config.postgre?.host,
 			user: client.config.postgre?.user,
@@ -107,7 +104,6 @@ if (client.config.postgre?.enabled) {
 	// MySQL Support
 	(async () => {
 		try {
-			// eslint-disable-next-line node/no-missing-require
 			require.resolve("mysql2");
 		} catch (e) {
 			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
@@ -135,7 +131,7 @@ if (client.config.postgre?.enabled) {
 	db = new QuickDB();
 	client.db = db;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 client.locales = require(`./locales/${client.config.lang}.json`) as locale;
 client.msToHm = function dhm(ms: number | Date) {
 	if(ms instanceof Date) ms = ms.getTime();
@@ -162,6 +158,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const command = require(filePath);
 	client.commands.set(command.data.name, command);
 }
@@ -189,6 +186,7 @@ const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".j
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const event = require(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));

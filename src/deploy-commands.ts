@@ -1,10 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { jsonc } from "jsonc";
-// eslint-disable-next-line node/no-extraneous-require
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
-// eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
 import { token } from "../config/token.json";
 
 export default {
@@ -20,6 +18,7 @@ export default {
 
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const command = require(filePath);
 			commands.push(command.data.toJSON());
 		}
