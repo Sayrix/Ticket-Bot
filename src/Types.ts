@@ -63,7 +63,7 @@ export type config = {
         status: "online"
     },
     maxTicketOpened: number;
-	disableTelemetry: boolean;
+	minimalTracking: boolean;
 }
 export type locale = {
     embeds: {

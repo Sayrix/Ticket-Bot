@@ -181,6 +181,31 @@ export default {
 		let connected = false;
 
 		function telemetry(connection: connection) {
+			let fullInfo: {[key:string]: string | number | {[key:string]: string | number}} = {
+				os: os.platform(),
+				osVersion1: os.release(),
+				osVersion2: os.version(),
+				uptime: process.uptime(),
+				ram: {
+					total: os.totalmem(),
+					free: os.freemem()
+				},
+				cpu: {
+					model: os.cpus()[0].model,
+					cores: os.cpus().length,
+					arch: os.arch()
+				}
+			};
+			let moreInfo: {[key:string]: string | undefined} = {
+				clientName: client?.user?.tag,
+				clientId: client?.user?.id,
+				guildId: client?.config?.guildId
+			};
+			// Minimal tracking enabled, remove those info from being sent
+			if(client.config.minimalTracking) {
+				fullInfo = {};
+				moreInfo = {};
+			}
 			connection.sendUTF(
 				JSON.stringify({
 					type: "telemetry",
@@ -193,23 +218,9 @@ export default {
 							// eslint-disable-next-line @typescript-eslint/no-var-requires
 							ticketbotVersion: require("../../package.json").version,
 							nodeVersion: process.version,
-							os: os.platform(),
-							osVersion1: os.release(),
-							osVersion2: os.version(),
-							uptime: process.uptime(),
-							ram: {
-								total: os.totalmem(),
-								free: os.freemem()
-							},
-							cpu: {
-								model: os.cpus()[0].model,
-								cores: os.cpus().length,
-								arch: os.arch()
-							}
+							...fullInfo
 						},
-						clientName: client?.user?.tag,
-						clientId: client?.user?.id,
-						guildId: client?.config?.guildId
+						...moreInfo
 					}
 				})
 			);
@@ -249,25 +260,31 @@ export default {
 
 			ws.connect("wss://ws.ticket.pm", "echo-protocol");
 		}
-		if(!client.config.disableTelemetry) {
-			console.warn(`
-			PRIVACY NOTICES
-			-------------------------------
-			Telemetry is current enabled and the following information are sent to the server anonymously:
-			* Discord Bot's number of guilds & users
-			* Current Source Version
-			* NodeJS Version
-			* OS Version
-			* CPU version, name, core count, architecture, and model
-			* Current Process up-time
-			* System total ram and freed ram
-			* Client name and id
-			* Guild ID
-			-------------------------------
-			If you do not wish to send this ifnormation, please set "disableTelemetry" to true in the config
-			`);
-			connect();
-		}
+		if(!client.config.minimalTracking) console.warn(`
+		PRIVACY NOTICES
+		-------------------------------
+		Telemetry is current set to full and the following information are sent to the server anonymously:
+		* Discord Bot's number of guilds & users
+		* Current Source Version
+		* NodeJS Version
+		* OS Version
+		* CPU version, name, core count, architecture, and model
+		* Current Process up-time
+		* System total ram and freed ram
+		* Client name and id
+		* Guild ID
+		-------------------------------
+		If you wish to minimize the information that are being sent, please set "minimalTracking" to true in the config
+		`);
+		else console.warn(`
+		PRIVACY NOTICES
+		-------------------------------
+		Minimal tracking has been enabled; the following information are sent anonymously:
+		* Current Source Version
+		* NodeJS Version
+		-------------------------------
+		`);
+		connect();
 		deployCmd.deployCommands();
 	}
 };
