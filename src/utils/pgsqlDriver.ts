@@ -29,7 +29,7 @@ export class PostgresDriver {
 
 	async disconnect(): Promise<void> {
 		this.checkConnection();
-		await this.conn!.end();
+		await this.conn?.end();
 	}
 
 	private checkConnection(): void {
@@ -40,13 +40,14 @@ export class PostgresDriver {
 
 	async prepare(table: string): Promise<void> {
 		this.checkConnection();
-		await this.conn!.query(
+		await this.conn?.query(
 			`CREATE TABLE IF NOT EXISTS ${table} (id VARCHAR(255), value TEXT)`
 		);
 	}
-
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	async getAllRows(table: string): Promise<{ id: string; value: any }[]> {
 		this.checkConnection();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const queryResult = await this.conn!.query(`SELECT * FROM ${table}`);
 		return queryResult.rows.map((row) => ({
 			id: row.id,
@@ -59,6 +60,7 @@ export class PostgresDriver {
 		key: string
 	): Promise<[T | null, boolean]> {
 		this.checkConnection();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const queryResult = await this.conn!.query(
 			`SELECT value FROM ${table} WHERE id = $1`,
 			[key]
@@ -71,6 +73,7 @@ export class PostgresDriver {
 	async setRowByKey<T>(
 		table: string,
 		key: string,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		value: any,
 		update: boolean
 	): Promise<T> {
@@ -79,12 +82,12 @@ export class PostgresDriver {
 		const stringifiedValue = JSON.stringify(value);
 
 		if (update) {
-			await this.conn!.query(
+			await this.conn?.query(
 				`UPDATE ${table} SET value = $1 WHERE id = $2`,
 				[stringifiedValue, key]
 			);
 		} else {
-			await this.conn!.query(
+			await this.conn?.query(
 				`INSERT INTO ${table} (id, value) VALUES ($1, $2)`,
 				[key, stringifiedValue]
 			);
@@ -95,12 +98,14 @@ export class PostgresDriver {
 
 	async deleteAllRows(table: string): Promise<number> {
 		this.checkConnection();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const queryResult = await this.conn!.query(`DELETE FROM ${table}`);
 		return queryResult.rowCount;
 	}
 
 	async deleteRowByKey(table: string, key: string): Promise<number> {
 		this.checkConnection();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const queryResult = await this.conn!.query(
 			`DELETE FROM ${table} WHERE id = $1`,
 			[key]

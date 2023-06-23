@@ -144,13 +144,15 @@ export type locale = {
 
 export type command = {
 	data: SlashCommandBuilder;
+	// eslint-disable-next-line no-unused-vars
 	execute: (interaction: Interaction, client: DiscordClient) => Promise<void> | void;
 }
 
 export interface DiscordClient extends Client<boolean> {
 	config: config;
-	db: QuickDB<any>;
+	db: QuickDB;
 	locales: locale;
+	// eslint-disable-next-line no-unused-vars
 	msToHm: (ms: number | Date) => string;
 	commands: Collection<string, command>;
 }
