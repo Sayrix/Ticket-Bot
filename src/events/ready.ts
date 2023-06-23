@@ -79,7 +79,8 @@ export default {
 
 		embed.color = parseInt(client.config.mainColor, 16);
 		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-		embed.footer.text = "ticket.pm" + embed.footer.text.replace("ticket.pm", ""); // Please respect the LICENSE :D
+		const footer = embed.footer.text.replace("ticket.pm", "");
+		embed.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
 		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 
 		/*

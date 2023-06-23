@@ -119,6 +119,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			});
 		}
 		const lEmbeds = client.locales.embeds;
+		const footer = lEmbeds.ticketOpened.footer.text.replace("ticket.pm", "");
 		const ticketOpenedEmbed = new EmbedBuilder()
 			.setColor(`#${ticketType.color ? ticketType.color : client.config.mainColor}`)
 			.setTitle(lEmbeds.ticketOpened.title.replace("CATEGORYNAME", ticketType.name))
@@ -170,7 +171,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			*/
 			.setFooter({
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				text: "ticket.pm" + lEmbeds.ticketOpened.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
+				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				iconURL: lEmbeds.ticketOpened.footer.iconUrl
 			});

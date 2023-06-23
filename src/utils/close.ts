@@ -145,6 +145,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 			.catch((e) => console.log(e));
 
+		const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
 		const tiketClosedDMEmbed = new EmbedBuilder()
 			.setColor(`#${lEmbed.ticketClosedDM.color ? lEmbed.ticketClosedDM.color : client.config.mainColor}`)
 			.setDescription(
@@ -173,7 +174,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 
 			.setFooter({
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				text: "ticket.pm" + lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", ""), // Please respect the LICENSE :D
+				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				iconURL: lEmbed.ticketClosedDM.footer.iconUrl
 			});
