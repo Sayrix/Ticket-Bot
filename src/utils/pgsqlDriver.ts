@@ -6,7 +6,6 @@
  * LICENSE: https://github.com/plexidev/quick.db/blob/dev/LICENSE.md
  */
 
-// eslint-disable-next-line node/no-missing-require
 import { Client, ClientConfig } from "pg";
 
 export class PostgresDriver {
