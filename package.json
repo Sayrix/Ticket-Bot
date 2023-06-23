@@ -8,8 +8,8 @@
     "build": "rimraf dist && tsc",
     "format:fix": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:fix": "eslint --fix .",
-    "lint:check": "eslint ."
+    "lint:fix": "eslint --fix . --ext .ts",
+    "lint:check": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
