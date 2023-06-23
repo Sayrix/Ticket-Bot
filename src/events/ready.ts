@@ -4,7 +4,6 @@ import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
 import { DiscordClient, SayrixSponsorData } from "../Types";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import {version} from "../../package.json";
 import os from "os";
 import deployCmd from "../deploy-commands";
 
@@ -191,7 +190,8 @@ export default {
 							users: client?.users?.cache?.size
 						},
 						infos: {
-							ticketbotVersion: version,
+							// eslint-disable-next-line @typescript-eslint/no-var-requires
+							ticketbotVersion: require("../../package.json").version,
 							nodeVersion: process.version,
 							os: os.platform(),
 							osVersion1: os.release(),

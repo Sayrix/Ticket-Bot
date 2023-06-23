@@ -18,12 +18,15 @@ import { Interaction } from "discord.js";
 import fs from "fs-extra";
 import path from "node:path";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import { token } from "../config/token.json";
 import {QuickDB, MySQLDriver } from "quick.db";
 import { jsonc } from "jsonc";
 import { DiscordClient, config, locale } from "./Types";
-import {version} from "../package.json";
 import {PostgresDriver} from "./utils/pgsqlDriver";
+import { config as envconf } from "dotenv";
+
+// Initalize .env file as environment
+try {envconf();}
+catch(ex) {console.log(".env failed to load");}
 
 // Although invalid type, it should be good enough for now until more stuff needs to be handled here
 process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
@@ -48,7 +51,8 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 	res.json().then((json) => {
 		// Assumign the format stays consistent (i.e. x.x.x)
 		const latest = json[0].name.split(".").map((k: string) => parseInt(k));
-		const current = version.split(".")
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const current = require("../package.json").version.split(".")
 			.map((k: string) => parseInt(k));
 		if (
 			latest[0] > current[0] ||
@@ -61,8 +65,7 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 });
 
 
-
-const config: config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
+const config: config = jsonc.parse(fs.readFileSync(path.join(__dirname, "/../config/config.jsonc"), "utf8"));
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
@@ -132,7 +135,7 @@ if (client.config.postgre?.enabled) {
 	client.db = db;
 }
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-client.locales = require(`./locales/${client.config.lang}.json`) as locale;
+client.locales = require(`../locales/${client.config.lang}.json`) as locale;
 client.msToHm = function dhm(ms: number | Date) {
 	if(ms instanceof Date) ms = ms.getTime();
 	
@@ -159,7 +162,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const command = require(filePath);
+	const command = require(filePath).default;
 	client.commands.set(command.data.name, command);
 }
 
@@ -187,7 +190,7 @@ const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".j
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const event = require(filePath);
+	const event = require(filePath).default;
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
@@ -196,7 +199,7 @@ for (const file of eventFiles) {
 }
 
 // Login the bot
-client.login(token);
+client.login(process.env["TOKEN"]);
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

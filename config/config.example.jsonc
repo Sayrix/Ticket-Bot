@@ -110,5 +110,5 @@
 
 	"maxTicketOpened": 0, // The number of tickets the user can open while another one is already open. Set to 0 to unlimited
 	
-	"disableTelemetry": false
+	"disableTelemetry": false // Whether or not to allow anonymous telemetry to help improve the software
 }
