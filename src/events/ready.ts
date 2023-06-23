@@ -60,43 +60,12 @@ export default {
 
 		const embed = client.locales.embeds.openTicket;
 
-		/*
-			Copyright 2023 Sayrix (github.com/Sayrix)
-
-			Licensed under the Apache License, Version 2.0 (the "License");
-			you may not use this file except in compliance with the License.
-			You may obtain a copy of the License at
-
-			    http://www.apache.org/licenses/LICENSE-2.0
-
-			Unless required by applicable law or agreed to in writing, software
-			distributed under the License is distributed on an "AS IS" BASIS,
-			WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-			See the License for the specific language governing permissions and
-			limitations under the License.
-			*/
-
 		embed.color = parseInt(client.config.mainColor, 16);
+
 		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 		const footer = embed.footer.text.replace("ticket.pm", "");
 		embed.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
 		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-
-		/*
-			Copyright 2023 Sayrix (github.com/Sayrix)
-
-			Licensed under the Apache License, Version 2.0 (the "License");
-			you may not use this file except in compliance with the License.
-			You may obtain a copy of the License at
-
-			    http://www.apache.org/licenses/LICENSE-2.0
-
-			Unless required by applicable law or agreed to in writing, software
-			distributed under the License is distributed on an "AS IS" BASIS,
-			WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-			See the License for the specific language governing permissions and
-			limitations under the License.
-			*/
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(ButtonStyle.Primary)
