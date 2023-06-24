@@ -1,6 +1,6 @@
 /* Licensed under Apache License 2.0: https://github.com/Sayrix/Ticket-Bot/blob/typescript/LICENSE */
 
-import type { Client, Collection, Interaction, SlashCommandBuilder } from "discord.js";
+import type { Client, Collection, ColorResolvable, Interaction, SlashCommandBuilder } from "discord.js";
 import type { QuickDB } from "quick.db";
 
 // Config types and setups
@@ -15,7 +15,7 @@ export type TicketType = {
     name: string;
     description: string;
 	emoji: string;
-	color: string;
+	color?: ColorResolvable;
     categoryId: string;
     ticketNameOption: string;
     customDescription: string;
@@ -34,7 +34,7 @@ type dbConn = {
 export type config = {
 	clientId: string;
 	guildId: string;
-	mainColor: string;
+	mainColor: ColorResolvable;
 	lang: string; // Tho can be cs/de/es/fr/main/tr type but we can't guarantee what users put
 	// Database credentials are deprecated, will be removed when Prisma are in-place.
 	postgre?: dbConn;
@@ -69,7 +69,7 @@ export type locale = {
     embeds: {
 		openTicket: {
 			title: string,
-			color?: number,
+			color?: ColorResolvable,
 			description: string,
 			footer: {
 				text: string
@@ -89,7 +89,7 @@ export type locale = {
 		},
 		ticketClosedDM: {
 			title: string,
-			color?: string,
+			color?: ColorResolvable,
 			description: string,
 			footer: {
 				text: string,

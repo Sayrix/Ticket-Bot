@@ -120,8 +120,9 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 		}
 		const lEmbeds = client.locales.embeds;
 		const footer = lEmbeds.ticketOpened.footer.text.replace("ticket.pm", "");
+		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
 		const ticketOpenedEmbed = new EmbedBuilder()
-			.setColor(`#${ticketType.color ? ticketType.color : client.config.mainColor}`)
+			.setColor(ticketType.color ?? client.config.mainColor)
 			.setTitle(lEmbeds.ticketOpened.title.replace("CATEGORYNAME", ticketType.name))
 			.setDescription(
 				ticketType.customDescription

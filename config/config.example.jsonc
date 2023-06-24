@@ -1,7 +1,7 @@
 {
 	"clientId": "1111111111111111111", // The id of the discord bot
 	"guildId": "1111111111111111111", // The id of the discord server
-	"mainColor": "f6c42f", // The hex color of the embeds by default
+	"mainColor": "#f6c42f", // The hex color of the embeds by default
 	"lang": "main", // If you want to set english please set "main"
 
 	/*

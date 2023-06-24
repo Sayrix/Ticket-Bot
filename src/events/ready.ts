@@ -3,7 +3,7 @@ import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
 import { DiscordClient, SayrixSponsorData } from "../Types";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import os from "os";
 import deployCmd from "../deploy-commands";
 
@@ -58,14 +58,17 @@ export default {
 			process.exit(0);
 		}
 
-		const embed = client.locales.embeds.openTicket;
-
-		embed.color = parseInt(client.config.mainColor, 16);
-
-		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-		const footer = embed.footer.text.replace("ticket.pm", "");
-		embed.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
-		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		const embedDat = client.locales.embeds.openTicket;
+		const footer = embedDat.footer.text.replace("ticket.pm", "");
+		const embed = new EmbedBuilder()
+			.setTitle(embedDat.title)
+			.setColor(embedDat.color ?? client.config.mainColor)
+			.setDescription(embedDat.description)
+			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+			.setFooter({
+				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}` // Please respect the LICENSE :D
+			});
+			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(ButtonStyle.Primary)
