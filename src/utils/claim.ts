@@ -66,7 +66,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	   client
 	);
 
-	client.prisma.tickets.update({
+	await client.prisma.tickets.update({
 		data: {
 			claimedby: interaction.user.id,
 			claimedat: Date.now()
