@@ -23,6 +23,11 @@ You can come on the discord: https://discord.gg/VasYV6MEJy
 
 Contributions are welcome! Please read the [contributing guidelines](https://github.com/Sayrix/Ticket-Bot/blob/main/CONTRIBUTING.md) first.
 
+## 👨‍💻 Maintainers
+Thanks to the project maintainers for making/improving the software!
+* [Sayrix](https://github.com/Sayrix)
+* [小兽兽/zhiyan114](https://github.com/zhiyan114)
+
 ## 💎 Sponsors
 Thanks to all our sponsors! 🙏  
 You can see all perks here: https://github.com/sponsors/Sayrix
