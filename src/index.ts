@@ -18,11 +18,10 @@ import { Interaction } from "discord.js";
 import fs from "fs-extra";
 import path from "node:path";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import {QuickDB, MySQLDriver } from "quick.db";
 import { jsonc } from "jsonc";
 import { DiscordClient, config, locale } from "./Types";
-import {PostgresDriver} from "./utils/pgsqlDriver";
 import { config as envconf } from "dotenv";
+import { PrismaClient } from "@prisma/client";
 
 // Initalize .env file as environment
 try {envconf();}
@@ -76,64 +75,8 @@ const client = new Client({
 
 // All variables stored in the client object
 client.config = config;
+client.prisma = new PrismaClient();
 
-let db: QuickDB | undefined;
-
-if (client.config.postgre?.enabled) {
-	// PostgreSQL Support.
-	(async () => {
-		try {
-			require.resolve("pg");
-		} catch (e) {
-			console.error("pg driver is not installed!\n\nPlease run \"npm i pg\" in the console!");
-			throw e;
-		}
-		const pgsql = new PostgresDriver({
-			host: client.config.postgre?.host,
-			user: client.config.postgre?.user,
-			password: client.config.postgre?.password,
-			database: client.config.postgre?.database
-		});
-
-		await pgsql.connect();
-
-		db = new QuickDB({
-			driver: pgsql,
-			table: client.config.postgre?.table ?? "json"
-		});
-		client.db = db;
-	})();
-} else if (client.config.mysql?.enabled) {
-	// MySQL Support
-	(async () => {
-		try {
-			require.resolve("mysql2");
-		} catch (e) {
-			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
-			throw e;
-		}
-
-		const mysql = new MySQLDriver({
-			host: client.config.mysql?.host,
-			user: client.config.mysql?.user,
-			password: client.config.mysql?.password,
-			database: client.config.mysql?.database,
-			charset: "utf8mb4"
-		});
-
-		await mysql.connect();
-
-		db = new QuickDB({
-			driver: mysql,
-			table: client.config.mysql?.table ?? "json"
-		});
-		client.db = db;
-	})();
-} else {
-	// SQLite Support
-	db = new QuickDB();
-	client.db = db;
-}
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 client.locales = require(`../locales/${client.config.lang}.json`) as locale;
 client.msToHm = function dhm(ms: number | Date) {

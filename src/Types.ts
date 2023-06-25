@@ -1,7 +1,7 @@
 /* Licensed under Apache License 2.0: https://github.com/Sayrix/Ticket-Bot/blob/typescript/LICENSE */
 
+import { PrismaClient } from "@prisma/client";
 import type { Client, Collection, ColorResolvable, Interaction, SlashCommandBuilder } from "discord.js";
-import type { QuickDB } from "quick.db";
 
 // Config types and setups
 type TicketQuestion = {
@@ -150,7 +150,7 @@ export type command = {
 
 export interface DiscordClient extends Client<boolean> {
 	config: config;
-	db: QuickDB;
+	prisma: PrismaClient;
 	locales: locale;
 	// eslint-disable-next-line no-unused-vars
 	msToHm: (ms: number | Date) => string;

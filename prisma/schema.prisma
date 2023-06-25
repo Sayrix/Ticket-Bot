@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model config {
+  key   String  @id
+  value String?
+}
+
+model tickets {
+  id           Int     @id @default(autoincrement())
+  channelid    String  @unique
+  messageid    String  @unique
+  category     String
+  invited      String  @default("[]")
+  reason       String
+  creator      String
+  createdat    BigInt
+  claimedby    String?
+  claimedat    BigInt?
+  closedby     String?
+  closedat     BigInt?
+  closereason  String?
+  transcript   String?
+}

@@ -5,3 +5,4 @@ config.jsonc
 token.json
 dist
 .env
+*.db

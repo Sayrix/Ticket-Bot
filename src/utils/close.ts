@@ -24,7 +24,12 @@ limitations under the License.
 export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: DiscordClient, reason?: string) {
 	if (!client.config.createTranscript) domain = client.locales.other.unavailable;
 
-	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+	const ticket = await client.prisma.tickets.findUnique({
+		where: {
+			channelid: interaction.channel?.id
+		}
+	});
+	const ticketClosed = ticket?.closedat && ticket.closedby;
 	if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
 
 	if (
@@ -37,7 +42,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			})
 			.catch((e) => console.log(e));
 
-	if (ticket.closed)
+	if (ticketClosed)
 		return interaction
 			.editReply({
 				content: client.locales.ticketAlreadyClosed
@@ -50,31 +55,23 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			user: interaction.user,
 			ticketId: ticket.id,
 			ticketChannelId: interaction.channel?.id,
-			ticketCreatedAt: ticket.createdAt,
+			ticketCreatedAt: ticket.createdat,
 			reason: reason
 		},
 		client
 	);
+	
+	// Normally the user that closes the ticket will get posted here, but we'll do it when the ticket finalizes
 
-	await client.db.set(`tickets_${interaction.channel?.id}.closedBy`, interaction.user.id);
-	await client.db.set(`tickets_${interaction.channel?.id}.closedAt`, Date.now());
-
-	if (reason) {
-		await client.db.set(`tickets_${interaction.channel?.id}.closeReason`, reason);
-	} else {
-		await client.db.set(`tickets_${interaction.channel?.id}.closeReason`, client.locales.other.noReasonGiven);
-	}
-
-	const creator = await client.db.get(`tickets_${interaction.channel?.id}.creator`);
-	const invited = await client.db.get(`tickets_${interaction.channel?.id}.invited`);
+	const creator = ticket.creator;
+	const invited = JSON.parse(ticket.invited) as string[];
 
 	(interaction.channel as TextChannel | null)?.permissionOverwrites
 		.edit(creator, {
 			ViewChannel: false
 		})
 		.catch((e: unknown) => console.log(e));
-	// TODO: Replace user: string with the proper type once ORM is implemented
-	invited.forEach(async (user: string) => {
+	invited.forEach(async (user) => {
 		(interaction.channel as TextChannel | null)?.permissionOverwrites
 			.edit(user, {
 				ViewChannel: false
@@ -88,13 +85,19 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 		.catch((e) => console.log(e));
 
-	await interaction.channel?.messages.fetch();
-
-	async function close(id: string) {
+	async function _close(id: string) {
 		if (client.config.closeTicketCategoryId) (interaction.channel as TextChannel | null)?.setParent(client.config.closeTicketCategoryId).catch((e) => console.log(e));
 
-		const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
-		const msg = interaction.channel?.messages.cache.get(messageId);
+		// We can guarantee this is not null because it's already checked above.
+		// Should re-write this to prevent nested functions :/
+		let ticket = (await client.prisma.tickets.findUnique({
+			where: {
+				channelid: interaction.channel?.id
+			}
+		}));
+		if(!ticket) return console.error("close.ts: UNEXPECTED ERROR - _close func encountered null ticket");
+
+		const msg = await interaction.channel?.messages.fetch(ticket.messageid);
 		const embed = new EmbedBuilder(msg?.embeds[0].data);
 
 		const rowAction = new ActionRowBuilder<ButtonBuilder>();
@@ -113,20 +116,24 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 			.catch((e) => console.log(e));
 
-		await client.db.set(`tickets_${interaction.channel?.id}.closed`, true);
-
 		interaction.channel?.send({
 			content: client.locales.ticketTranscriptCreated.replace(
 				"TRANSCRIPTURL",
 				domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
 			)
-		})
-			.catch((e) => console.log(e));
-		await client.db.set(
-			`tickets_${interaction.channel?.id}.transcriptURL`,
-			domain === client.locales.other.unavailable ? client.locales.other.unavailable : `${domain}${id}`
-		);
-		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+		}).catch((e) => console.log(e));
+		
+		ticket = await client.prisma.tickets.update({
+			data: {
+				closedby: interaction.user.id,
+				closedat: Date.now(),
+				closereason: reason,
+				transcript: domain === client.locales.other.unavailable ? client.locales.other.unavailable : `${domain}${id}`
+			},
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.other.deleteTicketButtonMSG).setStyle(ButtonStyle.Danger)
@@ -136,8 +143,8 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			embeds: [
 				JSON.parse(
 					JSON.stringify(lEmbed.ticketClosed)
-						.replace("TICKETCOUNT", ticket.id)
-						.replace("REASON", ticket.closeReason.replace(/[\n\r]/g, "\\n"))
+						.replace("TICKETCOUNT", ticket.id.toString())
+						.replace("REASON", (ticket.closereason ?? client.locales.other.noReasonGiven).replace(/[\n\r]/g, "\\n"))
 						.replace("CLOSERNAME", interaction.user.tag)
 				)
 			],
@@ -146,13 +153,13 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			.catch((e) => console.log(e));
 
 		const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
-		const tiketClosedDMEmbed = new EmbedBuilder()
+		const ticketClosedDMEmbed = new EmbedBuilder()
 			.setColor(lEmbed.ticketClosedDM.color ?? client.config.mainColor)
 			.setDescription(
 				client.locales.embeds.ticketClosedDM.description
-					.replace("TICKETCOUNT", ticket.id)
+					.replace("TICKETCOUNT", ticket.id.toString())
 					.replace("TRANSCRIPTURL", `[\`${domain}${id}\`](${domain}${id})`)
-					.replace("REASON", ticket.closeReason)
+					.replace("REASON", ticket.closereason ?? client.locales.other.noReasonGiven)
 					.replace("CLOSERNAME", interaction.user.tag)
 			)
 			.setFooter({
@@ -165,14 +172,14 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		client.users.fetch(creator).then((user) => {
 			user
 				.send({
-					embeds: [tiketClosedDMEmbed]
+					embeds: [ticketClosedDMEmbed]
 				})
 				.catch((e) => console.log(e));
 		});
 	}
 
 	if (!client.config.createTranscript) {
-		close("");
+		_close("");
 		return;
 	}
 
@@ -213,7 +220,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 					}
 				})
 				.catch(console.error);
-			close(ts?.data);
+			_close(ts?.data);
 		}
 	});
 }

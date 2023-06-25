@@ -47,11 +47,12 @@ export default {
 					}
 				}
 
-				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
-				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
+				`SELECT COUNT(*) as count FROM tickets`)[0].count;
+				
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === BigInt(client.config.maxTicketOpened)) {
 						return interaction
 							.editReply({
 								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
@@ -126,8 +127,10 @@ export default {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
-				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
-				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				const ticketsOpened = (await client.prisma.$queryRaw<{count:number}>
+				`SELECT COUNT(*) as count FROM tickets WHERE closereason IS NOT NULL`)
+					.count;
+				
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
@@ -164,8 +167,14 @@ export default {
 			}
 
 			if (interaction.customId === "removeUser") {
-				const ticket = await client.db.get(`tickets_${interaction.message.channelId}`);
-				client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
+				const ticket = await client.prisma.tickets.findUnique({
+					select: {
+						id: true,
+					},
+					where: {
+						channelid: interaction.message.channelId
+					}
+				});
 
 				interaction.values.forEach((value) => {
 					(interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
@@ -174,7 +183,7 @@ export default {
 						{
 							LogType: "userRemoved",
 							user: interaction.user,
-							ticketId: ticket.id,
+							ticketId: ticket?.id.toString(),
 							ticketChannelId: interaction.channel?.id,
 							target: {
 								id: value,

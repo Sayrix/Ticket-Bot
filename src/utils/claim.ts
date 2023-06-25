@@ -24,7 +24,13 @@ import { log } from "./logs";
 * @param {Discord.Client} client
 */
 export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: DiscordClient) => {
-	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+	const ticket = await client.prisma.tickets.findUnique({
+		where: {
+			channelid: interaction.channel?.id
+		}
+	});
+	const claimed = ticket?.claimedat && ticket.claimedby;
+
 	if (!ticket)
 	   return interaction.reply({
 		   content: "Ticket not found",
@@ -41,7 +47,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		   })
 		   .catch((e) => console.log(e));
 
-	if (ticket.claimed)
+	if (claimed)
 	   return interaction
 		   .reply({
 			   content: client.locales.ticketAlreadyClaimed,
@@ -53,20 +59,24 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	   {
 			LogType: "ticketClaim",
 		    user: interaction.user,
-		    ticketId: ticket.id,
+		    ticketId: ticket.id.toString(),
 		    ticketChannelId: interaction.channel?.id,
-		    ticketCreatedAt: ticket.createdAt,
+		    ticketCreatedAt: ticket.createdat,
 	   },
 	   client
 	);
 
-	await client.db.set(`tickets_${interaction.channel?.id}.claimed`, true);
-	await client.db.set(`tickets_${interaction.channel?.id}.claimedBy`, interaction.user.id);
-	await client.db.set(`tickets_${interaction.channel?.id}.claimedAt`, Date.now());
+	await client.prisma.tickets.update({
+		data: {
+			claimedby: interaction.user.id,
+			claimedat: Date.now()
+		},
+		where: {
+			channelid: interaction.channel?.id,
+		}
+	});
 
-	//await interaction.channel?.messages.fetch(); // Commented bc it seems useless
-	const messageId = await client.db.get(`tickets_${interaction.channel?.id}.messageId`);
-	const msg = interaction.channel?.messages.cache.get(messageId);
+	const msg = await interaction.channel?.messages.fetch(ticket.messageid);
 	const oldEmbed = msg?.embeds[0].data;
 	const newEmbed = new EmbedBuilder(oldEmbed)
 		.setDescription(oldEmbed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`);

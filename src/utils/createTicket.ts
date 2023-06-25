@@ -43,16 +43,19 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		let ticketName = "";
 
+		let ticketCount = (await client.prisma.$queryRaw<[{count: bigint}]>
+		`SELECT COUNT(*) as count FROM tickets`)[0].count;
+
 		if (ticketType.ticketNameOption) {
 			ticketName = ticketType.ticketNameOption
 				.replace("USERNAME", interaction.user.username)
 				.replace("USERID", interaction.user.id)
-				.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) ?? "0");
+				.replace("TICKETCOUNT", ticketCount.toString() ?? "0");
 		} else {
 			ticketName = client.config.ticketNameOption
 				.replace("USERNAME", interaction.user.username)
 				.replace("USERID", interaction.user.id)
-				.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) ?? "0");
+				.replace("TICKETCOUNT", ticketCount.toString() ?? "0");
 		}
 		if(!interaction.guild) return console.error("Interaction createTicket was not executed in a guild");
 		
@@ -78,22 +81,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			client
 		);
 
-		await client.db.add("temp.ticketCount", 1);
-		const ticketId = await client.db.get("temp.ticketCount");
-		await client.db.set(`tickets_${channel.id}`, {
-			id: ticketId - 1,
-			category: ticketType,
-			reason: allReasons,
-			creator: interaction.user.id,
-			invited: [],
-			createdAt: Date.now(),
-			claimed: false,
-			claimedBy: null,
-			claimedAt: null,
-			closed: false,
-			closedBy: null,
-			closedAt: null,
-		});
+		// Client.db is set here and incremented ticket count
+		ticketCount++;
 
 		channel.permissionOverwrites
 			.edit(interaction.user, {
@@ -130,7 +119,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
-						.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || "0")
+						.replace("TICKETCOUNT", ticketCount.toString() || "0")
 						.replace("REASON1", reason[0])
 						.replace("REASON2", reason[1])
 						.replace("REASON3", reason[2])
@@ -144,7 +133,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
-						.replace("TICKETCOUNT", (await client.db.get("temp.ticketCount")) || "0")
+						.replace("TICKETCOUNT", ticketCount.toString() || "0")
 						.replace("REASON1", reason[0])
 						.replace("REASON2", reason[1])
 						.replace("REASON3", reason[2])
@@ -207,7 +196,16 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 		channel
 			.send(body)
 			.then((msg) => {
-				client.db.set(`tickets_${channel.id}.messageId`, msg.id);
+				client.prisma.tickets.create({
+					data: {
+						category: JSON.stringify(ticketType),
+						reason: allReasons,
+						creator: interaction.user.id,
+						createdat: Date.now(),
+						channelid: channel.id,
+						messageid: msg.id
+					}
+				}).then(); // Again why tf do I need .then()?!?!?
 				msg.pin().then(() => {
 					msg.channel.bulkDelete(1);
 				});

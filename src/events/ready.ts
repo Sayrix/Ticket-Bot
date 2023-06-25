@@ -42,7 +42,11 @@ export default {
 			process.exit(0);
 		}
 
-		const embedMessageId = await client.db.get("temp.openTicketMessageId");
+		const embedMessageId = (await client.prisma.config.findUnique({
+			where: {
+				key: "openTicketMessageId",
+			}
+		}))?.value;
 		await client.channels.fetch(client.config.openTicketChannelId).catch(() => {
 			console.error("The channel to open tickets is not found!");
 			process.exit(0);
@@ -75,7 +79,7 @@ export default {
 		);
 
 		try {
-			const msg = await openTicketChannel?.messages?.fetch(embedMessageId).catch((ex) => console.error(ex));
+			const msg = embedMessageId ? await openTicketChannel?.messages?.fetch(embedMessageId).catch((ex) => console.error(ex)) : undefined;
 			if (msg && msg.id) {
 				msg.edit({
 					embeds: [embed],
@@ -88,7 +92,12 @@ export default {
 					embeds: [embed],
 					components: [row]
 				}).then((rMsg) => {
-					client.db.set("temp.openTicketMessageId", rMsg.id);
+					client.prisma.config.create({
+						data: {
+							key: "openTicketMessageId",
+							value: rMsg.id
+						}
+					}).then(); // I need .then() for it to execute?!?!??
 				});
 			}
 		} catch (e) {

@@ -19,15 +19,20 @@ import { DiscordClient } from "../Types";
 import { log } from "./logs";
 
 export const deleteTicket = async (interaction: ButtonInteraction, client: DiscordClient) => {
-	const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+	const ticket = await client.prisma.tickets.findUnique({
+		where: {
+			channelid: interaction.channel?.id
+		}
+	});
+
 	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 	log(
 		{
 			LogType: "ticketDelete",
 			user: interaction.user,
 			ticketId: ticket.id,
-			ticketCreatedAt: ticket.createdAt,
-			transcriptURL: ticket.transcriptURL,
+			ticketCreatedAt: ticket.createdat,
+			transcriptURL: ticket.transcript ?? undefined,
 		},
 		client
 	);
