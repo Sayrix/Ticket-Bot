@@ -198,7 +198,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			.then((msg) => {
 				client.prisma.tickets.create({
 					data: {
-						categorycode: ticketType.codeName,
+						category: JSON.stringify(ticketType),
 						reason: allReasons,
 						creator: interaction.user.id,
 						createdat: Date.now(),

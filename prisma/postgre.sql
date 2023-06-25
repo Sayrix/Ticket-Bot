@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     id SERIAL PRIMARY KEY,
     channelid TEXT NOT NULL UNIQUE,
     messageid TEXT NOT NULL UNIQUE,
-    categorycode TEXT NOT NULL,
+    category JSON NOT NULL,
     reason TEXT NOT NULL,
     creator TEXT NOT NULL,
     createdat TIMESTAMP NOT NULL DEFAULT NOW(),

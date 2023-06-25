@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     id SERIAL PRIMARY KEY,
     channelid TEXT NOT NULL UNIQUE,
     messageid TEXT NOT NULL UNIQUE,
-    categorycode TEXT NOT NULL,
+    category TEXT NOT NULL,
     invited TEXT NOT NULL DEFAULT '[]',
     reason TEXT NOT NULL,
     creator TEXT NOT NULL,
