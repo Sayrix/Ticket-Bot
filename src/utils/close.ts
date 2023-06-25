@@ -51,7 +51,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 	if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
 
 	if (
-		client.config.whoCanCloseTicket === "STAFFONLY" &&
+		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 	)
 		return interaction

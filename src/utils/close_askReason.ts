@@ -19,7 +19,7 @@ import { DiscordClient } from "../Types";
 
 export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: DiscordClient) => {
 	if (
-		client.config.whoCanCloseTicket === "STAFFONLY" &&
+		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 	)
 		return interaction

@@ -157,7 +157,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 		const row = new ActionRowBuilder<ButtonBuilder>();
 
 		if (client.config.closeOption.closeButton) {
-			if (client.config.askReasonWhenClosing) {
+			if (client.config.closeOption.askReason) {
 				row.addComponents(
 					new ButtonBuilder()
 						.setCustomId("close_askReason")

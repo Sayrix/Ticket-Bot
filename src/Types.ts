@@ -43,12 +43,13 @@ export type config = {
     roleToPingWhenOpenedId: string[];
     logs: boolean;
     logsChannelId: string;
-    whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
-    askReasonWhenClosing: boolean;
     closeOption: {
 		closeButton: boolean;
 		dmUser: boolean;
 		createTranscript: boolean;
+		askReason: boolean;
+		whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
+		closeTicketCategoryId?: string;
 	};
 	uuidType: string;
     status: {
