@@ -1,7 +1,7 @@
 /*
 Copyright © 2023 小兽兽/zhiyan114 (github.com/zhiyan114)
 File is licensed respectively under the terms of the Apache License 2.0
-or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/orm/LICENSE
+or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/main/LICENSE
 
 This file is from postgre.sql but modified for sqlite and mysql compatibility with prisma.
 RANT: I LOVE AND HATE SQLITE. Why can't it just support a little more features...

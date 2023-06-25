@@ -1,7 +1,7 @@
 /*
 Copyright © 2023 小兽兽/zhiyan114 (github.com/zhiyan114)
 File is licensed respectively under the terms of the Apache License 2.0
-or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/orm/LICENSE
+or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/main/LICENSE
 
 For production use, please don't try to use this file, even if you're using postgresql,
 Since the code is tailored towards compatibility.sql, it will break.
