@@ -214,7 +214,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			console.error(err);
 		} else {
 			const ts = await axios
-				.post(`${domain}upload?key=${premiumKey}`, JSON.stringify(compressed), {
+				.post(`${domain}upload?key=${premiumKey}&uuid=${client.config.uuidType}`, JSON.stringify(compressed), {
 					headers: {
 						"Content-Type": "application/json"
 					}
