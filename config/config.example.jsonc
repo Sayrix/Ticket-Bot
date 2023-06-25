@@ -77,6 +77,7 @@
 	"askReasonWhenClosing": true, // If false the ticket will be closed without asking the reason
 
 	"createTranscript": true, // If set to true, when the ticket is closed a transcript will be generated and sent in the logs channel
+	"uuidType": "uuid", // uuid or emoji
 
 	"status": {
 		"enabled": true, // If you want to enable the status of the bot

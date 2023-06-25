@@ -44,6 +44,7 @@ export type config = {
     closeButton: boolean;
     askReasonWhenClosing: boolean;
     createTranscript: boolean;
+		uuidType: string,
     status: {
         enabled: boolean;
         text: string;
