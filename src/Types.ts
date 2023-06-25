@@ -46,8 +46,11 @@ export type config = {
     whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
     closeButton: boolean;
     askReasonWhenClosing: boolean;
-    createTranscript: boolean;
-		uuidType: string,
+    closeOption: {
+		dmUser: boolean;
+		createTranscript: boolean;
+	};
+	uuidType: string;
     status: {
         enabled: boolean;
         text: string;
