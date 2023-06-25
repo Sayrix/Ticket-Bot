@@ -62,17 +62,16 @@ export default {
 			process.exit(0);
 		}
 
-		const embedDat = client.locales.embeds.openTicket;
+		const embedDat = {...client.locales.embeds.openTicket};
 		const footer = embedDat.footer.text.replace("ticket.pm", "");
-		const embed = new EmbedBuilder()
-			.setTitle(embedDat.title)
-			.setColor(embedDat.color ?? client.config.mainColor)
-			.setDescription(embedDat.description)
-			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-			.setFooter({
-				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}` // Please respect the LICENSE :D
-			});
-			// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		embedDat.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
+		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
+		const embed = new EmbedBuilder({
+			...embedDat,
+			color: 0,
+		})
+			.setColor(embedDat.color ?? client.config.mainColor);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId("openTicket").setLabel(client.locales.other.openTicketButtonMSG).setStyle(ButtonStyle.Primary)

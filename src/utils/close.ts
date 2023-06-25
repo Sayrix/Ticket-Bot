@@ -153,7 +153,10 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			.catch((e) => console.log(e));
 
 		const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
-		const ticketClosedDMEmbed = new EmbedBuilder()
+		const ticketClosedDMEmbed = new EmbedBuilder({
+			...lEmbed,
+			color: 0,
+		})
 			.setColor(lEmbed.ticketClosedDM.color ?? client.config.mainColor)
 			.setDescription(
 				client.locales.embeds.ticketClosedDM.description
