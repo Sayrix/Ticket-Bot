@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
 import { DiscordClient } from "../Types";
 import { log } from "./logs";
 
@@ -24,7 +24,7 @@ import { log } from "./logs";
 * @param {Discord.Client} client
 */
 export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: DiscordClient) => {
-	const ticket = await client.prisma.tickets.findUnique({
+	let ticket = await client.prisma.tickets.findUnique({
 		where: {
 			channelid: interaction.channel?.id
 		}
@@ -66,7 +66,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	   client
 	);
 
-	await client.prisma.tickets.update({
+	ticket = await client.prisma.tickets.update({
 		data: {
 			claimedby: interaction.user.id,
 			claimedat: Date.now()
@@ -101,9 +101,25 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	   })
 	   .catch((e) => console.log(e));
 
-   	if (client.config.ticketNamePrefixWhenClaimed) {
-	   (interaction.channel as TextChannel | null)?.setName(`${client.config.ticketNamePrefixWhenClaimed}${(interaction.channel as TextChannel | null)?.name}`).catch((e) => console.log(e));
+	const defaultName = client.config.claimOption.nameWhenClaimed;
+   	if (defaultName && defaultName.trim() !== "") {
+		const creatorUser = await client.users.fetch(ticket.creator);
+		const newName = defaultName
+			.replaceAll("S_USERNAME", interaction.user.username)
+			.replaceAll("U_USERNAME", creatorUser.username)
+			.replaceAll("S_USERID", interaction.user.id)
+			.replaceAll("U_USERID", creatorUser.id)
+			.replaceAll("TICKETCOUNT", ticket.id.toString());
+	   (interaction.channel as TextChannel | null)?.setName(newName).catch((e) => console.log(e));
    	}
+
+	const categoryID = client.config.claimOption.categoryWhenClaimed;
+	if(categoryID && categoryID.trim() !== "") {
+		const category = await interaction.guild?.channels.fetch(categoryID);
+		if(category?.type !== ChannelType.GuildCategory)
+			return console.error("claim.ts: USER ERROR - Invalid categoryWhenClaimed ID. Channel must be a category.");
+		(interaction.channel as TextChannel | null)?.setParent(category);
+	}
 };
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
