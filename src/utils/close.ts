@@ -40,7 +40,7 @@ type ticketType = {
 }
 
 export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: DiscordClient, reason?: string) {
-	if (!client.config.createTranscript) domain = client.locales.other.unavailable;
+	if (!client.config.closeOption.createTranscript) domain = client.locales.other.unavailable;
 
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
@@ -160,6 +160,8 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 			.catch((e) => console.log(e));
 
+
+		if(!client.config.closeOption.dmUser) return;
 		const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
 		const ticketClosedDMEmbed = new EmbedBuilder({
 			...lEmbed,
@@ -189,7 +191,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		});
 	}
 
-	if (!client.config.createTranscript) {
+	if (!client.config.closeOption.createTranscript) {
 		_close("", ticket);
 		return;
 	}

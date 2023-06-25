@@ -61,7 +61,7 @@
 
 	// Ticket Claim Options
 	"claimOption": {
-		"enabled": true, // Whether to enable ticket claim button or not
+		"claimButton": true, // Whether to enable ticket claim button or not
 		// The X can be replaced with S (The staff that claimed the ticket) or U (The user that created the ticket)
 		"nameWhenClaimed": "✔️ Ticket-TICKETCOUNT", // Here is all parameter: X_USERNAME, X_USERID, TICKETCOUNT
 		"categoryWhenClaimed": "" // The category the ticket is moved to when claimed
@@ -78,9 +78,9 @@
 	"logsChannelId": "1111111111111111111", // The id of the channel where the logs will be sent
 
 	"whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
-	"closeButton": true, // If false the ticket can be closed only by doing /closes
 	"askReasonWhenClosing": true, // If false the ticket will be closed without asking the reason
 	"closeOption": {
+		"closeButton": true, // If false the ticket can be closed only by doing /closes
 		"dmUser": true, // Whether to DM the user when the ticket is closed
 		"createTranscript": true // If set to true, when the ticket is closed a transcript will be generated and sent in the logs channel
 	},

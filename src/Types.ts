@@ -33,7 +33,7 @@ export type config = {
 	ticketTypes: TicketType[];
     ticketNameOption: string;
 	claimOption: {
-		enabled: boolean;
+		claimButton: boolean;
 		nameWhenClaimed?: string;
 		categoryWhenClaimed?: string;
 	};
@@ -44,9 +44,9 @@ export type config = {
     logs: boolean;
     logsChannelId: string;
     whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
-    closeButton: boolean;
     askReasonWhenClosing: boolean;
     closeOption: {
+		closeButton: boolean;
 		dmUser: boolean;
 		createTranscript: boolean;
 	};
