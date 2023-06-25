@@ -146,7 +146,6 @@ export default {
 		process.stdout.write(
 			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${client.user?.tag}\x1b[0m (\x1b[37;46;1m${client.user?.id}\x1b[0m)
 		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
-		\x1b[0m📖  Documentation: \x1b[37;46;1mhttps://doc.ticket.pm \x1b[0m
 		\x1b[0m⛅  Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, "")
 		);
 
@@ -241,32 +240,46 @@ export default {
 
 			ws.connect("wss://ws.ticket.pm", "echo-protocol");
 		}
-		if(!client.config.minimalTracking) console.warn(`
-		PRIVACY NOTICES
-		-------------------------------
-		Telemetry is current set to full and the following information are sent to the server anonymously:
-		* Discord Bot's number of guilds & users
-		* Current Source Version
-		* NodeJS Version
-		* OS Version
-		* CPU version, name, core count, architecture, and model
-		* Current Process up-time
-		* System total ram and freed ram
-		* Client name and id
-		* Guild ID
-		-------------------------------
-		If you wish to minimize the information that are being sent, please set "minimalTracking" to true in the config
-		`);
-		else console.warn(`
-		PRIVACY NOTICES
-		-------------------------------
-		Minimal tracking has been enabled; the following information are sent anonymously:
-		* Current Source Version
-		* NodeJS Version
-		-------------------------------
-		`);
+
+		if ((await client.prisma.config.findUnique({
+			where: {
+				key: "firstStart",
+			}
+		})) === null) {
+			await client.prisma.config.create({
+				data: {
+					key: "firstStart",
+					value: "true",
+				}
+			});
+
+			if(!client.config.minimalTracking) console.warn(`
+				PRIVACY NOTICES
+				-------------------------------
+				Telemetry is current set to full and the following information are sent to the server anonymously:
+				* Discord Bot's number of guilds & users
+				* Current Source Version
+				* NodeJS Version
+				* OS Version
+				* CPU version, name, core count, architecture, and model
+				* Current Process up-time
+				* System total ram and freed ram
+				* Client name and id
+				* Guild ID
+				-------------------------------
+				If you wish to minimize the information that are being sent, please set "minimalTracking" to true in the config
+		`.replace(/\t/g, ""));
+			else console.warn(`
+				PRIVACY NOTICES
+				-------------------------------
+				Minimal tracking has been enabled; the following information are sent anonymously:
+				* Current Source Version
+				* NodeJS Version
+				-------------------------------
+		`.replace(/\t/g, ""));
+		}
 		connect();
-		deployCmd.deployCommands();
+		deployCmd.deployCommands(client);
 	}
 };
 
