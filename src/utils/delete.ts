@@ -1,5 +1,3 @@
-const Discord = require("discord.js");
-
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
 
@@ -16,32 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
-	async closeAskReason(interaction, client) {
-		if (
-			client.config.whoCanCloseTicket === "STAFFONLY" &&
-			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
-		)
-			return interaction
-				.reply({
-					content: client.locales.ticketOnlyClosableByStaff,
-					ephemeral: true,
-				})
-				.catch((e) => console.log(e));
+import { ButtonInteraction } from "discord.js";
+import { DiscordClient } from "../Types";
+import { log } from "./logs";
 
-		const modal = new Discord.ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
+export const deleteTicket = async (interaction: ButtonInteraction, client: DiscordClient) => {
+	const ticket = await client.prisma.tickets.findUnique({
+		where: {
+			channelid: interaction.channel?.id
+		}
+	});
 
-		const input = new Discord.TextInputBuilder()
-			.setCustomId("reason")
-			.setLabel(client.locales.modals.reasonTicketClose.label)
-			.setStyle(Discord.TextInputStyle.Paragraph)
-			.setPlaceholder(client.locales.modals.reasonTicketClose.placeholder)
-			.setMaxLength(256);
-
-		const firstActionRow = new Discord.ActionRowBuilder().addComponents(input);
-		modal.addComponents(firstActionRow);
-		await interaction.showModal(modal).catch((e) => console.log(e));
-	},
+	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+	log(
+		{
+			LogType: "ticketDelete",
+			user: interaction.user,
+			ticketId: ticket.id,
+			ticketCreatedAt: ticket.createdat,
+			transcriptURL: ticket.transcript ?? undefined,
+		},
+		client
+	);
+	await interaction.deferUpdate();
+	interaction.channel?.delete().catch((e) => console.log(e));
 };
 
 /*

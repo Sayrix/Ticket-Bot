@@ -1,10 +1,11 @@
-name: ESLint Check
+name: Source Check
 
 on:
   push:
     branches:
       - "main"
   pull_request:
+    types: [review_requested, ready_for_review]
 
 permissions:
   contents: read
@@ -35,8 +36,11 @@ jobs:
           key: node_modules-${{ matrix.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
 
       - name: npm i
-        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+        if: steps.cache-node_modules.outputs.cache-hit != 'true' || github.event_name == 'pull_request'
         run: npm i --no-audit
 
       - name: ESLint
-        run: npx --no-install eslint .
+        run: npm run lint:check
+
+      - name: build
+        run: npm run build --if-present

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
+import { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, CommandInteraction, User } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -16,26 +17,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default{
 	data: new SlashCommandBuilder().setName("remove").setDescription("Remove someone from the ticket"),
-	async execute(interaction, client) {
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
+	
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		const ticket = await client.prisma.tickets.findUnique({
+			select: {
+				invited: true,
+			},
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		if (ticket.invited.length < 1) return interaction.reply({ content: "There are no users to remove", ephemeral: true }).catch((e) => console.log(e));
+		
+		const invited = JSON.parse(ticket.invited) as string[];
+		if (invited.length < 1) return interaction.reply({ content: "There are no users to remove", ephemeral: true }).catch((e) => console.log(e));
 
-		for (let i = 0; i < ticket.invited.length; i++) {
-			await client.users.fetch(ticket.invited[i]);
+		const addedUsers: User[] = [];
+		for (let i = 0; i < invited.length; i++) {
+			addedUsers.push(await client.users.fetch(invited[i]));
 		}
 
-		const addedUsers = ticket.invited.map((user) => client.users.cache.get(user));
-
-		const row = new ActionRowBuilder().addComponents(
+		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId("removeUser")
 				.setPlaceholder("Please select a user to remove")
 				.setMinValues(1)
 				.setMaxValues(ticket.invited.length)
 				.addOptions(
+					// @TODO: Fix type definitions when I figure it out via ORM migration. For now assign a random type that gets the error removed.
 					addedUsers.map((user) => {
 						return {
 							label: user.tag,

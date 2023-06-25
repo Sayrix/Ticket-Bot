@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const Discord = require("discord.js");
+import { CommandInteraction, GuildMember, SlashCommandBuilder, TextChannel } from "discord.js";
+import { DiscordClient } from "../Types";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -18,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName("rename")
 		.setDescription("Rename the ticket")
@@ -29,10 +28,14 @@ module.exports = {
 	 * @param {Discord.Client} client
 	 * @returns
 	 */
-	async execute(interaction, client) {
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		const ticket = await client.prisma.tickets.findUnique({
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		if (!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
+		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
 			return interaction
 				.reply({
 					content: client.locales.ticketOnlyRenamableByStaff,
@@ -40,9 +43,9 @@ module.exports = {
 				})
 				.catch((e) => console.log(e));
 
-		interaction.channel.setName(interaction.options.getString("name")).catch((e) => console.log(e));
+		(interaction.channel as TextChannel)?.setName(interaction.options.get("name", true).value as string).catch((e) => console.log(e));
 		interaction
-			.reply({ content: client.locales.ticketRenamed.replace("NEWNAME", interaction.channel.toString()), ephemeral: false })
+			.reply({ content: client.locales.ticketRenamed.replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
 			.catch((e) => console.log(e));
 	},
 };

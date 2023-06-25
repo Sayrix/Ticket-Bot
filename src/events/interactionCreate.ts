@@ -1,4 +1,11 @@
-const Discord = require("discord.js");
+import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, SelectMenuComponentOptionData, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { DiscordClient } from "../Types";
+import { log } from "../utils/logs";
+import {createTicket} from "../utils/createTicket";
+import { close } from "../utils/close";
+import { claim } from "../utils/claim";
+import { closeAskReason } from "../utils/close_askReason";
+import { deleteTicket } from "../utils/delete";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -16,54 +23,52 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default {
 	name: "interactionCreate",
 	once: false,
 	/**
 	 * @param {Discord.Interaction} interaction
 	 * @param {Discord.Client} client
 	 */
-	async execute(interaction, client) {
+	async execute(interaction: Interaction, client: DiscordClient) {
 		if (interaction.isButton()) {
 			if (interaction.customId === "openTicket") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
 				// Max ticket opened
 
-				for (let role of client.config.rolesWhoCanNotCreateTickets) {
-					if (role && interaction.member.roles.cache.has(role)) {
+				for (const role of client.config.rolesWhoCanNotCreateTickets) {
+					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 						return interaction
 							.editReply({
-								content: "You can't create a ticket because you are blacklisted",
-								ephemeral: true,
+								content: "You can't create a ticket because you are blacklisted"
 							})
 							.catch((e) => console.log(e));
 					}
 				}
 
-				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
-				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
+				`SELECT COUNT(*) as count FROM tickets`)[0].count;
+				
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === BigInt(client.config.maxTicketOpened)) {
 						return interaction
 							.editReply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
-								ephemeral: true,
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
 							})
 							.catch((e) => console.log(e));
 					}
 				}
 
 				// Make a select menus of all tickets types
+				let options: SelectMenuComponentOptionData[] = [];
 
-				let options = [];
-
-				for (let x of client.config.ticketTypes) {
+				for (const x of client.config.ticketTypes) {
 					// x.cantAccess is an array of roles id
 					// If the user has one of the roles, he can't access to this ticket type
 
-					const a = {
+					const a: SelectMenuComponentOptionData = {
 						label: x.name,
 						value: x.codeName,
 					};
@@ -72,11 +77,11 @@ module.exports = {
 					options.push(a);
 				}
 
-				for (let x of options) {
-					let option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
+				for (const x of options) {
+					const option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
 					if (option.cantAccess) {
-						for (let role of option.cantAccess) {
-							if (role && interaction.member.roles.cache.has(role)) {
+						for (const role of option.cantAccess) {
+							if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 								options = options.filter((y) => y.value !== x.value);
 							}
 						}
@@ -84,12 +89,11 @@ module.exports = {
 				}
 
 				if (options.length <= 0) return interaction.editReply({
-					ephemeral: true,
 					content: client.locales.noTickets
 				});
 
-				const row = new Discord.ActionRowBuilder().addComponents(
-					new Discord.StringSelectMenuBuilder()
+				const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					new StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
 						.setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
 						.setMaxValues(1)
@@ -98,44 +102,41 @@ module.exports = {
 
 				interaction
 					.editReply({
-						ephemeral: true,
 						components: [row],
 					})
 					.catch((e) => console.log(e));
 			}
 
 			if (interaction.customId === "claim") {
-				const { claim } = require("../utils/claim.js");
 				claim(interaction, client);
 			}
 
 			if (interaction.customId === "close") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				const { close } = require("../utils/close.js");
 				close(interaction, client, client.locales.other.noReasonGiven);
 			}
 
 			if (interaction.customId === "close_askReason") {
-				const { closeAskReason } = require("../utils/close_askReason.js");
 				closeAskReason(interaction, client);
 			}
 
 			if (interaction.customId === "deleteTicket") {
-				const { deleteTicket } = require("../utils/delete.js");
 				deleteTicket(interaction, client);
 			}
 		}
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
-				const all = (await client.db.all()).filter((data) => data.id.startsWith("tickets_"));
-				const ticketsOpened = all.filter((data) => data.value.creator === interaction.user.id && data.value.closed === false).length;
+				const ticketsOpened = (await client.prisma.$queryRaw<{count:number}>
+				`SELECT COUNT(*) as count FROM tickets WHERE closereason IS NOT NULL`)
+					.count;
+				
 				if (client.config.maxTicketOpened !== 0) {
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
 						return interaction
 							.reply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened),
+								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
 								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
@@ -145,44 +146,46 @@ module.exports = {
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askQuestions) {
-					const modal = new client.discord.ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
+					const modal = new ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
 
 					ticketType.questions.forEach((x, i) => {
-						const input = new client.discord.TextInputBuilder()
+						const input = new TextInputBuilder()
 							.setCustomId(`input_${interaction.values[0]}_${i}`)
 							.setLabel(x.label)
-							.setStyle(x.style == "SHORT" ? client.discord.TextInputStyle.Short : client.discord.TextInputStyle.Paragraph)
+							.setStyle(x.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
 							.setPlaceholder(x.placeholder)
 							.setMaxLength(x.maxLength);
 
-						const firstActionRow = new client.discord.ActionRowBuilder().addComponents(input);
+						const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
 						modal.addComponents(firstActionRow);
 					});
 
 					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {
-					require("../utils/createTicket.js").createTicket(interaction, client, ticketType, client.locales.other.noReasonGiven);
+					createTicket(interaction, client, ticketType, client.locales.other.noReasonGiven);
 				}
 			}
 
 			if (interaction.customId === "removeUser") {
-				const ticket = await client.db.get(`tickets_${interaction.message.channelId}`);
-				client.db.pull(`tickets_${interaction.message.channel.id}.invited`, interaction.values);
+				const ticket = await client.prisma.tickets.findUnique({
+					select: {
+						id: true,
+					},
+					where: {
+						channelid: interaction.message.channelId
+					}
+				});
 
 				interaction.values.forEach((value) => {
-					interaction.channel.permissionOverwrites.delete(value).catch((e) => console.log(e));
+					(interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
 
-					client.log(
-						"userRemoved",
+					log(
 						{
-							user: {
-								tag: interaction.user.tag,
-								id: interaction.user.id,
-								avatarURL: interaction.user.displayAvatarURL(),
-							},
-							ticketId: ticket.id,
-							ticketChannelId: interaction.channel.id,
-							removed: {
+							LogType: "userRemoved",
+							user: interaction.user,
+							ticketId: ticket?.id.toString(),
+							ticketChannelId: interaction.channel?.id,
+							target: {
 								id: value,
 							},
 						},
@@ -203,16 +206,16 @@ module.exports = {
 
 		if (interaction.isModalSubmit()) {
 			if (interaction.customId === "askReason") {
-				const type = interaction.fields.fields.first().customId.split("_")[1];
+				const type = interaction.fields.fields.first()?.customId.split("_")[1];
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === type);
-				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
-				require("../utils/createTicket.js").createTicket(interaction, client, ticketType, interaction.fields.fields);
+				// Using customId until the value can be figured out
+				if (!ticketType) return console.error(`Ticket type ${interaction.customId} not found!`);
+				createTicket(interaction, client, ticketType, interaction.fields.fields);
 			}
 
 			if (interaction.customId === "askReasonClose") {
 				await interaction.deferReply().catch((e) => console.log(e));
-				const { close } = require("../utils/close.js");
-				close(interaction, client, interaction.fields.fields.first().value);
+				close(interaction, client, interaction.fields.fields.first()?.value);
 			}
 		}
 	},

@@ -1,3 +1,7 @@
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { DiscordClient } from "../Types";
+import {claim} from "../utils/claim";
+
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
 
@@ -14,28 +18,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
-	async deleteTicket(interaction, client) {
-		const ticket = await client.db.get(`tickets_${interaction.channel.id}`);
-		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-
-		client.log(
-			"ticketDelete",
-			{
-				user: {
-					tag: interaction.user.tag,
-					id: interaction.user.id,
-					avatarURL: interaction.user.displayAvatarURL(),
-				},
-				ticketId: ticket.id,
-				ticketCreatedAt: ticket.createdAt,
-				transcriptURL: ticket.transcriptURL,
-			},
-			client
-		);
-
-		await interaction.deferUpdate();
-		interaction.channel.delete().catch((e) => console.log(e));
+export default {
+	data: new SlashCommandBuilder().setName("claim").setDescription("Set the ticket as claimed."),
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
+		claim(interaction, client);
 	},
 };
 

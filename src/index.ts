@@ -14,15 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const fs = require("fs-extra");
-const path = require("node:path");
-const { Client, Collection, GatewayIntentBits } = require("discord.js");
-// eslint-disable-next-line node/no-missing-require, node/no-unpublished-require
-const { token } = require("./config/token.json");
-const { QuickDB, MySQLDriver } = require("quick.db");
-const jsonc = require("jsonc");
+import { Interaction } from "discord.js";
+import fs from "fs-extra";
+import path from "node:path";
+import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { jsonc } from "jsonc";
+import { DiscordClient, config, locale } from "./Types";
+import { config as envconf } from "dotenv";
+import { PrismaClient } from "@prisma/client";
 
-process.on("unhandledRejection", (reason, promise, a) => {
+// Initalize .env file as environment
+try {envconf();}
+catch(ex) {console.log(".env failed to load");}
+
+// Although invalid type, it should be good enough for now until more stuff needs to be handled here
+process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
 	console.log(reason, promise, a);
 });
 
@@ -40,101 +46,42 @@ Connecting to Discord...
 
 // Update Detector
 fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
-	if (Math.floor(res.status / 100) !== 2) return console.warn("[Version Check] Failed to pull latest version from server");
+	if (Math.floor(res.status / 100) !== 2) return console.warn("🔄  Failed to pull latest version from server");
 	res.json().then((json) => {
 		// Assumign the format stays consistent (i.e. x.x.x)
-		const latest = json[0].name.split(".").map((k) => parseInt(k));
-		const current = require("./package.json")
-			.version.split(".")
-			.map((k) => parseInt(k));
+		const latest = json[0].name.split(".").map((k: string) => parseInt(k));
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const current = require("../package.json").version.split(".")
+			.map((k: string) => parseInt(k));
 		if (
 			latest[0] > current[0] ||
 			(latest[0] === current[0] && latest[1] > current[1]) ||
 			(latest[0] === current[0] && latest[1] === current[1] && latest[2] > current[2])
 		)
-			console.warn(`[Version Check] New version available: ${json[0].name}; Current Version: ${current.join(".")}`);
-		else console.log("[Version Check] Up to date");
+			console.warn(`🔄  New version available: ${json[0].name}; Current Version: ${current.join(".")}`);
+		else console.log("🔄  The ticket-bot is up to date");
 	});
 });
 
-const config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
+
+const config: config = jsonc.parse(fs.readFileSync(path.join(__dirname, "/../config/config.jsonc"), "utf8"));
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 	presence: {
 		status: config.status?.status ?? "online"
 	}
-});
+}) as DiscordClient;
 
 // All variables stored in the client object
-client.discord = require("discord.js");
-client.config = jsonc.parse(fs.readFileSync(path.join(__dirname, "config/config.jsonc"), "utf8"));
+client.config = config;
+client.prisma = new PrismaClient();
 
-let db = null;
-
-if (client.config.postgre?.enabled) {
-	// PostgreSQL Support.
-	(async () => {
-		try {
-			// eslint-disable-next-line node/no-missing-require
-			require.resolve("pg");
-		} catch (e) {
-			console.error("pg driver is not installed!\n\nPlease run \"npm i pg\" in the console!");
-			throw e.code;
-		}
-		const PostgresDriver = require("./utils/pgsqlDriver");
-		const pgsql = new PostgresDriver({
-			host: client.config.postgre?.host,
-			user: client.config.postgre?.user,
-			password: client.config.postgre?.password,
-			database: client.config.postgre?.database
-		});
-
-		await pgsql.connect();
-
-		db = new QuickDB({
-			driver: pgsql,
-			table: client.config.postgre?.table ?? "json"
-		});
-		client.db = db;
-	})();
-} else if (client.config.mysql?.enabled) {
-	// MySQL Support
-	(async () => {
-		try {
-			// eslint-disable-next-line node/no-missing-require
-			require.resolve("mysql2");
-		} catch (e) {
-			console.error("mysql2 is not installed!\n\nPlease run \"npm i mysql2\" in the console!");
-			throw e.code;
-		}
-
-		const mysql = new MySQLDriver({
-			host: client.config.mysql?.host,
-			user: client.config.mysql?.user,
-			password: client.config.mysql?.password,
-			database: client.config.mysql?.database,
-			charset: "utf8mb4"
-		});
-
-		await mysql.connect();
-
-		db = new QuickDB({
-			driver: mysql,
-			table: client.config.mysql?.table ?? "json"
-		});
-		client.db = db;
-	})();
-} else {
-	// SQLite Support
-	db = new QuickDB();
-	client.db = db;
-}
-
-client.locales = require(`./locales/${client.config.lang}.json`);
-client.embeds = client.locales.embeds;
-client.log = require("./utils/logs.js").log;
-client.msToHm = function dhm(ms) {
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+client.locales = require(`../locales/${client.config.lang}.json`) as locale;
+client.msToHm = function dhm(ms: number | Date) {
+	if(ms instanceof Date) ms = ms.getTime();
+	
 	const days = Math.floor(ms / (24 * 60 * 60 * 1000));
 	const daysms = ms % (24 * 60 * 60 * 1000);
 	const hours = Math.floor(daysms / (60 * 60 * 1000));
@@ -157,12 +104,13 @@ const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
-	const command = require(filePath);
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const command = require(filePath).default;
 	client.commands.set(command.data.name, command);
 }
 
 // Execute commands
-client.on("interactionCreate", async (interaction) => {
+client.on("interactionCreate", async (interaction: Interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 	const command = client.commands.get(interaction.commandName);
 	if (!command) return;
@@ -184,7 +132,8 @@ const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".j
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const event = require(filePath).default;
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
@@ -193,7 +142,7 @@ for (const file of eventFiles) {
 }
 
 // Login the bot
-client.login(token);
+client.login(process.env["TOKEN"]);
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

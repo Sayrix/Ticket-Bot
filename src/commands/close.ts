@@ -1,4 +1,7 @@
-const { SlashCommandBuilder } = require("discord.js");
+import { CommandInteraction, GuildMember, SlashCommandBuilder } from "discord.js";
+import { DiscordClient } from "../Types";
+import { closeAskReason } from "../utils/close_askReason";
+import {close} from "../utils/close.js";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -16,12 +19,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder().setName("close").setDescription("Close the ticket"),
-	async execute(interaction, client) {
+	async execute(interaction: CommandInteraction, client: DiscordClient) {
 		if (
 			client.config.whoCanCloseTicket === "STAFFONLY" &&
-			!interaction.member.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
+			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
 				.reply({
@@ -31,11 +34,9 @@ module.exports = {
 				.catch((e) => console.log(e));
 
 		if (client.config.askReasonWhenClosing) {
-			const { closeAskReason } = require("../utils/close_askReason.js");
 			closeAskReason(interaction, client);
 		} else {
 			await interaction.deferReply().catch((e) => console.log(e));
-			const { close } = require("../utils/close.js");
 			close(interaction, client);
 		}
 	},
