@@ -29,7 +29,7 @@ this will be used for storing tickets
 
 CREATE TABLE IF NOT EXISTS tickets (
     id SERIAL PRIMARY KEY,
-    messageid TEXT NOT NULL UNIQUE,
+    channelid TEXT NOT NULL UNIQUE,
     categorycode TEXT NOT NULL,
     reason TEXT NOT NULL,
     creator TEXT NOT NULL,

@@ -14,7 +14,7 @@ model config {
 
 model tickets {
   id           Int     @id @default(autoincrement())
-  messageid    String  @unique
+  channelid    String  @unique
   categorycode String
   invited      String  @default("[]")
   reason       String
