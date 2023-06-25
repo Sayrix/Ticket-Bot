@@ -110,7 +110,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 			.replaceAll("S_USERID", interaction.user.id)
 			.replaceAll("U_USERID", creatorUser.id)
 			.replaceAll("TICKETCOUNT", ticket.id.toString());
-	   (interaction.channel as TextChannel | null)?.setName(newName).catch((e) => console.log(e));
+	   await (interaction.channel as TextChannel | null)?.setName(newName).catch((e) => console.log(e));
    	}
 
 	const categoryID = client.config.claimOption.categoryWhenClaimed;
@@ -118,7 +118,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		const category = await interaction.guild?.channels.fetch(categoryID);
 		if(category?.type !== ChannelType.GuildCategory)
 			return console.error("claim.ts: USER ERROR - Invalid categoryWhenClaimed ID. Channel must be a category.");
-		(interaction.channel as TextChannel | null)?.setParent(category);
+		await (interaction.channel as TextChannel | null)?.setParent(category);
 	}
 };
 /*
