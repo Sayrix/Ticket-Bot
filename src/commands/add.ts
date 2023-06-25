@@ -25,14 +25,33 @@ export default {
 		.addUserOption((input) => input.setName("user").setDescription("The user to add").setRequired(true)),
 	async execute(interaction: CommandInteraction, client: DiscordClient) {
 		const added = interaction.options.getUser("user", true);
-		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
-		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		if (ticket.invited.includes(added.id)) return interaction.reply({ content: "User already added", ephemeral: true }).catch((e) => console.log(e));
 
-		if (ticket.invited.lenght >= 25)
+		const ticket = await client.prisma.tickets.findUnique({
+			select: {
+				id: true,
+				invited: true,
+			},
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
+		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+		
+		const invited = JSON.parse(ticket.invited) as string[];
+		if (invited.includes(added.id)) return interaction.reply({ content: "User already added", ephemeral: true }).catch((e) => console.log(e));
+
+		if (invited.length >= 25)
 			return interaction.reply({ content: "You can't add more than 25 users", ephemeral: true }).catch((e) => console.log(e));
 
-		client.db.push(`tickets_${interaction.channel?.id}.invited`, added.id);
+		invited.push(added.id);
+		await client.prisma.tickets.update({
+			data: {
+				invited: JSON.stringify(invited)
+			},
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
 
 		await (interaction.channel as TextChannel | null)?.permissionOverwrites
 			.edit(added, {
@@ -50,7 +69,7 @@ export default {
 			{
 				LogType: "userAdded",
 				user: interaction.user,
-				ticketId: ticket.id,
+				ticketId: ticket.id.toString(),
 				ticketChannelId: interaction.channel?.id,
 				target: added,
 			},

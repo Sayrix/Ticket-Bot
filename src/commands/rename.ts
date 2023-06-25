@@ -29,7 +29,11 @@ export default {
 	 * @returns
 	 */
 	async execute(interaction: CommandInteraction, client: DiscordClient) {
-		const ticket = await client.db.get(`tickets_${interaction.channel?.id}`);
+		const ticket = await client.prisma.tickets.findUnique({
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
 		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
 			return interaction
