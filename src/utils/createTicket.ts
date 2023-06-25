@@ -43,9 +43,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		let ticketName = "";
 
-		let ticketCount = (await client.prisma.$queryRaw<{count:number}>
-		`SELECT COUNT(*) as count FROM tickets`)
-			.count;
+		let ticketCount = (await client.prisma.$queryRaw<[{count: bigint}]>
+		`SELECT COUNT(*) as count FROM tickets`)[0].count;
 
 		if (ticketType.ticketNameOption) {
 			ticketName = ticketType.ticketNameOption
@@ -206,7 +205,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						channelid: channel.id,
 						messageid: msg.id
 					}
-				});
+				}).then(); // Again why tf do I need .then()?!?!?
 				msg.pin().then(() => {
 					msg.channel.bulkDelete(1);
 				});

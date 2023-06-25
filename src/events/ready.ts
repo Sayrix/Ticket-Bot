@@ -97,7 +97,7 @@ export default {
 							key: "openTicketMessageId",
 							value: rMsg.id
 						}
-					});
+					}).then(); // I need .then() for it to execute?!?!??
 				});
 			}
 		} catch (e) {

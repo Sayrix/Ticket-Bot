@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     claimedby TEXT,
     claimedat TIMESTAMP,
     closedby TEXT,
-    closedat INTEGER,
+    closedat TIMESTAMP,
     closereason TEXT,
     transcript TEXT
 );

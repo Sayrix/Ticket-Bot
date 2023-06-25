@@ -33,11 +33,11 @@ CREATE TABLE IF NOT EXISTS tickets (
     invited TEXT NOT NULL DEFAULT '[]',
     reason TEXT NOT NULL,
     creator TEXT NOT NULL,
-    createdat INTEGER NOT NULL,
+    createdat BIGINT NOT NULL,
     claimedby TEXT,
-    claimedat INTEGER,
+    claimedat BIGINT,
     closedby TEXT,
-    closedat INTEGER,
+    closedat BIGINT,
     closereason TEXT,
     transcript TEXT
 );

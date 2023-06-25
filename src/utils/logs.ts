@@ -28,14 +28,14 @@ type log = {
 	ticketChannelId?: string;
 	ticketId?: string | number;
 	reason?: string;
-	ticketCreatedAt: number;
+	ticketCreatedAt: number | bigint;
 } | {
 	LogType: "ticketDelete"
 	user: User
 	ticketChannelId?: string;
 	ticketId?: string | number;
 	reason?: string;
-	ticketCreatedAt: number;
+	ticketCreatedAt: number | bigint;
 	transcriptURL?: string;
 
 } | {
@@ -85,7 +85,7 @@ export const log = async(logs: log, client: DiscordClient) => {
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 			.setDescription(
 				`${logs.user.tag} (<@${logs.user.id}>) Claimed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) after ${client.msToHm(
-					new Date(Date.now() - logs.ticketCreatedAt)
+					new Date(Number(BigInt(Date.now()) - BigInt(logs.ticketCreatedAt)))
 				)} of creation`
 			);
 		webhook
@@ -104,7 +104,7 @@ export const log = async(logs: log, client: DiscordClient) => {
 			.setDescription(
 				`${logs.user.tag} (<@${logs.user.id}>) Closed the ticket n°${logs.ticketId} (<#${logs.ticketChannelId}>) with the reason: \`${
 					logs.reason
-				}\` after ${client.msToHm(new Date(Date.now() - logs.ticketCreatedAt))} of creation`
+				}\` after ${client.msToHm(Number(BigInt(Date.now()) - BigInt(logs.ticketCreatedAt)))} of creation`
 			);
 
 		webhook
@@ -122,7 +122,7 @@ export const log = async(logs: log, client: DiscordClient) => {
 			.setAuthor({ name: logs.user.tag, iconURL: logs.user.displayAvatarURL() })
 			.setDescription(
 				`${logs.user.tag} (<@${logs.user.id}>) Deleted the ticket n°${logs.ticketId} after ${client.msToHm(
-					new Date(Date.now() - logs.ticketCreatedAt)
+					new Date(Number(BigInt(Date.now()) - BigInt(logs.ticketCreatedAt)))
 				)} of creation\n\nTranscript: ${logs.transcriptURL}`
 			);
 

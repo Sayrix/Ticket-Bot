@@ -20,11 +20,11 @@ model tickets {
   invited      String  @default("[]")
   reason       String
   creator      String
-  createdat    Int
+  createdat    BigInt
   claimedby    String?
-  claimedat    Int?
+  claimedat    BigInt?
   closedby     String?
-  closedat     Int?
+  closedat     BigInt?
   closereason  String?
   transcript   String?
 }
