@@ -26,14 +26,14 @@ type log = {
 	LogType: "ticketClaim" | "ticketClose"
 	user: User
 	ticketChannelId?: string;
-	ticketId?: string;
+	ticketId?: string | number;
 	reason?: string;
 	ticketCreatedAt: number;
 } | {
 	LogType: "ticketDelete"
 	user: User
 	ticketChannelId?: string;
-	ticketId?: string;
+	ticketId?: string | number;
 	reason?: string;
 	ticketCreatedAt: number;
 	transcriptURL?: string;
@@ -46,7 +46,7 @@ type log = {
 	};
 	ticketChannelId?: string;
 	reason?: string;
-	ticketId?: string;
+	ticketId?: string | number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

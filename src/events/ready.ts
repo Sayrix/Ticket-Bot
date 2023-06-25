@@ -42,11 +42,11 @@ export default {
 			process.exit(0);
 		}
 
-		const embedMessageId = await client.prisma.config.findUnique({
+		const embedMessageId = (await client.prisma.config.findUnique({
 			where: {
 				key: "openTicketMessageId",
 			}
-		});
+		}))?.value;
 		await client.channels.fetch(client.config.openTicketChannelId).catch(() => {
 			console.error("The channel to open tickets is not found!");
 			process.exit(0);
@@ -79,7 +79,7 @@ export default {
 		);
 
 		try {
-			const msg = embedMessageId?.value ? await openTicketChannel?.messages?.fetch(embedMessageId.value).catch((ex) => console.error(ex)) : undefined;
+			const msg = embedMessageId ? await openTicketChannel?.messages?.fetch(embedMessageId).catch((ex) => console.error(ex)) : undefined;
 			if (msg && msg.id) {
 				msg.edit({
 					embeds: [embed],

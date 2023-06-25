@@ -4,7 +4,7 @@ File is licensed respectively under the terms of the Apache License 2.0
 or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/orm/LICENSE
 
 For production use, please don't try to use this file, even if you're using postgresql,
-since the code is tailored towards compatibility.sql. You will break the software if you do so.
+Since the code is tailored towards compatibility.sql, it will break.
 You have been warned.
 
 I wrote this in-case multi-db support will eventually be dropped, and I'm a big postgresql fan ^w^
