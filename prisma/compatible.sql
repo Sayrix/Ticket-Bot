@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS tickets (
     createdat INTEGER NOT NULL,
     claimedby TEXT,
     claimedat INTEGER,
+    closedby TEXT,
+    closedat INTEGER,
     closereason TEXT,
     transcript TEXT
 );

@@ -23,6 +23,8 @@ model tickets {
   createdat    Int
   claimedby    String?
   claimedat    Int?
+  closedby     String?
+  closedat     Int?
   closereason  String?
   transcript   String?
 }
