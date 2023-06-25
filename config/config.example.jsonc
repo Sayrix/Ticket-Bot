@@ -4,28 +4,6 @@
 	"mainColor": "#f6c42f", // The hex color of the embeds by default
 	"lang": "main", // If you want to set english please set "main"
 
-	/*
-	Pick a database driver, postgres will take priority over mysql (if both are enabled, which please don't do).
-	If neither option is enabled, SQLite will be used.
-		*PostgreSQL will be using default schema*
-	*/
-	"postgre": {
-		"enabled": false,
-		"host": "postgresql.example.com", // The host of the PostgreSQL database
-		"user": "postgres", // The user of the PostgreSQL database
-		"password": "password", // The password of the PostgreSQL database
-		"database": "postgres", // The name of the PostgreSQL database
-		"table": "json" // The name of the table where the tickets will be saved
-	},
-	"mysql": {
-		"enabled": false,
-		"host": "mysql.example.com", // The host of the MySQL database
-		"user": "mysql", // The user of the MySQL database
-		"password": "password", // The password of the MySQL database
-		"database": "ticketbot", // The name of the MySQL database
-		"table": "json" // The name of the table where the tickets will be saved
-	},
-
 	"closeTicketCategoryId": "", // The id of the category where a closed ticket will be moved to. Leave blank to disable this feature
 
 	"openTicketChannelId": "1111111111111111111", // The id of the channel where the message to create a ticket will be sent

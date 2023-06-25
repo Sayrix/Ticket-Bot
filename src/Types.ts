@@ -23,22 +23,11 @@ export type TicketType = {
     askQuestions: boolean;
     questions: TicketQuestion[];
 }
-type dbConn = {
-	enabled: boolean;
-	host: string;
-	user: string;
-	password: string;
-	database: string;
-	table: string;
-}
 export type config = {
 	clientId: string;
 	guildId: string;
 	mainColor: ColorResolvable;
 	lang: string; // Tho can be cs/de/es/fr/main/tr type but we can't guarantee what users put
-	// Database credentials are deprecated, will be removed when Prisma are in-place.
-	postgre?: dbConn;
-	mysql?: dbConn;
 	closeTicketCategoryId: string;
 	openTicketChannelId: string;
 	ticketTypes: TicketType[];
