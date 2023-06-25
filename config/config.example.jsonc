@@ -58,7 +58,14 @@
 		}
 	],
 	"ticketNameOption": "Ticket-TICKETCOUNT", // Here is all parameter: USERNAME, USERID, TICKETCOUNT
-	"ticketNamePrefixWhenClaimed": "✔️", // With ✔️ as prefix the name of the ticket will be like this: ✔️ticket-1
+
+	// Ticket Claim Options
+	"claimOption": {
+		"enabled": true, // Whether to enable ticket claim button or not
+		// The X can be replaced with S (The staff that claimed the ticket) or U (The user that created the ticket)
+		"nameWhenClaimed": "✔️ Ticket-TICKETCOUNT", // Here is all parameter: X_USERNAME, X_USERID, TICKETCOUNT
+		"categoryWhenClaimed": "" // The category the ticket is moved to when claimed
+	},
 
 	"rolesWhoHaveAccessToTheTickets": ["1111111111111111111", "2222222222222222222"], // Roles who can access to the tickets (Like the staff)
 
@@ -69,8 +76,6 @@
 
 	"logs": true,
 	"logsChannelId": "1111111111111111111", // The id of the channel where the logs will be sent
-
-	"claimButton": true,
 
 	"whoCanCloseTicket": "STAFFONLY", // STAFFONLY (roles configured at "rolesWhoHaveAccessToTheTickets") or EVERYONE
 	"closeButton": true, // If false the ticket can be closed only by doing /closes
