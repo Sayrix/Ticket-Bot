@@ -91,10 +91,16 @@ export default {
 					embeds: [embed],
 					components: [row]
 				}).then((rMsg) => {
-					client.prisma.config.create({
-						data: {
+					client.prisma.config.upsert({
+						create: {
 							key: "openTicketMessageId",
 							value: rMsg.id
+						},
+						update: {
+							value: rMsg.id
+						},
+						where: {
+							key: "openTicketMessageId"
 						}
 					}).then(); // I need .then() for it to execute?!?!??
 				});
