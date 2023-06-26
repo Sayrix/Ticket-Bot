@@ -12,8 +12,7 @@ The documentation is available [here](https://doc.ticket.pm/)
 ## ⚠️ Incompatibility
 This new source code you're seeing are completely refactored and will be incompatible with the older version.
 I recommend you finish up all of your remaining support ticket and start migrating to the newer version.
-If you prefer to stay in the older version, you can download anything that is less than `3.0.0` from the release
-or clone from the `old` branch (i.e. `git clone -b old https://github.com/Sayrix/Ticket-Bot.git`)
+If you prefer to stay in the older version, here is the doc for the old version: https://doc.ticket.pm/docs/oldDoc/intro
 
 ## 💬 Discord
 
@@ -22,6 +21,11 @@ You can come on the discord: https://discord.gg/VasYV6MEJy
 ## ✨ Contributing
 
 Contributions are welcome! Please read the [contributing guidelines](https://github.com/Sayrix/Ticket-Bot/blob/main/CONTRIBUTING.md) first.
+
+## 👨‍💻 Maintainers
+Our current project maintainers:
+* [Sayrix](https://github.com/Sayrix)
+* [小兽兽/zhiyan114](https://github.com/zhiyan114)
 
 ## 💎 Sponsors
 Thanks to all our sponsors! 🙏  

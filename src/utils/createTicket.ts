@@ -156,8 +156,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
 
-		if (client.config.closeButton) {
-			if (client.config.askReasonWhenClosing) {
+		if (client.config.closeOption.closeButton) {
+			if (client.config.closeOption.askReason) {
 				row.addComponents(
 					new ButtonBuilder()
 						.setCustomId("close_askReason")
@@ -176,7 +176,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			}
 		}
 
-		if (client.config.claimButton) {
+		if (client.config.claimOption.claimButton) {
 			row.addComponents(
 				new ButtonBuilder()
 					.setCustomId("claim")

@@ -21,8 +21,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+type ticketType = {
+    id: number;
+    channelid: string;
+    messageid: string;
+    category: string;
+    invited: string;
+    reason: string;
+    creator: string;
+    createdat: bigint;
+    claimedby: string | null;
+    claimedat: bigint | null;
+    closedby: string | null;
+    closedat: bigint | null;
+    closereason: string | null;
+    transcript: string | null;
+}
+
 export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: DiscordClient, reason?: string) {
-	if (!client.config.createTranscript) domain = client.locales.other.unavailable;
+	if (!client.config.closeOption.createTranscript) domain = client.locales.other.unavailable;
 
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
@@ -33,7 +51,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 	if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
 
 	if (
-		client.config.whoCanCloseTicket === "STAFFONLY" &&
+		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 	)
 		return interaction
@@ -84,18 +102,8 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			content: client.locales.ticketCreatingTranscript
 		})
 		.catch((e) => console.log(e));
-
-	async function _close(id: string) {
+	async function _close(id: string, ticket: ticketType) {
 		if (client.config.closeTicketCategoryId) (interaction.channel as TextChannel | null)?.setParent(client.config.closeTicketCategoryId).catch((e) => console.log(e));
-
-		// We can guarantee this is not null because it's already checked above.
-		// Should re-write this to prevent nested functions :/
-		let ticket = (await client.prisma.tickets.findUnique({
-			where: {
-				channelid: interaction.channel?.id
-			}
-		}));
-		if(!ticket) return console.error("close.ts: UNEXPECTED ERROR - _close func encountered null ticket");
 
 		const msg = await interaction.channel?.messages.fetch(ticket.messageid);
 		const embed = new EmbedBuilder(msg?.embeds[0].data);
@@ -152,6 +160,8 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 			.catch((e) => console.log(e));
 
+
+		if(!client.config.closeOption.dmUser) return;
 		const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
 		const ticketClosedDMEmbed = new EmbedBuilder({
 			...lEmbed,
@@ -181,8 +191,8 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		});
 	}
 
-	if (!client.config.createTranscript) {
-		_close("");
+	if (!client.config.closeOption.createTranscript) {
+		_close("", ticket);
 		return;
 	}
 
@@ -223,7 +233,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 					}
 				})
 				.catch(console.error);
-			_close(ts?.data);
+			_close(ts?.data, ticket);
 		}
 	});
 }

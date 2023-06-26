@@ -32,19 +32,26 @@ export type config = {
 	openTicketChannelId: string;
 	ticketTypes: TicketType[];
     ticketNameOption: string;
-    ticketNamePrefixWhenClaimed: string;
+	claimOption: {
+		claimButton: boolean;
+		nameWhenClaimed?: string;
+		categoryWhenClaimed?: string;
+	};
     rolesWhoHaveAccessToTheTickets: string[];
     rolesWhoCanNotCreateTickets: string[];
     pingRoleWhenOpened: boolean;
     roleToPingWhenOpenedId: string[];
     logs: boolean;
     logsChannelId: string;
-    claimButton: boolean;
-    whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
-    closeButton: boolean;
-    askReasonWhenClosing: boolean;
-    createTranscript: boolean;
-		uuidType: string,
+    closeOption: {
+		closeButton: boolean;
+		dmUser: boolean;
+		createTranscript: boolean;
+		askReason: boolean;
+		whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
+		closeTicketCategoryId?: string;
+	};
+	uuidType: "uuid" | "emoji";
     status: {
         enabled: boolean;
         text: string;

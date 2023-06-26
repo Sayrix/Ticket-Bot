@@ -23,7 +23,7 @@ export default {
 	data: new SlashCommandBuilder().setName("close").setDescription("Close the ticket"),
 	async execute(interaction: CommandInteraction, client: DiscordClient) {
 		if (
-			client.config.whoCanCloseTicket === "STAFFONLY" &&
+			client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
@@ -33,7 +33,7 @@ export default {
 				})
 				.catch((e) => console.log(e));
 
-		if (client.config.askReasonWhenClosing) {
+		if (client.config.closeOption.askReason) {
 			closeAskReason(interaction, client);
 		} else {
 			await interaction.deferReply().catch((e) => console.log(e));
