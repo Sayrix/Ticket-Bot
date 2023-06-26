@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -16,7 +16,7 @@ model tickets {
   id           Int     @id @default(autoincrement())
   channelid    String  @unique
   messageid    String  @unique
-  category     String
+  category     String  @db.Text
   invited      String  @default("[]")
   reason       String
   creator      String
