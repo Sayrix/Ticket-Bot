@@ -51,7 +51,7 @@ export type config = {
 		whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
 		closeTicketCategoryId?: string;
 	};
-	uuidType: string;
+	uuidType: "uuid" | "emoji";
     status: {
         enabled: boolean;
         text: string;
