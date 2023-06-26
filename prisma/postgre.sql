@@ -20,7 +20,7 @@ this will be used for
 
 CREATE TABLE IF NOT EXISTS config (
     key VARCHAR(256) PRIMARY KEY,
-    value TEXT
+    value LONGTEXT
 );
 
 /*
