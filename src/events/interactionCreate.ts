@@ -49,16 +49,15 @@ export default {
 
 				const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
 				`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NOT NULL`)[0].count;
-				
-				if (client.config.maxTicketOpened !== 0) {
-					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= client.config.maxTicketOpened) {
-						return interaction
-							.editReply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
-							})
-							.catch((e) => console.log(e));
-					}
+
+				// If maxTicketOpened is 0, it means that there is no limit
+				if (client.config.maxTicketOpened > 0 &&
+					ticketsOpened >= client.config.maxTicketOpened) {
+					return interaction
+						.editReply({
+							content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
+						})
+						.catch((e) => console.log(e));
 				}
 
 				// Make a select menus of all tickets types
@@ -127,20 +126,18 @@ export default {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
-				const ticketsOpened = (await client.prisma.$queryRaw<{count:bigint}>
-				`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NOT NULL`)
-					.count;
+				const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
+				`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NOT NULL`)[0].count;
 				
-				if (client.config.maxTicketOpened !== 0) {
-					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= client.config.maxTicketOpened) {
-						return interaction
-							.reply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
-								ephemeral: true,
-							})
-							.catch((e) => console.log(e));
-					}
+				// If maxTicketOpened is 0, it means that there is no limit
+				if (client.config.maxTicketOpened > 0 &&
+					ticketsOpened >= client.config.maxTicketOpened) {
+					return interaction
+						.reply({
+							content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
+							ephemeral: true,
+						})
+						.catch((e) => console.log(e));
 				}
 
 				const ticketType = client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
