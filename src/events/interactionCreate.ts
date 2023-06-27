@@ -47,12 +47,12 @@ export default {
 					}
 				}
 				
-				if (client.config.maxTicketOpened !== 0) {
+				if (client.config.maxTicketOpened > 0) {
 					const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
-						`SELECT COUNT(*) as count FROM tickets WHERE closereason IS NULL`)[0].count;
+						`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
 					
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === BigInt(client.config.maxTicketOpened)) {
+					if (ticketsOpened >= client.config.maxTicketOpened) {
 						return interaction
 							.editReply({
 								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
@@ -127,11 +127,11 @@ export default {
 
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {				
-				if (client.config.maxTicketOpened !== 0) {
+				if (client.config.maxTicketOpened > 0) {
 					const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
-						`SELECT COUNT(*) as count FROM tickets WHERE closereason IS NULL`)[0].count;
+						`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened > client.config.maxTicketOpened || ticketsOpened === client.config.maxTicketOpened) {
+					if (ticketsOpened >= client.config.maxTicketOpened) {
 						return interaction
 							.reply({
 								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
