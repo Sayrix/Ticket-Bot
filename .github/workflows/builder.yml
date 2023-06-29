@@ -37,7 +37,7 @@ jobs:
 
       - name: npm i
         if: steps.cache-node_modules.outputs.cache-hit != 'true' || github.event_name == 'pull_request'
-        run: npm i --no-audit
+        run: npm i --no-audit && npm install @typescript-eslint/eslint-plugin@latest --save-dev
 
       - name: ESLint
         run: npm run lint:check
