@@ -53,8 +53,8 @@ export default class ExtendedClient extends Client {
 	}
 
 	private loadEvents () {
-		this.on("interactionCreate", new InteractionCreateEvent(this).execute.bind(this));
-		this.on("ready", new ReadyEvent(this).execute.bind(this));
+		this.on("interactionCreate", (interaction) => new InteractionCreateEvent(this).execute(interaction));
+		this.on("ready", () => new ReadyEvent(this).execute());
 	}
 
 	public deployCommands() {
@@ -66,7 +66,7 @@ export default class ExtendedClient extends Client {
 			RenameCommand.data.toJSON()
 		];
 
-		const { guildId } = jsonc.parse(fs.readFileSync(path.join(__dirname, "../config/config.jsonc"), "utf8"));
+		const { guildId } = jsonc.parse(fs.readFileSync(path.join(__dirname, "../../config/config.jsonc"), "utf8"));
 
 		if(!process.env["TOKEN"]) throw Error("Discord Token Expected, deploy-command");
 		const rest = new REST({ version: "10" }).setToken(process.env["TOKEN"]);
