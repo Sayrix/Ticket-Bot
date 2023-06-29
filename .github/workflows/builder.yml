@@ -36,8 +36,11 @@ jobs:
           key: node_modules-${{ matrix.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
 
       - name: npm i
-        if: steps.cache-node_modules.outputs.cache-hit != 'true' || github.event_name == 'pull_request' || $[ $RANDOM % 3 + 1 ] == 1
-        run: npm i --no-audit && npm install @typescript-eslint/eslint-plugin@latest --save-dev
+        if: steps.cache-node_modules.outputs.cache-hit != 'true' || github.event_name == 'pull_request'
+        run: npm i --no-audit
+        
+      - name: install dev dependencies
+        run: npm install @typescript-eslint/eslint-plugin@latest --save-dev
 
       - name: ESLint
         run: npm run lint:check
