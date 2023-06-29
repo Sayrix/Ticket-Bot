@@ -15,9 +15,9 @@ limitations under the License.
 */
 
 import { ActionRowBuilder, ButtonInteraction, CommandInteraction, GuildMember, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { DiscordClient } from "../Types";
+import {ExtendedClient} from "../structure";
 
-export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: DiscordClient) => {
+export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: ExtendedClient) => {
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
