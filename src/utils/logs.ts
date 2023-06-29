@@ -1,5 +1,5 @@
 import Discord, { ChannelType, TextChannel, User } from "discord.js";
-import { DiscordClient } from "../Types";
+import {ExtendedClient} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -50,7 +50,7 @@ type log = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const log = async(logs: log, client: DiscordClient) => {
+export const log = async(logs: log, client: ExtendedClient) => {
 	if (!client.config.logs) return;
 	if (!client.config.logsChannelId) return;
 	const channel = await client.channels

@@ -1,11 +1,11 @@
 import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, SelectMenuComponentOptionData, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { DiscordClient } from "../Types";
 import { log } from "../utils/logs";
 import {createTicket} from "../utils/createTicket";
 import { close } from "../utils/close";
 import { claim } from "../utils/claim";
 import { closeAskReason } from "../utils/close_askReason";
 import { deleteTicket } from "../utils/delete";
+import {BaseEvent, ExtendedClient} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -23,48 +23,63 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export default {
-	name: "interactionCreate",
-	once: false,
-	/**
-	 * @param {Discord.Interaction} interaction
-	 * @param {Discord.Client} client
-	 */
-	async execute(interaction: Interaction, client: DiscordClient) {
+export default class InteractionCreateEvent extends BaseEvent {
+	constructor(client: ExtendedClient) {
+		super(client);
+	}
+
+	public async execute(interaction: Interaction): Promise<void>  {
+		if (interaction.isChatInputCommand()) {
+			const command = this.client.commands.get(interaction.commandName);
+			if (!command) return;
+
+			try {
+				await command.execute(interaction);
+			} catch (error) {
+				console.error(error);
+				await interaction.reply({
+					content: "There was an error while executing this command!",
+					ephemeral: true
+				});
+			}
+		}
+
 		if (interaction.isButton()) {
 			if (interaction.customId === "openTicket") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
 				// Max ticket opened
 
-				for (const role of client.config.rolesWhoCanNotCreateTickets) {
+				for (const role of this.client.config.rolesWhoCanNotCreateTickets) {
 					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
-						return interaction
+						interaction
 							.editReply({
 								content: "You can't create a ticket because you are blacklisted"
 							})
 							.catch((e) => console.log(e));
+						return;
 					}
 				}
-				
-				if (client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
+
+				if (this.client.config.maxTicketOpened > 0) {
+					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
 					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
-					
+
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= client.config.maxTicketOpened) {
-						return interaction
+					if (ticketsOpened >= this.client.config.maxTicketOpened) {
+						interaction
 							.editReply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString())
+								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
 							})
 							.catch((e) => console.log(e));
+						return;
 					}
 				}
 
 				// Make a select menus of all tickets types
 				let options: SelectMenuComponentOptionData[] = [];
 
-				for (const x of client.config.ticketTypes) {
+				for (const x of this.client.config.ticketTypes) {
 					// x.cantAccess is an array of roles id
 					// If the user has one of the roles, he can't access to this ticket type
 
@@ -78,7 +93,7 @@ export default {
 				}
 
 				for (const x of options) {
-					const option = client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
+					const option = this.client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
 					if (option.cantAccess) {
 						for (const role of option.cantAccess) {
 							if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
@@ -88,14 +103,17 @@ export default {
 					}
 				}
 
-				if (options.length <= 0) return interaction.editReply({
-					content: client.locales.noTickets
-				});
+				if (options.length <= 0) {
+					interaction.editReply({
+						content: this.client.locales.noTickets
+					});
+					return;
+				}
 
 				const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 					new StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
-						.setPlaceholder(client.locales.other.selectTicketTypePlaceholder)
+						.setPlaceholder(this.client.locales.other.selectTicketTypePlaceholder)
 						.setMaxValues(1)
 						.addOptions(options)
 				);
@@ -108,43 +126,44 @@ export default {
 			}
 
 			if (interaction.customId === "claim") {
-				claim(interaction, client);
+				claim(interaction, this.client);
 			}
 
 			if (interaction.customId === "close") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				close(interaction, client, client.locales.other.noReasonGiven);
+				close(interaction, this.client, this.client.locales.other.noReasonGiven);
 			}
 
 			if (interaction.customId === "close_askReason") {
-				closeAskReason(interaction, client);
+				closeAskReason(interaction, this.client);
 			}
 
 			if (interaction.customId === "deleteTicket") {
-				deleteTicket(interaction, client);
+				deleteTicket(interaction, this.client);
 			}
 		}
 
 		if (interaction.isStringSelectMenu()) {
-			if (interaction.customId === "selectTicketType") {				
-				if (client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await client.prisma.$queryRaw<[{count: bigint}]>
+			if (interaction.customId === "selectTicketType") {
+				if (this.client.config.maxTicketOpened > 0) {
+					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
 					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
 					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= client.config.maxTicketOpened) {
-						return interaction
+					if (ticketsOpened >= this.client.config.maxTicketOpened) {
+						interaction
 							.reply({
-								content: client.locales.ticketLimitReached.replace("TICKETLIMIT", client.config.maxTicketOpened.toString()),
+								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
 								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
+						return;
 					}
 				}
 
-				const ticketType = client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
+				const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askQuestions) {
-					const modal = new ModalBuilder().setCustomId("askReason").setTitle(client.locales.modals.reasonTicketOpen.title);
+					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
 
 					ticketType.questions.forEach((x, i) => {
 						const input = new TextInputBuilder()
@@ -160,12 +179,12 @@ export default {
 
 					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {
-					createTicket(interaction, client, ticketType, client.locales.other.noReasonGiven);
+					createTicket(interaction, this.client, ticketType, this.client.locales.other.noReasonGiven);
 				}
 			}
 
 			if (interaction.customId === "removeUser") {
-				const ticket = await client.prisma.tickets.findUnique({
+				const ticket = await this.client.prisma.tickets.findUnique({
 					select: {
 						id: true,
 					},
@@ -187,7 +206,7 @@ export default {
 								id: value,
 							},
 						},
-						client
+						this.client
 					);
 				});
 
@@ -205,19 +224,19 @@ export default {
 		if (interaction.isModalSubmit()) {
 			if (interaction.customId === "askReason") {
 				const type = interaction.fields.fields.first()?.customId.split("_")[1];
-				const ticketType = client.config.ticketTypes.find((x) => x.codeName === type);
+				const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === type);
 				// Using customId until the value can be figured out
 				if (!ticketType) return console.error(`Ticket type ${interaction.customId} not found!`);
-				createTicket(interaction, client, ticketType, interaction.fields.fields);
+				createTicket(interaction, this.client, ticketType, interaction.fields.fields);
 			}
 
 			if (interaction.customId === "askReasonClose") {
 				await interaction.deferReply().catch((e) => console.log(e));
-				close(interaction, client, interaction.fields.fields.first()?.value);
+				close(interaction, this.client, interaction.fields.fields.first()?.value);
 			}
 		}
-	},
-};
+	}
+}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

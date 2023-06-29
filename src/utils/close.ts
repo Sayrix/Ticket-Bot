@@ -2,8 +2,8 @@ import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
-import { DiscordClient } from "../Types";
 import { log } from "./logs";
+import {ExtendedClient} from "../structure";
 let domain = "https://ticket.pm/";
 
 /*
@@ -39,7 +39,7 @@ type ticketType = {
     transcript: string | null;
 }
 
-export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: DiscordClient, reason?: string) {
+export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: ExtendedClient, reason?: string) {
 	if (!client.config.closeOption.createTranscript) domain = client.locales.other.unavailable;
 
 	const ticket = await client.prisma.tickets.findUnique({

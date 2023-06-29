@@ -15,10 +15,10 @@ limitations under the License.
 */
 
 import { ButtonInteraction } from "discord.js";
-import { DiscordClient } from "../Types";
 import { log } from "./logs";
+import {ExtendedClient} from "../structure";
 
-export const deleteTicket = async (interaction: ButtonInteraction, client: DiscordClient) => {
+export const deleteTicket = async (interaction: ButtonInteraction, client: ExtendedClient) => {
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
 			channelid: interaction.channel?.id

@@ -15,15 +15,10 @@ limitations under the License.
 */
 
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
-import { DiscordClient } from "../Types";
 import { log } from "./logs";
+import {ExtendedClient} from "../structure";
 
-
-/**
-* @param {Discord.CommandInteraction} interaction
-* @param {Discord.Client} client
-*/
-export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: DiscordClient) => {
+export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: ExtendedClient) => {
 	let ticket = await client.prisma.tickets.findUnique({
 		where: {
 			channelid: interaction.channel?.id

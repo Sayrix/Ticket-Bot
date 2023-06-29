@@ -1,7 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, StringSelectMenuInteraction, TextInputComponent } from "discord.js";
-import { DiscordClient } from "../Types";
-import {TicketType} from "../Types";
 import { log } from "./logs";
+import {ExtendedClient, TicketType} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -25,7 +24,7 @@ limitations under the License.
  * @param {Object} ticketType
  * @param {Object|string} reasons
  */
-export const createTicket = async (interaction: StringSelectMenuInteraction | ModalSubmitInteraction, client: DiscordClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent> | string) => {
+export const createTicket = async (interaction: StringSelectMenuInteraction | ModalSubmitInteraction, client: ExtendedClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent> | string) => {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise(async function (resolve, reject) {
 		await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
