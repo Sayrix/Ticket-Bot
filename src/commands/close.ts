@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, SlashCommandBuilder } from "discord.js";
-import { DiscordClient } from "../Types";
 import { closeAskReason } from "../utils/close_askReason";
 import {close} from "../utils/close.js";
+import {BaseCommand, ExtendedClient} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -19,28 +19,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export default {
-	data: new SlashCommandBuilder().setName("close").setDescription("Close the ticket"),
-	async execute(interaction: CommandInteraction, client: DiscordClient) {
+export default class CloseCommand extends BaseCommand {
+	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
+		.setName("close").setDescription("Close the ticket");
+	constructor(client: ExtendedClient) {
+		super(client);
+	}
+
+	async execute(interaction: CommandInteraction) {
 		if (
-			client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
+			this.client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
+			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
 		)
 			return interaction
 				.reply({
-					content: client.locales.ticketOnlyClosableByStaff,
+					content: this.client.locales.ticketOnlyClosableByStaff,
 					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
-		if (client.config.closeOption.askReason) {
-			closeAskReason(interaction, client);
+		if (this.client.config.closeOption.askReason) {
+			closeAskReason(interaction, this.client);
 		} else {
 			await interaction.deferReply().catch((e) => console.log(e));
-			close(interaction, client);
-		}
-	},
-};
+			close(interaction, this.client);
+		}	}
+}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

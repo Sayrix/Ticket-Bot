@@ -1,6 +1,6 @@
+import {BaseCommand, ExtendedClient} from "../structure";
 import {CommandInteraction, SlashCommandBuilder, TextChannel} from "discord.js";
-import { DiscordClient } from "../Types";
-import { log } from "../utils/logs";
+import {log} from "../utils/logs";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -18,15 +18,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export default {
-	data: new SlashCommandBuilder()
+export default class AddCommand extends BaseCommand {
+	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
 		.setName("add")
 		.setDescription("Add someone to the ticket")
-		.addUserOption((input) => input.setName("user").setDescription("The user to add").setRequired(true)),
-	async execute(interaction: CommandInteraction, client: DiscordClient) {
-		const added = interaction.options.getUser("user", true);
+		.addUserOption((input) => input.setName("user").setDescription("The user to add").setRequired(true));
+	constructor(client: ExtendedClient) {
+		super(client);
+	}
 
-		const ticket = await client.prisma.tickets.findUnique({
+	async execute(interaction: CommandInteraction) {
+
+		const added = interaction.options.getUser("user", true);
+		const ticket = await this.client.prisma.tickets.findUnique({
 			select: {
 				id: true,
 				invited: true,
@@ -35,8 +39,9 @@ export default {
 				channelid: interaction.channel?.id
 			}
 		});
+
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		
+
 		const invited = JSON.parse(ticket.invited) as string[];
 		if (invited.includes(added.id)) return interaction.reply({ content: "User already added", ephemeral: true }).catch((e) => console.log(e));
 
@@ -44,7 +49,7 @@ export default {
 			return interaction.reply({ content: "You can't add more than 25 users", ephemeral: true }).catch((e) => console.log(e));
 
 		invited.push(added.id);
-		await client.prisma.tickets.update({
+		await this.client.prisma.tickets.update({
 			data: {
 				invited: JSON.stringify(invited)
 			},
@@ -73,10 +78,10 @@ export default {
 				ticketChannelId: interaction.channel?.id,
 				target: added,
 			},
-			client
+			this.client
 		);
-	},
-};
+	}
+}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

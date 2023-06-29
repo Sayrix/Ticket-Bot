@@ -14,14 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Interaction } from "discord.js";
 import fs from "fs-extra";
 import path from "node:path";
-import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { GatewayIntentBits } from "discord.js";
 import { jsonc } from "jsonc";
-import { DiscordClient, config, locale } from "./Types";
 import { config as envconf } from "dotenv";
-import { PrismaClient } from "@prisma/client";
+import {ConfigType, ExtendedClient} from "./structure";
 
 // Initalize .env file as environment
 try {envconf();}
@@ -63,86 +61,17 @@ fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
 	});
 });
 
+const config: ConfigType = jsonc.parse(fs.readFileSync(path.join(__dirname, "/../config/config.jsonc"), "utf8"));
 
-const config: config = jsonc.parse(fs.readFileSync(path.join(__dirname, "/../config/config.jsonc"), "utf8"));
-
-const client = new Client({
+const client = new ExtendedClient({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 	presence: {
 		status: config.status?.status ?? "online"
 	}
-}) as DiscordClient;
-
-// All variables stored in the client object
-client.config = config;
-client.prisma = new PrismaClient();
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-client.locales = require(`../locales/${client.config.lang}.json`) as locale;
-client.msToHm = function dhm(ms: number | Date) {
-	if(ms instanceof Date) ms = ms.getTime();
-	
-	const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-	const daysms = ms % (24 * 60 * 60 * 1000);
-	const hours = Math.floor(daysms / (60 * 60 * 1000));
-	const hoursms = ms % (60 * 60 * 1000);
-	const minutes = Math.floor(hoursms / (60 * 1000));
-	const minutesms = ms % (60 * 1000);
-	const sec = Math.floor(minutesms / 1000);
-
-	if (days > 0) return `${days}d ${hours}h ${minutes}m ${sec}s`;
-	if (hours > 0) return `${hours}h ${minutes}m ${sec}s`;
-	if (minutes > 0) return `${minutes}m ${sec}s`;
-	if (sec > 0) return `${sec}s`;
-	return "0s";
-};
-
-// Command handler
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of commandFiles) {
-	const filePath = path.join(commandsPath, file);
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const command = require(filePath).default;
-	client.commands.set(command.data.name, command);
-}
-
-// Execute commands
-client.on("interactionCreate", async (interaction: Interaction) => {
-	if (!interaction.isChatInputCommand()) return;
-	const command = client.commands.get(interaction.commandName);
-	if (!command) return;
-
-	try {
-		await command.execute(interaction, client);
-	} catch (error) {
-		console.error(error);
-		await interaction.reply({
-			content: "There was an error while executing this command!",
-			ephemeral: true
-		});
-	}
-});
-
-// Event handler
-const eventsPath = path.join(__dirname, "events");
-const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const event = require(filePath).default;
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args, client));
-	}
-}
+}, config);
 
 // Login the bot
-client.login(process.env["TOKEN"]);
+client.login(process.env["TOKEN"]).then(null);
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)

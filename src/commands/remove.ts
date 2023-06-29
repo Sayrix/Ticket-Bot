@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, CommandInteraction, User } from "discord.js";
-import { DiscordClient } from "../Types";
+import {BaseCommand, ExtendedClient} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -17,11 +17,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export default{
-	data: new SlashCommandBuilder().setName("remove").setDescription("Remove someone from the ticket"),
-	
-	async execute(interaction: CommandInteraction, client: DiscordClient) {
-		const ticket = await client.prisma.tickets.findUnique({
+export default class RemoveCommand extends BaseCommand {
+	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
+		.setName("remove").setDescription("Remove someone from the ticket");
+	constructor(client: ExtendedClient) {
+		super(client);
+	}
+
+	async execute(interaction: CommandInteraction) {
+		const ticket = await this.client.prisma.tickets.findUnique({
 			select: {
 				invited: true,
 			},
@@ -30,13 +34,13 @@ export default{
 			}
 		});
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		
+
 		const invited = JSON.parse(ticket.invited) as string[];
 		if (invited.length < 1) return interaction.reply({ content: "There are no users to remove", ephemeral: true }).catch((e) => console.log(e));
 
 		const addedUsers: User[] = [];
 		for (let i = 0; i < invited.length; i++) {
-			addedUsers.push(await client.users.fetch(invited[i]));
+			addedUsers.push(await this.client.users.fetch(invited[i]));
 		}
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -56,9 +60,8 @@ export default{
 				)
 		);
 
-		interaction.reply({ components: [row] }).catch((e) => console.log(e));
-	},
-};
+		interaction.reply({ components: [row] }).catch((e) => console.log(e));	}
+}
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
