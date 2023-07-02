@@ -27,7 +27,11 @@ catch(ex) {console.log(".env failed to load");}
 
 // Although invalid type, it should be good enough for now until more stuff needs to be handled here
 process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
-	console.log(reason, promise, a);
+	console.error(reason, promise, a);
+});
+
+process.on("uncaughtException", (err: string) => {
+	console.error(err);
 });
 
 process.stdout.write(`
