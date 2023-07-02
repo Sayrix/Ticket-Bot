@@ -1,0 +1,31 @@
+// Docker uses postgresql as the main database
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model config {
+  key   String  @id
+  value String? @db.Text
+}
+
+model tickets {
+  id           Int     @id @default(autoincrement())
+  channelid    String  @unique
+  messageid    String  @unique
+  category     String  @db.Text
+  invited      String  @default("[]")
+  reason       String
+  creator      String
+  createdat    BigInt
+  claimedby    String?
+  claimedat    BigInt?
+  closedby     String?
+  closedat     BigInt?
+  closereason  String?
+  transcript   String?
+}

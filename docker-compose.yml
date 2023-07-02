@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  bot:
+    build: .
+    container_name: ticket-bot
+    environment:
+      - TOKEN
+      - DATABASE_URL=postgres://postgres:postgres@pgsql:5432/postgres
+    depends_on:
+      - pgsql
+    restart: on-failure
+  pgsql:
+    image: postgres:15.3-alpine
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
