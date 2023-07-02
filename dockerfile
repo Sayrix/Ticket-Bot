@@ -1,22 +1,26 @@
-FROM node:20.3-alpine
+FROM node:20.3-alpine AS dependencies
 
 # Setup workspace
 WORKDIR /app
 ENV DATABASE_URL="postgresql://postgres:postgres@db:5432/postgres?schema=public"
 
+# Copy runtime files
+COPY ./config/config.jsonc ./config/config.jsonc
+COPY docker_run.sh .
+COPY locales ./locales
+
+# Prisma builds
+COPY prisma ./prisma
+RUN npx prisma generate --schema=./prisma/docker.prisma
+
 # Install dependencies
 COPY package.json .
 RUN npm install
 
-# Update the database with docker.prisma
-COPY prisma ./prisma
-RUN npx prisma db push --schema=./prisma/schema.prisma
-
 # Transpile the source
 COPY tsconfig.json .
 COPY src ./src
-COPY ./config/config.jsonc ./config/config.jsonc
 RUN npm run build
 
 # Start the server
-CMD ["npm", "start"]
+CMD ["./docker_run.sh"]
