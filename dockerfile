@@ -1,4 +1,4 @@
-FROM node:20.3-alpine AS dependencies
+FROM node:20.3-alpine
 
 # Setup workspace
 WORKDIR /app
