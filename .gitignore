@@ -6,3 +6,4 @@ token.json
 dist
 .env
 *.db
+db-data
