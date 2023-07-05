@@ -103,7 +103,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		})
 		.catch((e) => console.log(e));
 	async function _close(id: string, ticket: ticketType) {
-		if (client.config.closeTicketCategoryId) (interaction.channel as TextChannel | null)?.setParent(client.config.closeTicketCategoryId).catch((e) => console.log(e));
+		if (client.config.closeOption.closeTicketCategoryId) (interaction.channel as TextChannel | null)?.setParent(client.config.closeOption.closeTicketCategoryId).catch((e) => console.log(e));
 
 		const msg = await interaction.channel?.messages.fetch(ticket.messageid);
 		const embed = new EmbedBuilder(msg?.embeds[0].data);
