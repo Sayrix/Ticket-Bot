@@ -110,7 +110,7 @@ export default class ReadyEvent extends BaseEvent {
 
 
 		this.setStatus();
-		setInterval(this.setStatus, 9e5); // 15 minutes
+		setInterval(()=>this.setStatus(), 9e5); // 15 minutes
 
 		readline.cursorTo(process.stdout, 0);
 		process.stdout.write(
@@ -213,20 +213,20 @@ export default class ReadyEvent extends BaseEvent {
 
 		ws.on("connectFailed", (e) => {
 			this.connected = false;
-			setTimeout(this.connect, Math.random() * 1e4);
+			setTimeout(()=>this.connect(), Math.random() * 1e4);
 			console.log(`❌  WebSocket Error: ${e.toString()}`);
 		});
 
 		ws.on("connect", (connection) => {
 			connection.on("error", (e) => {
 				this.connected = false;
-				setTimeout(this.connect, Math.random() * 1e4);
+				setTimeout(()=>this.connect(), Math.random() * 1e4);
 				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
 			connection.on("close", (e) => {
 				this.connected = false;
-				setTimeout(this.connect, Math.random() * 1e4);
+				setTimeout(()=>this.connect(), Math.random() * 1e4);
 				console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
