@@ -63,7 +63,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 				if (this.client.config.maxTicketOpened > 0) {
 					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
+					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
 
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
@@ -147,7 +147,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 			if (interaction.customId === "selectTicketType") {
 				if (this.client.config.maxTicketOpened > 0) {
 					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL`)[0].count;
+					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
 						interaction
