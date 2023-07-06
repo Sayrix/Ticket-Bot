@@ -6,15 +6,23 @@ services:
     container_name: ticket-bot
     environment:
       - TOKEN
-      - DATABASE_URL=postgres://postgres:postgres@pgsql:5432/postgres
+    networks:
+      - net
     depends_on:
       - pgsql
     restart: on-failure
+    volumes:
+      - /opt/ticket-bot/config:./config
   pgsql:
     image: postgres:15.3-alpine
     environment:
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - net
     volumes:
-      - ./db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - /opt/ticket-bot/pgsql:/var/lib/postgresql/data
+    restart: on-failure
+
+networks:
+  net:
+    driver: bridge

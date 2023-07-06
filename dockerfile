@@ -2,7 +2,7 @@ FROM node:20.3-alpine
 
 # Setup workspace
 WORKDIR /app
-ENV DATABASE_URL="postgresql://postgres:postgres@db:5432/postgres?schema=public"
+ENV DATABASE_URL=postgresql://postgres:postgres@pgsql:5432/postgres?schema=public
 
 # Copy runtime files
 COPY ./config/config.jsonc ./config/config.jsonc
