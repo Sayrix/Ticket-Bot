@@ -1,14 +1,24 @@
 #!/bin/bash
 
-# Move config file is found during build process
-if [ -f "./temp_config.jsonc" ]; then
-    mv ./temp_config.jsonc ./config/config.jsonc
+# Setup the config files
+if [ ! -f "./config/config.json" ]; then
+    if [ -f "./temp_config/config.jsonc" ]; then
+        # Config already setup by the user
+        echo "Config Detected, moving to config folder...";
+        mv ./temp_config/config.jsonc ./config/config.jsonc
+    else
+        # Config not setup by the user
+        echo "Config not detected, creating config...";
+        echo "Make sure to edit the config file in /opt/ticket-bot/config/config.jsonc before starting the bot again.";
+        mv ./temp_config/config.example.jsonc ./config/config.jsonc
+        exit 1;
+    fi
 fi
 
 # Exit if config not found
 if [ ! -f "./config/config.jsonc" ]; then
     echo "Config file not found. Exiting..."
-    exit 1
+    exit 1;
 fi
 
 npx prisma db push --schema=./prisma/docker.prisma
