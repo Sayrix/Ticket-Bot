@@ -20,7 +20,7 @@
 		},
 		"ticketClosedDM": {
 			"title": "Ticket fermé",
-			"description": "Le ticket n°TICKETCOUNT a été fermé par CLOSERNAME avec comme raison: `REASON`\n\nVoici une transcript du ticket: TRANSCRIPTURL",
+			"description": "Le ticket n°TICKETCOUNT a été fermé par CLOSERNAME avec comme raison: `REASON`\n\nVoici une retranscription du ticket: TRANSCRIPTURL",
 			"footer": {
 				"text": "ticket.pm"
 			}
@@ -30,12 +30,12 @@
 		"reasonTicketOpen": {
 			"title": "Ouvrir un ticket",
 			"label": "La raison de votre ticket",
-			"placeholder": "Veuillez entrer la raison de votre ticket."
+			"placeholder": "Veuillez entrer la raison de l'ouverture de votre ticket."
 		},
 		"reasonTicketClose": {
 			"title": "Fermer un ticket",
 			"label": "La raison de la fermeture du ticket",
-			"placeholder": "Veuillez entrer la raison de pourquoi vous fermez le ticket."
+			"placeholder": "Veuillez entrer la raison de la fermeture de votre ticket."
 		}
 	},
 	"buttons": {
@@ -44,20 +44,20 @@
 			"emoji": "🔒"
 		},
 		"claim": {
-			"label": "Claim",
+			"label": "Réclamer",
 			"emoji": "🙋"
 		}
 	},
 	"ticketOpenedMessage": "Ticket ouvert! TICKETCHANNEL",
-	"ticketOnlyClaimableByStaff": "Seuls les staffs peuvent claim un ticket !",
-	"ticketAlreadyClaimed": "Le ticket est déjà claim!",
-	"ticketClaimedMessage": "> Ticket claim par USER",
-	"ticketOnlyClosableByStaff": "Seuls les staffs peuvent fermer le ticket !",
+	"ticketOnlyClaimableByStaff": "Seuls les membres du staff peuvent réclamer un ticket !",
+	"ticketAlreadyClaimed": "Le ticket est déjà reçu!",
+	"ticketClaimedMessage": "> Ticket reçu par USER",
+	"ticketOnlyClosableByStaff": "Seuls les membres du staff peuvent fermer le ticket !",
 	"ticketAlreadyClosed": "Ticket déjà fermé !",
-	"ticketCreatingTranscript": "> Création du transcript...",
-	"ticketTranscriptCreated": "> Transcript créée ! TRANSCRIPTURL",
+	"ticketCreatingTranscript": "> Retranscription...",
+	"ticketTranscriptCreated": "> Retranscription créée ! TRANSCRIPTURL",
 	"ticketRenamed": "> Ticket renommé en NEWNAME",
-	"ticketLimitReached": "Vous pouvez seulement avoir TICKETLIMIT ticket ouvert !",
+	"ticketLimitReached": "Vous ne pouvez seulement que TICKETLIMIT ticket(s) ouvert(s) !",
 
 	"other": {
 		"openTicketButtonMSG": "Ouvrir un ticket",
