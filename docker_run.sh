@@ -4,7 +4,7 @@
 if [ ! -f "./config/config.json" ]; then
     if [ -f "./temp_config/config.jsonc" ]; then
         # Config already setup by the user
-        echo "Config Detected, moving to config folder...";
+        echo "Pre-build config detected, moving to config folder...";
         mv ./temp_config/config.jsonc ./config/config.jsonc
     else
         # Config not setup by the user
@@ -13,12 +13,9 @@ if [ ! -f "./config/config.json" ]; then
         mv ./temp_config/config.example.jsonc ./config/config.jsonc
         exit 1;
     fi
-fi
-
-# Exit if config not found
-if [ ! -f "./config/config.jsonc" ]; then
-    echo "Config file not found. Exiting..."
-    exit 1;
+else
+    echo "Config detected, cleaning up temp_config...";
+    rm -rf ./temp_config
 fi
 
 npx prisma db push --schema=./prisma/docker.prisma
