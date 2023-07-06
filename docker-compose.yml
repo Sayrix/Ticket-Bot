@@ -12,7 +12,7 @@ services:
       - pgsql
     restart: on-failure
     volumes:
-      - /opt/ticket-bot/config:./config
+      - /opt/ticket-bot/config:/config
   pgsql:
     image: postgres:15.3-alpine
     environment:

@@ -5,7 +5,6 @@ WORKDIR /app
 ENV DATABASE_URL=postgresql://postgres:postgres@pgsql:5432/postgres?schema=public
 
 # Copy runtime files
-COPY ./config/config.jsonc ./config/config.jsonc
 COPY docker_run.sh .
 COPY locales ./locales
 
