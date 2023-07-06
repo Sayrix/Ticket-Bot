@@ -23,4 +23,4 @@ COPY src ./src
 RUN npm run build
 
 # Start the server
-CMD ["./docker_run.sh"]
+ENTRYPOINT ["./docker_run.sh"]
