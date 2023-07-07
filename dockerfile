@@ -2,10 +2,10 @@ FROM node:20.3-alpine
 
 # Setup workspace
 WORKDIR /app
-ENV DATABASE_URL="postgresql://postgres:postgres@db:5432/postgres?schema=public"
+ENV DATABASE_URL=postgresql://postgres:postgres@pgsql:5432/postgres?schema=public
 
 # Copy runtime files
-COPY ./config/config.jsonc ./config/config.jsonc
+COPY ./config/ ./temp_config
 COPY docker_run.sh .
 COPY locales ./locales
 
@@ -22,5 +22,9 @@ COPY tsconfig.json .
 COPY src ./src
 RUN npm run build
 
+# Setup Bash
+RUN apk add --no-cache bash
+RUN chmod +x ./docker_run.sh
+
 # Start the server
-CMD ["./docker_run.sh"]
+ENTRYPOINT ["./docker_run.sh"]
