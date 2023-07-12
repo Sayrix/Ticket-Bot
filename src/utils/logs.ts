@@ -49,7 +49,7 @@ type log = {
 	ticketId?: string | number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 export const log = async(logs: log, client: ExtendedClient) => {
 	if (!client.config.logs) return;
 	if (!client.config.logsChannelId) return;

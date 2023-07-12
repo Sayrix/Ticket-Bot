@@ -1,4 +1,4 @@
-import {CommandInteraction, SlashCommandBuilder} from "discord.js";
+import {CommandInteraction, InteractionResponse, SlashCommandBuilder} from "discord.js";
 import {ExtendedClient} from "./";
 
 export default  abstract class BaseCommand {
@@ -7,7 +7,7 @@ export default  abstract class BaseCommand {
 	protected constructor(client: ExtendedClient) {
 		this.client = client;
 	}
-
-	abstract execute(interaction: CommandInteraction): void;
+	// eslint-disable-next-line no-unused-vars
+	abstract execute(interaction: CommandInteraction): void | Promise<void | InteractionResponse<boolean>>;
 
 }

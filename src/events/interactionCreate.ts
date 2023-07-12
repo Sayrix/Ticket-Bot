@@ -174,18 +174,18 @@ export default class InteractionCreateEvent extends BaseEvent {
 						throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
 
 					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
-					//@TODO: REFACTOR THIS TO USE "for of"
-					ticketType.questions.forEach((x, i) => {
+					for (const question of ticketType.questions) {
+						const index = ticketType.questions.indexOf(question);
 						const input = new TextInputBuilder()
-							.setCustomId(`input_${interaction.values[0]}_${i}`)
-							.setLabel(x.label)
-							.setStyle(x.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
-							.setPlaceholder(x.placeholder)
-							.setMaxLength(x.maxLength);
+							.setCustomId(`input_${interaction.values[0]}_${index}`)
+							.setLabel(question.label)
+							.setStyle(question.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
+							.setPlaceholder(question.placeholder)
+							.setMaxLength(question.maxLength);
 
 						const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
 						modal.addComponents(firstActionRow);
-					});
+					}
 
 					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {

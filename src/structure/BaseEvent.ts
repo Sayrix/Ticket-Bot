@@ -7,6 +7,7 @@ export default abstract class BaseEvent {
 		this.client = client;
 	}
 
-    protected abstract execute(...args: ClientEvents[keyof ClientEvents]): void
+	// eslint-disable-next-line no-unused-vars
+    protected abstract execute(...args: ClientEvents[keyof ClientEvents]): void | Promise<void>;
 
 }
