@@ -96,6 +96,7 @@ export type LocaleType = {
             emoji: string
         }
     },
+    invalidConfig: string;
     ticketOpenedMessage: string,
     ticketOnlyClaimableByStaff: string,
     ticketAlreadyClaimed: string,

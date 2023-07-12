@@ -50,7 +50,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 				const tCount = this.client.config.ticketTypes.length;
 				if(tCount === 0 || tCount > 25) {
-					await interaction.followUp({content: "Invalid ticketTypes size, please ask the owner to check the bot's output log", ephemeral: true});
+					await interaction.followUp({content: this.client.locales.invalidConfig, ephemeral: true});
 					throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
 				}
 

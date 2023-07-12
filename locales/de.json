@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Ungültige Konfiguration erkannt. Bitten Sie den Bot-Betreiber, das Problem zu beheben!",
 	"ticketOpenedMessage": "Ticket geöffnet! TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "Das Ticket kann nur von Teammitgliedern beansprucht werden!",
 	"ticketAlreadyClaimed": "Dieses Ticket wurde schon beansprucht!",
