@@ -1,0 +1,16 @@
+# Main Source
+/src/ @sayrix @zhiyan114
+/config/ @sayrix @zhiyan114
+
+# Docker files
+/dockerfile @zhiyan114
+/docker_run.sh @zhiyan114
+/docker-compose.yml @zhiyan114
+
+# Database schema
+/prisma/schema.prisma @sayrix @zhiyan114
+/prisma/docker.prisma @zhiyan114
+*.sql @zhiyan114
+
+# Langs
+/locales/ @sayrix
