@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Geçersiz yapılandırma algılandı, lütfen bot operatöründen düzeltmesini isteyin!",
 	"ticketOpenedMessage": "Bir destek talebi başlatıldı! TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "Destek talepleri sadece yetkililer tarafından alınabilir!",
 	"ticketAlreadyClaimed": "Bu destek talebi hali hazırda başka bir yetkili tarafından alındı!",

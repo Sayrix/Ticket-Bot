@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Se detectó una configuración no válida, ¡pídale al operador del bot que la arregle!",
 	"ticketOpenedMessage": "¡Tique abierto! --> TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "¡El tique solo puede ser reclamado por un miembro del equipo!",
 	"ticketAlreadyClaimed": "¡Ya se reclamó el tique!",

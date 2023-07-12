@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Byla zjištěna neplatná konfigurace. Požádejte operátora bota, aby problém vyřešil!",
 	"ticketOpenedMessage": "Ticket byl otevřen! TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "Pouze admin půže vzít ticket",
 	"ticketAlreadyClaimed": "Ticket už je sebrán jiným adminem!",

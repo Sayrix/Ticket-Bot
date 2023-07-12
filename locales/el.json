@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Εντοπίστηκε μη έγκυρη διαμόρφωση, ζητήστε από τον χειριστή του bot να τη διορθώσει!",
 	"ticketOpenedMessage": "Το ticket άνοιξε! TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "Το ticket μπορεί να διεκδικηθεί μόνο από προσωπικό!",
 	"ticketAlreadyClaimed": "Το ticket έχει ήδη διεκδικηθεί!",

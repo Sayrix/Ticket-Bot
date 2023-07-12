@@ -48,6 +48,7 @@
 			"emoji": "🙋"
 		}
 	},
+	"invalidConfig": "Configuration non valide détectée, veuillez demander à l'opérateur du bot de la corriger!",
 	"ticketOpenedMessage": "Ticket ouvert! TICKETCHANNEL",
 	"ticketOnlyClaimableByStaff": "Seuls les membres du staff peuvent réclamer un ticket !",
 	"ticketAlreadyClaimed": "Le ticket est déjà reçu!",
