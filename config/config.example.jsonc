@@ -46,6 +46,7 @@
 			"cantAccess": [], // The roles who can't access to this ticket type
 			"askQuestions": true, // If the bot should ask the reason of the ticket
 			"questions": [
+				// Maximum of 5 questions can be set due to discord's limit
 				{
 					"label": "What is the reason of the ticket?",
 					"placeholder": "Please enter the reason",

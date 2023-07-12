@@ -48,7 +48,11 @@ export default class InteractionCreateEvent extends BaseEvent {
 			if (interaction.customId === "openTicket") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
-				// Max ticket opened
+				const tCount = this.client.config.ticketTypes.length;
+				if(tCount === 0 || tCount > 25) {
+					await interaction.followUp({content: "Invalid ticketTypes size, please ask the owner to check the bot's output log", ephemeral: true});
+					throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
+				}
 
 				for (const role of this.client.config.rolesWhoCanNotCreateTickets) {
 					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
@@ -60,7 +64,8 @@ export default class InteractionCreateEvent extends BaseEvent {
 						return;
 					}
 				}
-
+				
+				// Max Ticket
 				if (this.client.config.maxTicketOpened > 0) {
 					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
 					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
@@ -163,8 +168,13 @@ export default class InteractionCreateEvent extends BaseEvent {
 				const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
 				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
 				if (ticketType.askQuestions) {
-					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
+					// Sanity Check
+					const qCount = ticketType.questions.length;
+					if(qCount === 0 || qCount > 5)
+						throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
 
+					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
+					//@TODO: REFACTOR THIS TO USE "for of"
 					ticketType.questions.forEach((x, i) => {
 						const input = new TextInputBuilder()
 							.setCustomId(`input_${interaction.values[0]}_${i}`)
