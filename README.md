@@ -1,3 +1,15 @@
+# What I am doing
+
+I'm implementing a django admin panel to the project to have more control over the database and facilitate queries.
+I'm not changing anything that could break or affect how the bot works
+
+# Fork Features
+* Provide ways to query and filter tickets
+* CRUD
+
+# How to use
+## ⚠️ work in progress
+
 # Ticket Bot
 
 Ticket Bot is a open source project of an ticket discord bot using [discord.js](https://discord.js.org) v14
