@@ -1,7 +1,7 @@
 # What I am doing
 
 I'm implementing a django admin panel to the project to have more control over the database and facilitate queries.
-I'm not changing anything that could break or affect how the bot works
+I'm not changing anything that could break or affect how the bot works. (All I'm doing in the database is using existing tables, or creating new tables, I'm not changing existing tables.)
 
 # Fork Features
 * Provide ways to query and filter tickets
