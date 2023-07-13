@@ -8,7 +8,7 @@ I'm not changing anything that could break or affect how the bot works. (All I'm
 * CRUD
 
 # How to use
-## ⚠️ work in progress
+## ⚠️ work in progress ⚠️
 
 # Ticket Bot
 
