@@ -27,11 +27,11 @@ class Tickets(models.Model):
         managed = False
         db_table = 'tickets'
         
-class Categorys(models.Model):
+class Tickets_Info(models.Model):
     category_ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE)
     codeName = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     
     class Meta:
         managed = True
-        db_table = 'category'
+        db_table = 'tickets_info'
