@@ -57,7 +57,10 @@
 	"ticketAlreadyClosed": "Dieses Ticket wurde schon geschlossen!",
 	"ticketCreatingTranscript": "> Generiere Transkript...",
 	"ticketTranscriptCreated": "> Transkript generiert! TRANSCRIPTURL",
+	"ticketOnlyRenamableByStaff": "Nur Teammitglieder können den Namen des tickets ändern!",
+	"ticketRenamed": "> Ticketname geändert zu NEWNAME",
 	"ticketLimitReached": "Du kannst nur TICKETLIMIT Tickets gleichzeitig offen haben",
+	"noTickets": "Sie haben keinen Zugriff auf Tickets",
 
 	"other": {
 		"openTicketButtonMSG": "Öffne ein Ticket",
