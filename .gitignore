@@ -6,6 +6,7 @@ dist
 *.db
 
 
+test.sql
 migrations
 
 # Byte-compiled / optimized / DLL files
