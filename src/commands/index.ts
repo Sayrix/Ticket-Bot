@@ -5,9 +5,9 @@ import RemoveCommand from "./remove";
 import RenameCommand from "./rename";
 
 export {
-	AddCommand,
-	ClaimCommand,
-	CloseCommand,
-	RemoveCommand,
-	RenameCommand
+    AddCommand,
+    ClaimCommand,
+    CloseCommand,
+    RemoveCommand,
+    RenameCommand
 };

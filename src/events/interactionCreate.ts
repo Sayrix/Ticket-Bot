@@ -24,228 +24,228 @@ limitations under the License.
 */
 
 export default class InteractionCreateEvent extends BaseEvent {
-	constructor(client: ExtendedClient) {
-		super(client);
-	}
+    constructor(client: ExtendedClient) {
+        super(client);
+    }
 
-	public async execute(interaction: Interaction): Promise<void>  {
-		if (interaction.isChatInputCommand()) {
-			const command = this.client.commands.get(interaction.commandName);
-			if (!command) return;
+    public async execute(interaction: Interaction): Promise<void>  {
+        if (interaction.isChatInputCommand()) {
+            const command = this.client.commands.get(interaction.commandName);
+            if (!command) return;
 
-			try {
-				await command.execute(interaction);
-			} catch (error) {
-				console.error(error);
-				await interaction.reply({
-					content: "There was an error while executing this command!",
-					ephemeral: true
-				});
-			}
-		}
+            try {
+                await command.execute(interaction);
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({
+                    content: "There was an error while executing this command!",
+                    ephemeral: true
+                });
+            }
+        }
 
-		if (interaction.isButton()) {
-			if (interaction.customId === "openTicket") {
-				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
+        if (interaction.isButton()) {
+            if (interaction.customId === "openTicket") {
+                await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
-				const tCount = this.client.config.ticketTypes.length;
-				if(tCount === 0 || tCount > 25) {
-					await interaction.followUp({content: this.client.locales.invalidConfig, ephemeral: true});
-					throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
-				}
+                const tCount = this.client.config.ticketTypes.length;
+                if(tCount === 0 || tCount > 25) {
+                    await interaction.followUp({content: this.client.locales.invalidConfig, ephemeral: true});
+                    throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
+                }
 
-				for (const role of this.client.config.rolesWhoCanNotCreateTickets) {
-					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
-						interaction
-							.editReply({
-								content: "You can't create a ticket because you are blacklisted"
-							})
-							.catch((e) => console.log(e));
-						return;
-					}
-				}
+                for (const role of this.client.config.rolesWhoCanNotCreateTickets) {
+                    if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
+                        interaction
+                            .editReply({
+                                content: "You can't create a ticket because you are blacklisted"
+                            })
+                            .catch((e) => console.log(e));
+                        return;
+                    }
+                }
 				
-				// Max Ticket
-				if (this.client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
+                // Max Ticket
+                if (this.client.config.maxTicketOpened > 0) {
+                    const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
+                    `SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
 
-					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= this.client.config.maxTicketOpened) {
-						interaction
-							.editReply({
-								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
-							})
-							.catch((e) => console.log(e));
-						return;
-					}
-				}
+                    // If maxTicketOpened is 0, it means that there is no limit
+                    if (ticketsOpened >= this.client.config.maxTicketOpened) {
+                        interaction
+                            .editReply({
+                                content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
+                            })
+                            .catch((e) => console.log(e));
+                        return;
+                    }
+                }
 
-				// Make a select menus of all tickets types
-				let options: SelectMenuComponentOptionData[] = [];
+                // Make a select menus of all tickets types
+                let options: SelectMenuComponentOptionData[] = [];
 
-				for (const x of this.client.config.ticketTypes) {
-					// x.cantAccess is an array of roles id
-					// If the user has one of the roles, he can't access to this ticket type
+                for (const x of this.client.config.ticketTypes) {
+                    // x.cantAccess is an array of roles id
+                    // If the user has one of the roles, he can't access to this ticket type
 
-					const a: SelectMenuComponentOptionData = {
-						label: x.name,
-						value: x.codeName,
-					};
-					if (x.description) a.description = x.description;
-					if (x.emoji) a.emoji = x.emoji;
-					options.push(a);
-				}
+                    const a: SelectMenuComponentOptionData = {
+                        label: x.name,
+                        value: x.codeName,
+                    };
+                    if (x.description) a.description = x.description;
+                    if (x.emoji) a.emoji = x.emoji;
+                    options.push(a);
+                }
 
-				for (const x of options) {
-					const option = this.client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
-					if (option.cantAccess) {
-						for (const role of option.cantAccess) {
-							if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
-								options = options.filter((y) => y.value !== x.value);
-							}
-						}
-					}
-				}
+                for (const x of options) {
+                    const option = this.client.config.ticketTypes.filter((y) => y.codeName === x.value)[0];
+                    if (option.cantAccess) {
+                        for (const role of option.cantAccess) {
+                            if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
+                                options = options.filter((y) => y.value !== x.value);
+                            }
+                        }
+                    }
+                }
 
-				if (options.length <= 0) {
-					interaction.editReply({
-						content: this.client.locales.noTickets
-					});
-					return;
-				}
+                if (options.length <= 0) {
+                    interaction.editReply({
+                        content: this.client.locales.noTickets
+                    });
+                    return;
+                }
 
-				const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-					new StringSelectMenuBuilder()
-						.setCustomId("selectTicketType")
-						.setPlaceholder(this.client.locales.other.selectTicketTypePlaceholder)
-						.setMaxValues(1)
-						.addOptions(options)
-				);
+                const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId("selectTicketType")
+                        .setPlaceholder(this.client.locales.other.selectTicketTypePlaceholder)
+                        .setMaxValues(1)
+                        .addOptions(options)
+                );
 
-				interaction
-					.editReply({
-						components: [row],
-					})
-					.catch((e) => console.log(e));
-			}
+                interaction
+                    .editReply({
+                        components: [row],
+                    })
+                    .catch((e) => console.log(e));
+            }
 
-			if (interaction.customId === "claim") {
-				claim(interaction, this.client);
-			}
+            if (interaction.customId === "claim") {
+                claim(interaction, this.client);
+            }
 
-			if (interaction.customId === "close") {
-				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				close(interaction, this.client, this.client.locales.other.noReasonGiven);
-			}
+            if (interaction.customId === "close") {
+                await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
+                close(interaction, this.client, this.client.locales.other.noReasonGiven);
+            }
 
-			if (interaction.customId === "close_askReason") {
-				closeAskReason(interaction, this.client);
-			}
+            if (interaction.customId === "close_askReason") {
+                closeAskReason(interaction, this.client);
+            }
 
-			if (interaction.customId === "deleteTicket") {
-				deleteTicket(interaction, this.client);
-			}
-		}
+            if (interaction.customId === "deleteTicket") {
+                deleteTicket(interaction, this.client);
+            }
+        }
 
-		if (interaction.isStringSelectMenu()) {
-			if (interaction.customId === "selectTicketType") {
-				if (this.client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
-					// If maxTicketOpened is 0, it means that there is no limit
-					if (ticketsOpened >= this.client.config.maxTicketOpened) {
-						interaction
-							.reply({
-								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
-								ephemeral: true,
-							})
-							.catch((e) => console.log(e));
-						return;
-					}
-				}
+        if (interaction.isStringSelectMenu()) {
+            if (interaction.customId === "selectTicketType") {
+                if (this.client.config.maxTicketOpened > 0) {
+                    const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
+                    `SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
+                    // If maxTicketOpened is 0, it means that there is no limit
+                    if (ticketsOpened >= this.client.config.maxTicketOpened) {
+                        interaction
+                            .reply({
+                                content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
+                                ephemeral: true,
+                            })
+                            .catch((e) => console.log(e));
+                        return;
+                    }
+                }
 
-				const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
-				if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
-				if (ticketType.askQuestions) {
-					// Sanity Check
-					const qCount = ticketType.questions.length;
-					if(qCount === 0 || qCount > 5)
-						throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
+                const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === interaction.values[0]);
+                if (!ticketType) return console.error(`Ticket type ${interaction.values[0]} not found!`);
+                if (ticketType.askQuestions) {
+                    // Sanity Check
+                    const qCount = ticketType.questions.length;
+                    if(qCount === 0 || qCount > 5)
+                        throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
 
-					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
-					for (const question of ticketType.questions) {
-						const index = ticketType.questions.indexOf(question);
-						const input = new TextInputBuilder()
-							.setCustomId(`input_${interaction.values[0]}_${index}`)
-							.setLabel(question.label)
-							.setStyle(question.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
-							.setPlaceholder(question.placeholder)
-							.setMaxLength(question.maxLength);
+                    const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
+                    for (const question of ticketType.questions) {
+                        const index = ticketType.questions.indexOf(question);
+                        const input = new TextInputBuilder()
+                            .setCustomId(`input_${interaction.values[0]}_${index}`)
+                            .setLabel(question.label)
+                            .setStyle(question.style == "SHORT" ? TextInputStyle.Short : TextInputStyle.Paragraph)
+                            .setPlaceholder(question.placeholder)
+                            .setMaxLength(question.maxLength);
 
-						const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
-						modal.addComponents(firstActionRow);
-					}
+                        const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
+                        modal.addComponents(firstActionRow);
+                    }
 
-					await interaction.showModal(modal).catch((e) => console.log(e));
-				} else {
-					createTicket(interaction, this.client, ticketType, this.client.locales.other.noReasonGiven);
-				}
-			}
+                    await interaction.showModal(modal).catch((e) => console.log(e));
+                } else {
+                    createTicket(interaction, this.client, ticketType, this.client.locales.other.noReasonGiven);
+                }
+            }
 
-			if (interaction.customId === "removeUser") {
-				const ticket = await this.client.prisma.tickets.findUnique({
-					select: {
-						id: true,
-					},
-					where: {
-						channelid: interaction.message.channelId
-					}
-				});
+            if (interaction.customId === "removeUser") {
+                const ticket = await this.client.prisma.tickets.findUnique({
+                    select: {
+                        id: true,
+                    },
+                    where: {
+                        channelid: interaction.message.channelId
+                    }
+                });
 
-				interaction.values.forEach((value) => {
-					(interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
+                interaction.values.forEach((value) => {
+                    (interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
 
-					log(
-						{
-							LogType: "userRemoved",
-							user: interaction.user,
-							ticketId: ticket?.id.toString(),
-							ticketChannelId: interaction.channel?.id,
-							target: {
-								id: value,
-							},
-						},
-						this.client
-					);
-				});
+                    log(
+                        {
+                            LogType: "userRemoved",
+                            user: interaction.user,
+                            ticketId: ticket?.id.toString(),
+                            ticketChannelId: interaction.channel?.id,
+                            target: {
+                                id: value,
+                            },
+                        },
+                        this.client
+                    );
+                });
 
-				interaction
-					.update({
-						content: `> Removed ${
-							interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
-						} from the ticket`,
-						components: [],
-					})
-					.catch((e) => console.log(e));
-			}
-		}
+                interaction
+                    .update({
+                        content: `> Removed ${
+                            interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
+                        } from the ticket`,
+                        components: [],
+                    })
+                    .catch((e) => console.log(e));
+            }
+        }
 
-		if (interaction.isModalSubmit()) {
-			if (interaction.customId === "askReason") {
-				const type = interaction.fields.fields.first()?.customId.split("_")[1];
-				const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === type);
-				// Using customId until the value can be figured out
-				if (!ticketType) return console.error(`Ticket type ${interaction.customId} not found!`);
-				createTicket(interaction, this.client, ticketType, interaction.fields.fields);
-			}
+        if (interaction.isModalSubmit()) {
+            if (interaction.customId === "askReason") {
+                const type = interaction.fields.fields.first()?.customId.split("_")[1];
+                const ticketType = this.client.config.ticketTypes.find((x) => x.codeName === type);
+                // Using customId until the value can be figured out
+                if (!ticketType) return console.error(`Ticket type ${interaction.customId} not found!`);
+                createTicket(interaction, this.client, ticketType, interaction.fields.fields);
+            }
 
-			if (interaction.customId === "askReasonClose") {
-				await interaction.deferReply().catch((e) => console.log(e));
-				close(interaction, this.client, interaction.fields.fields.first()?.value);
-			}
-		}
-	}
+            if (interaction.customId === "askReasonClose") {
+                await interaction.deferReply().catch((e) => console.log(e));
+                close(interaction, this.client, interaction.fields.fields.first()?.value);
+            }
+        }
+    }
 }
 
 /*

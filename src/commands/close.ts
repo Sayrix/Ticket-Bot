@@ -20,30 +20,30 @@ limitations under the License.
 */
 
 export default class CloseCommand extends BaseCommand {
-	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
-		.setName("close").setDescription("Close the ticket");
-	constructor(client: ExtendedClient) {
-		super(client);
-	}
+    public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
+        .setName("close").setDescription("Close the ticket");
+    constructor(client: ExtendedClient) {
+        super(client);
+    }
 
-	async execute(interaction: CommandInteraction) {
-		if (
-			this.client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
+    async execute(interaction: CommandInteraction) {
+        if (
+            this.client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
-		)
-			return interaction
-				.reply({
-					content: this.client.locales.ticketOnlyClosableByStaff,
-					ephemeral: true,
-				})
-				.catch((e) => console.log(e));
+        )
+            return interaction
+                .reply({
+                    content: this.client.locales.ticketOnlyClosableByStaff,
+                    ephemeral: true,
+                })
+                .catch((e) => console.log(e));
 
-		if (this.client.config.closeOption.askReason) {
-			closeAskReason(interaction, this.client);
-		} else {
-			await interaction.deferReply().catch((e) => console.log(e));
-			close(interaction, this.client);
-		}	}
+        if (this.client.config.closeOption.askReason) {
+            closeAskReason(interaction, this.client);
+        } else {
+            await interaction.deferReply().catch((e) => console.log(e));
+            close(interaction, this.client);
+        }	}
 }
 
 /*

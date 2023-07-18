@@ -18,29 +18,29 @@ import { ActionRowBuilder, ButtonInteraction, CommandInteraction, GuildMember, M
 import {ExtendedClient} from "../structure";
 
 export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: ExtendedClient) => {
-	if (
-		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
+    if (
+        client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
-	)
-		return interaction
-			.reply({
-				content: client.locales.ticketOnlyClosableByStaff,
-				ephemeral: true,
-			})
-			.catch((e) => console.log(e));
+    )
+        return interaction
+            .reply({
+                content: client.locales.ticketOnlyClosableByStaff,
+                ephemeral: true,
+            })
+            .catch((e) => console.log(e));
 
-	const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
+    const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
 
-	const input = new TextInputBuilder()
-		.setCustomId("reason")
-		.setLabel(client.locales.modals.reasonTicketClose.label)
-		.setStyle(TextInputStyle.Paragraph)
-		.setPlaceholder(client.locales.modals.reasonTicketClose.placeholder)
-		.setMaxLength(256);
+    const input = new TextInputBuilder()
+        .setCustomId("reason")
+        .setLabel(client.locales.modals.reasonTicketClose.label)
+        .setStyle(TextInputStyle.Paragraph)
+        .setPlaceholder(client.locales.modals.reasonTicketClose.placeholder)
+        .setMaxLength(256);
 
-	const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
-	modal.addComponents(firstActionRow);
-	await interaction.showModal(modal).catch((e) => console.log(e));
+    const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);
+    modal.addComponents(firstActionRow);
+    await interaction.showModal(modal).catch((e) => console.log(e));
 };
 
 /*

@@ -16,7 +16,7 @@
 		"no-console": "off",
 		"no-undef": "warn",
 		"no-constant-condition": "warn",
-		"indent": ["error", "tab"],
+		"indent": ["error", 4],
 		"semi": ["error", "always"],
 		"quotes": [2, "double"],
 		"semi-style": ["error", "last"],

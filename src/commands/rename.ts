@@ -18,33 +18,33 @@ limitations under the License.
 */
 
 export default class RenameCommand extends BaseCommand {
-	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
-		.setName("rename")
-		.setDescription("Rename the ticket")
-		.addStringOption((option) => option.setName("name").setDescription("The new name of the ticket").setRequired(true));
-	constructor(client: ExtendedClient) {
-		super(client);
-	}
+    public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
+        .setName("rename")
+        .setDescription("Rename the ticket")
+        .addStringOption((option) => option.setName("name").setDescription("The new name of the ticket").setRequired(true));
+    constructor(client: ExtendedClient) {
+        super(client);
+    }
 
-	async execute(interaction: CommandInteraction) {
-		const ticket = await this.client.prisma.tickets.findUnique({
-			where: {
-				channelid: interaction.channel?.id
-			}
-		});
-		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
-			return interaction
-				.reply({
-					content: this.client.locales.ticketOnlyRenamableByStaff,
-					ephemeral: true,
-				})
-				.catch((e) => console.log(e));
+    async execute(interaction: CommandInteraction) {
+        const ticket = await this.client.prisma.tickets.findUnique({
+            where: {
+                channelid: interaction.channel?.id
+            }
+        });
+        if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+        if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
+            return interaction
+                .reply({
+                    content: this.client.locales.ticketOnlyRenamableByStaff,
+                    ephemeral: true,
+                })
+                .catch((e) => console.log(e));
 
-		(interaction.channel as TextChannel)?.setName(interaction.options.get("name", true).value as string).catch((e) => console.log(e));
-		interaction
-			.reply({ content: this.client.locales.ticketRenamed.replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
-			.catch((e) => console.log(e));	}
+        (interaction.channel as TextChannel)?.setName(interaction.options.get("name", true).value as string).catch((e) => console.log(e));
+        interaction
+            .reply({ content: this.client.locales.ticketRenamed.replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
+            .catch((e) => console.log(e));	}
 }
 
 /*
