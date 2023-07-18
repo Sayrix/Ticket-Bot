@@ -75,6 +75,9 @@ const client = new ExtendedClient({
 }, config);
 
 // Login the bot
+const token = process.env["TOKEN"];
+if(!token || token.trim() === "")
+	throw new Error("TOKEN Environment Not Found");
 client.login(process.env["TOKEN"]).then(null);
 
 /*
