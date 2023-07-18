@@ -2,7 +2,7 @@
 import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
-import {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder} from "discord.js";
+import {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message} from "discord.js";
 import os from "os";
 import {BaseEvent, ExtendedClient, SponsorType} from "../structure";
 
@@ -77,7 +77,13 @@ export default class ReadyEvent extends BaseEvent {
 		);
 
 		try {
-			const msg = embedMessageId ? await openTicketChannel?.messages?.fetch(embedMessageId).catch((ex) => console.error(ex)) : undefined;
+			// Fetch Message object and return undefined if not found
+			const msg = embedMessageId ? await (()=> new Promise<Message | undefined>((res)=> {
+				openTicketChannel?.messages?.fetch(embedMessageId)
+					.then(msg=>res(msg))
+					.catch(()=>res(undefined));
+			}))() : undefined;
+			
 			if (msg && msg.id) {
 				msg.edit({
 					embeds: [embed],
