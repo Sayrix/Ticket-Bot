@@ -46,6 +46,7 @@ export class Translation {
         console.warn(`TRANSLATION: Key '${key}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
         return backup;
     }
+
     /**
      * Get the translation value that isn't on the top of the JSON object
      * @param key All the keys leading to the value
@@ -67,7 +68,18 @@ export class Translation {
             throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indiciates this key data does not exist at all.`);
         console.warn(`TRANSLATION: Key '${keys.join(".")}' is missign translation. If you can, please help fill in the translation and make PR for it.`);
         return bkup;
-        
+    }
+    /**
+     * Used for translation keys that can be empty
+     * @param keys All the keys leading to the value
+     * @returns the translation data or undefined if the translation data cannot be found
+     */
+    getNoErrorSubValue(...keys: string[]): string | undefined {
+        try {
+            return this.getSubValue(...keys);
+        } catch(ex) {
+            return;
+        }
     }
 }
 

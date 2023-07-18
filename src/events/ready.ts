@@ -68,7 +68,9 @@ export default class ReadyEvent extends BaseEvent {
         const embed = new EmbedBuilder({
             color: 0,
         })
-            .setColor(locale.getSubValue("embeds", "openTicket", "color") as ColorResolvable ?? this.client.config.mainColor)
+            .setTitle(locale.getSubValue("embeds", "openTicket", "title"))
+            .setDescription(locale.getSubValue("embeds", "openTicket", "description"))
+            .setColor(locale.getNoErrorSubValue("embeds", "openTicket", "color") as ColorResolvable | undefined ?? this.client.config.mainColor)
             .setFooter({text: footer});
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
