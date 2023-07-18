@@ -1,7 +1,7 @@
 import { generateMessages } from "ticket-bot-transcript-uploader";
 import zlib from "zlib";
 import axios from "axios";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ColorResolvable, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { log } from "./logs";
 import {ExtendedClient} from "../structure";
 let domain = "https://ticket.pm/";
@@ -146,11 +146,11 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.getSubValue("other", "deleteTicketButtonMSG")).setStyle(ButtonStyle.Danger)
         );
-        const lEmbed = client.rawLocales.embeds;
+        const locale = client.locales;
         interaction.channel?.send({
             embeds: [
                 JSON.parse(
-                    JSON.stringify(lEmbed.ticketClosed)
+                    JSON.stringify(locale.getSubValue("embeds", "ticketClosed"))
                         .replace("TICKETCOUNT", ticket.id.toString())
                         .replace("REASON", (ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven")).replace(/[\n\r]/g, "\\n"))
                         .replace("CLOSERNAME", interaction.user.tag)
@@ -162,12 +162,11 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 
 
         if(!client.config.closeOption.dmUser) return;
-        const footer = lEmbed.ticketClosedDM.footer.text.replace("ticket.pm", "");
+        const footer = locale.getSubValue("embeds", "ticketClosedDM", "footer", "text").replace("ticket.pm", "");
         const ticketClosedDMEmbed = new EmbedBuilder({
-            ...lEmbed,
             color: 0,
         })
-            .setColor(lEmbed.ticketClosedDM.color ?? client.config.mainColor)
+            .setColor(locale.getSubValue("ticketClosedDM", "color") as ColorResolvable ?? client.config.mainColor)
             .setDescription(
                 client.locales.getSubValue("embeds", "ticketClosedDM", "description")
                     .replace("TICKETCOUNT", ticket.id.toString())
@@ -179,7 +178,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
                 // Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
                 text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
                 // Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-                iconURL: lEmbed.ticketClosedDM.footer.iconUrl
+                iconURL: locale.getSubValue("embeds", "ticketClosedDM", "footer", "iconUrl")
             });
 
         client.users.fetch(creator).then((user) => {

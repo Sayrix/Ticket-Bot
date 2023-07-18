@@ -2,7 +2,7 @@
 import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
-import {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message} from "discord.js";
+import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, Message} from "discord.js";
 import os from "os";
 import {BaseEvent, ExtendedClient, SponsorType} from "../structure";
 
@@ -60,17 +60,16 @@ export default class ReadyEvent extends BaseEvent {
             console.error("The channel to open tickets is not a channel!");
             process.exit(0);
         }
-
-        const embedDat = {...this.client.rawLocales.embeds.openTicket};
-        const footer = embedDat.footer.text.replace("ticket.pm", "");
+        const locale = this.client.locales;
+        let footer = locale.getSubValue("embeds", "openTicket", "footer", "text").replace("ticket.pm", "");
         // Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-        embedDat.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
+        footer = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
         // Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
         const embed = new EmbedBuilder({
-            ...embedDat,
             color: 0,
         })
-            .setColor(embedDat.color ?? this.client.config.mainColor);
+            .setColor(locale.getSubValue("embeds", "openTicket", "color") as ColorResolvable ?? this.client.config.mainColor)
+            .setFooter({text: footer});
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("openTicket").setLabel(this.client.locales.getSubValue("other", "openTicketButtonMSG")).setStyle(ButtonStyle.Primary)
