@@ -1,5 +1,5 @@
 import {Client, ClientOptions, Collection, Routes} from "discord.js";
-import {BaseCommand, ConfigType, LocaleType} from "./";
+import {BaseCommand, ConfigType} from "./";
 import {PrismaClient} from "@prisma/client";
 import fs from "fs-extra";
 import path from "node:path";
@@ -7,18 +7,19 @@ import {AddCommand, ClaimCommand, CloseCommand, RemoveCommand, RenameCommand} fr
 import {InteractionCreateEvent, ReadyEvent} from "../events";
 import {jsonc} from "jsonc";
 import {REST} from "@discordjs/rest";
+import {Translation} from "../utils/translation";
 
 export default class ExtendedClient extends Client {
     public readonly config: ConfigType;
     public readonly prisma: PrismaClient;
-    public locales: LocaleType;
+    public locales: Translation;
     public commands: Collection<string, BaseCommand>;
     constructor(options: ClientOptions, config: ConfigType) {
         super(options);
 
         this.config = config;
         this.prisma = new PrismaClient();
-        this.locales = JSON.parse(fs.readFileSync(path.join(__dirname, `../../locales/${this.config.lang}.json`), "utf8"));
+        this.locales = new Translation(this.config.lang, path.join(__dirname, "../../locales/"));
         this.commands = new Collection([
             [AddCommand.data.name, new AddCommand(this)],
             [ClaimCommand.data.name, new ClaimCommand(this)],
