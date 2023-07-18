@@ -19,15 +19,15 @@ limitations under the License.
 */
 
 export default class ClaimCommand extends BaseCommand {
-    public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
-        .setName("claim").setDescription("Set the ticket as claimed.");
-    constructor(client: ExtendedClient) {
-        super(client);
-    }
+	public static data: SlashCommandBuilder = <SlashCommandBuilder>new SlashCommandBuilder()
+		.setName("claim").setDescription("Set the ticket as claimed.");
+	constructor(client: ExtendedClient) {
+		super(client);
+	}
 
-    async execute(interaction: CommandInteraction) {
-        return claim(interaction, this.client);
-    }
+	async execute(interaction: CommandInteraction) {
+		return claim(interaction, this.client);
+	}
 }
 
 /*

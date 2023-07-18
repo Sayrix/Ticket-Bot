@@ -19,25 +19,25 @@ import { log } from "./logs";
 import {ExtendedClient} from "../structure";
 
 export const deleteTicket = async (interaction: ButtonInteraction, client: ExtendedClient) => {
-    const ticket = await client.prisma.tickets.findUnique({
-        where: {
-            channelid: interaction.channel?.id
-        }
-    });
+	const ticket = await client.prisma.tickets.findUnique({
+		where: {
+			channelid: interaction.channel?.id
+		}
+	});
 
-    if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-    log(
-        {
-            LogType: "ticketDelete",
-            user: interaction.user,
-            ticketId: ticket.id,
-            ticketCreatedAt: ticket.createdat,
-            transcriptURL: ticket.transcript ?? undefined,
-        },
-        client
-    );
-    await interaction.deferUpdate();
-    interaction.channel?.delete().catch((e) => console.log(e));
+	if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
+	log(
+		{
+			LogType: "ticketDelete",
+			user: interaction.user,
+			ticketId: ticket.id,
+			ticketCreatedAt: ticket.createdat,
+			transcriptURL: ticket.transcript ?? undefined,
+		},
+		client
+	);
+	await interaction.deferUpdate();
+	interaction.channel?.delete().catch((e) => console.log(e));
 };
 
 /*

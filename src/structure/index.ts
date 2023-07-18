@@ -4,7 +4,7 @@ import ExtendedClient from "./ExtendedClient";
 
 export * from "./types";
 export {
-    BaseCommand,
-    BaseEvent,
-    ExtendedClient,
+	BaseCommand,
+	BaseEvent,
+	ExtendedClient,
 };
