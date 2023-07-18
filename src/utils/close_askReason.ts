@@ -24,18 +24,18 @@ export const closeAskReason = async(interaction: CommandInteraction | ButtonInte
     )
         return interaction
             .reply({
-                content: client.locales.ticketOnlyClosableByStaff,
+                content: client.locales.getValue("ticketOnlyClosableByStaff"),
                 ephemeral: true,
             })
             .catch((e) => console.log(e));
 
-    const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.modals.reasonTicketClose.title);
+    const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.getSubValue("modals", "reasonTicketClose", "title"));
 
     const input = new TextInputBuilder()
         .setCustomId("reason")
-        .setLabel(client.locales.modals.reasonTicketClose.label)
+        .setLabel(client.locales.getSubValue("modals","reasonTicketClose", "label"))
         .setStyle(TextInputStyle.Paragraph)
-        .setPlaceholder(client.locales.modals.reasonTicketClose.placeholder)
+        .setPlaceholder(client.locales.getSubValue("modals", "reasonTicketClose", "placeholder"))
         .setMaxLength(256);
 
     const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(input);

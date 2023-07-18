@@ -106,7 +106,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
                     .catch((e) => console.log(e));
             });
         }
-        const lEmbeds = client.locales.embeds;
+        const lEmbeds = client.rawLocales.embeds;
         const footer = lEmbeds.ticketOpened.footer.text.replace("ticket.pm", "");
         if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
         const ticketOpenedEmbed = new EmbedBuilder({
@@ -160,16 +160,16 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
                 row.addComponents(
                     new ButtonBuilder()
                         .setCustomId("close_askReason")
-                        .setLabel(client.locales.buttons.close.label)
-                        .setEmoji(client.locales.buttons.close.emoji)
+                        .setLabel(client.rawLocales.buttons.close.label)
+                        .setEmoji(client.rawLocales.buttons.close.emoji)
                         .setStyle(ButtonStyle.Danger)
                 );
             } else {
                 row.addComponents(
                     new ButtonBuilder()
                         .setCustomId("close")
-                        .setLabel(client.locales.buttons.close.label)
-                        .setEmoji(client.locales.buttons.close.emoji)
+                        .setLabel(client.rawLocales.buttons.close.label)
+                        .setEmoji(client.rawLocales.buttons.close.emoji)
                         .setStyle(ButtonStyle.Danger)
                 );
             }
@@ -179,8 +179,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
             row.addComponents(
                 new ButtonBuilder()
                     .setCustomId("claim")
-                    .setLabel(client.locales.buttons.claim.label)
-                    .setEmoji(client.locales.buttons.claim.emoji)
+                    .setLabel(client.rawLocales.buttons.claim.label)
+                    .setEmoji(client.rawLocales.buttons.claim.emoji)
                     .setStyle(ButtonStyle.Primary)
             );
         }
@@ -213,7 +213,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
                 });
                 interaction
                     .editReply({
-                        content: client.locales.ticketOpenedMessage.replace("TICKETCHANNEL", `<#${channel.id}>`),
+                        content: client.locales.getValue("ticketOpenedMessage").replace("TICKETCHANNEL", `<#${channel.id}>`),
                         components: [],
 
                     })

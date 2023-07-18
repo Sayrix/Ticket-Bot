@@ -40,7 +40,7 @@ type ticketType = {
 }
 
 export async function close(interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction, client: ExtendedClient, reason?: string) {
-    if (!client.config.closeOption.createTranscript) domain = client.locales.other.unavailable;
+    if (!client.config.closeOption.createTranscript) domain = client.locales.getSubValue("other","unavailable");
 
     const ticket = await client.prisma.tickets.findUnique({
         where: {
@@ -56,14 +56,14 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
     )
         return interaction
             .editReply({
-                content: client.locales.ticketOnlyClosableByStaff
+                content: client.locales.getValue("ticketOnlyClosableByStaff")
             })
             .catch((e) => console.log(e));
 
     if (ticketClosed)
         return interaction
             .editReply({
-                content: client.locales.ticketAlreadyClosed
+                content: client.locales.getValue("ticketAlreadyClosed")
             })
             .catch((e) => console.log(e));
 
@@ -99,7 +99,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 
     interaction
         .editReply({
-            content: client.locales.ticketCreatingTranscript
+            content: client.locales.getValue("ticketCreatingTranscript")
         })
         .catch((e) => console.log(e));
     async function _close(id: string, ticket: ticketType) {
@@ -125,9 +125,9 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
             .catch((e) => console.log(e));
 
         interaction.channel?.send({
-            content: client.locales.ticketTranscriptCreated.replace(
+            content: client.locales.getValue("ticketTranscriptCreated").replace(
                 "TRANSCRIPTURL",
-                domain === client.locales.other.unavailable ? client.locales.other.unavailable : `<${domain}${id}>`
+                domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `<${domain}${id}>`
             )
         }).catch((e) => console.log(e));
 		
@@ -136,7 +136,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
                 closedby: interaction.user.id,
                 closedat: Date.now(),
                 closereason: reason,
-                transcript: domain === client.locales.other.unavailable ? client.locales.other.unavailable : `${domain}${id}`
+                transcript: domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `${domain}${id}`
             },
             where: {
                 channelid: interaction.channel?.id
@@ -144,15 +144,15 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
         });
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.other.deleteTicketButtonMSG).setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("deleteTicket").setLabel(client.locales.getSubValue("other", "deleteTicketButtonMSG")).setStyle(ButtonStyle.Danger)
         );
-        const lEmbed = client.locales.embeds;
+        const lEmbed = client.rawLocales.embeds;
         interaction.channel?.send({
             embeds: [
                 JSON.parse(
                     JSON.stringify(lEmbed.ticketClosed)
                         .replace("TICKETCOUNT", ticket.id.toString())
-                        .replace("REASON", (ticket.closereason ?? client.locales.other.noReasonGiven).replace(/[\n\r]/g, "\\n"))
+                        .replace("REASON", (ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven")).replace(/[\n\r]/g, "\\n"))
                         .replace("CLOSERNAME", interaction.user.tag)
                 )
             ],
@@ -169,10 +169,10 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
         })
             .setColor(lEmbed.ticketClosedDM.color ?? client.config.mainColor)
             .setDescription(
-                client.locales.embeds.ticketClosedDM.description
+                client.locales.getSubValue("embeds", "ticketClosedDM", "description")
                     .replace("TICKETCOUNT", ticket.id.toString())
                     .replace("TRANSCRIPTURL", `[\`${domain}${id}\`](${domain}${id})`)
-                    .replace("REASON", ticket.closereason ?? client.locales.other.noReasonGiven)
+                    .replace("REASON", ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven"))
                     .replace("CLOSERNAME", interaction.user.tag)
             )
             .setFooter({

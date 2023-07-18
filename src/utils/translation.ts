@@ -22,9 +22,9 @@ export class Translation {
         if(!fs.existsSync(fullDir))
             throw new TranslationError("Translation file not found, check your config to verify if the name is correct or not");
 
-        this.primaryData = JSON.parse(fullDir);
+        this.primaryData = JSON.parse(fs.readFileSync(fullDir, "utf8"));
         if(optName !== "main")
-            this.backupData = JSON.parse(path.join(dir, "main.json"));
+            this.backupData = JSON.parse(fs.readFileSync(path.join(dir, "main.json"), "utf8"));
     }
 
     /**
@@ -45,8 +45,29 @@ export class Translation {
         // Return the backup translation
         console.warn(`TRANSLATION: Key '${key}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
         return backup;
-        
+    }
+    /**
+     * Get the translation value that isn't on the top of the JSON object
+     * @param key All the keys leading to the value
+     * @returns the translation data or throw error if the translation data cannot be found at all
+     */
+    getSubValue(...keys: string[]): string {
+        // Check the primary value first
+        let main: {[k: string]: string | undefined} | string | undefined = this.primaryData;
+        let bkup: {[k: string]: string | undefined} | string | undefined = this.backupData;
+        for(const key of keys) {
+            if(typeof(main) === "object")
+                main = main[key];
+            if(this.backupData && typeof(bkup) === "object")
+                bkup = bkup[key];
+        }
 
+        if(typeof(main) === "string") return main;
+        if(typeof(bkup) !== "string")
+            throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indiciates this key data does not exist at all.`);
+        console.warn(`TRANSLATION: Key '${keys.join(".")}' is missign translation. If you can, please help fill in the translation and make PR for it.`);
+        return bkup;
+        
     }
 }
 

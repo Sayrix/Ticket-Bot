@@ -61,7 +61,7 @@ export default class ReadyEvent extends BaseEvent {
             process.exit(0);
         }
 
-        const embedDat = {...this.client.locales.embeds.openTicket};
+        const embedDat = {...this.client.rawLocales.embeds.openTicket};
         const footer = embedDat.footer.text.replace("ticket.pm", "");
         // Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
         embedDat.footer.text = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
@@ -73,7 +73,7 @@ export default class ReadyEvent extends BaseEvent {
             .setColor(embedDat.color ?? this.client.config.mainColor);
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("openTicket").setLabel(this.client.locales.other.openTicketButtonMSG).setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("openTicket").setLabel(this.client.locales.getSubValue("other", "openTicketButtonMSG")).setStyle(ButtonStyle.Primary)
         );
 
         try {
