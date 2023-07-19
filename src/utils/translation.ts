@@ -56,6 +56,7 @@ export class Translation {
 		// Check the primary value first
 		let main: {[k: string]: string | undefined} | string | undefined = this.primaryData;
 		let bkup: {[k: string]: string | undefined} | string | undefined = this.backupData;
+		
 		for(const key of keys) {
 			if(typeof(main) === "object")
 				main = main[key];
@@ -63,8 +64,8 @@ export class Translation {
 				bkup = bkup[key];
 		}
 
-		if(typeof(main) === "string") return main;
-		if(typeof(bkup) !== "string")
+		if(typeof(main) === "string" || typeof(main) === "number") return main;
+		if(typeof(bkup) !== "string" && typeof(bkup) !== "number")
 			throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indicates this key data does not exist at all.`);
 		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
 		return bkup;
