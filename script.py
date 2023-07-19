@@ -19,6 +19,7 @@ for t in ticket:
         Ticket_InfoCategory.category_codeName = t.category['codeName']
         Ticket_InfoCategory.category_name = t.category['name']
         
+        # Verify if each of the fields isn't null
         if t.creator:
             Ticket_InfoCategory.creator_username = discord_user_request(t.creator, 'username')
             Ticket_InfoCategory.creator_displayname = discord_user_request(t.creator, 'display_name')
