@@ -50,7 +50,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 				const tCount = this.client.config.ticketTypes.length;
 				if(tCount === 0 || tCount > 25) {
-					await interaction.followUp({content: this.client.locales.invalidConfig, ephemeral: true});
+					await interaction.followUp({content: this.client.locales.getValue("invalidConfig"), ephemeral: true});
 					throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
 				}
 
@@ -74,7 +74,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
 						interaction
 							.editReply({
-								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
+								content: this.client.locales.getValue("ticketLimitReached").replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
 							})
 							.catch((e) => console.log(e));
 						return;
@@ -110,7 +110,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 				if (options.length <= 0) {
 					interaction.editReply({
-						content: this.client.locales.noTickets
+						content: this.client.locales.getValue("noTickets")
 					});
 					return;
 				}
@@ -118,7 +118,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 				const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 					new StringSelectMenuBuilder()
 						.setCustomId("selectTicketType")
-						.setPlaceholder(this.client.locales.other.selectTicketTypePlaceholder)
+						.setPlaceholder(this.client.locales.getSubValue("other", "selectTicketTypePlaceholder"))
 						.setMaxValues(1)
 						.addOptions(options)
 				);
@@ -136,7 +136,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 			if (interaction.customId === "close") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				close(interaction, this.client, this.client.locales.other.noReasonGiven);
+				close(interaction, this.client, this.client.locales.getSubValue("other", "noReasonGiven"));
 			}
 
 			if (interaction.customId === "close_askReason") {
@@ -157,7 +157,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
 						interaction
 							.reply({
-								content: this.client.locales.ticketLimitReached.replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
+								content: this.client.locales.getValue("ticketLimitReached").replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
 								ephemeral: true,
 							})
 							.catch((e) => console.log(e));
@@ -173,7 +173,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 					if(qCount === 0 || qCount > 5)
 						throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
 
-					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.modals.reasonTicketOpen.title);
+					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.getSubValue("modals", "reasonTicketOpen", "title"));
 					for (const question of ticketType.questions) {
 						const index = ticketType.questions.indexOf(question);
 						const input = new TextInputBuilder()
@@ -189,7 +189,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 					await interaction.showModal(modal).catch((e) => console.log(e));
 				} else {
-					createTicket(interaction, this.client, ticketType, this.client.locales.other.noReasonGiven);
+					createTicket(interaction, this.client, ticketType, this.client.locales.getSubValue("other", "noReasonGiven"));
 				}
 			}
 

@@ -18,14 +18,14 @@ model tickets {
   channelid    String  @unique
   messageid    String  @unique
   category     String  @db.Text
-  invited      String  @default("[]")
-  reason       String
-  creator      String
+  invited      String  @default("[]") @db.Text
+  reason       String  @db.Text
+  creator      String  @db.Text
   createdat    BigInt
-  claimedby    String?
+  claimedby    String? @db.Text
   claimedat    BigInt?
-  closedby     String?
+  closedby     String? @db.Text
   closedat     BigInt?
-  closereason  String?
-  transcript   String?
+  closereason  String? @db.Text
+  transcript   String? @db.Text
 }
