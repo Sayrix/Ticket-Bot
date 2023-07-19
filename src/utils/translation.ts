@@ -40,7 +40,7 @@ export class Translation {
 		// Pull backup and throw error if it doesn't exist
 		const backup = this.backupData && this.backupData[key];
 		if(!backup)
-			throw new TranslationError(`TRANSLATION: Key '${key}' failed to pull backup translation. This indiciates this key data does not exist at all.`);
+			throw new TranslationError(`TRANSLATION: Key '${key}' failed to pull backup translation. This indicates this key data does not exist at all.`);
         
 		// Return the backup translation
 		console.warn(`TRANSLATION: Key '${key}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
@@ -65,8 +65,8 @@ export class Translation {
 
 		if(typeof(main) === "string") return main;
 		if(typeof(bkup) !== "string")
-			throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indiciates this key data does not exist at all.`);
-		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missign translation. If you can, please help fill in the translation and make PR for it.`);
+			throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indicates this key data does not exist at all.`);
+		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
 		return bkup;
 	}
 	/**
