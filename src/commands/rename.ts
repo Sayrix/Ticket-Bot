@@ -36,14 +36,14 @@ export default class RenameCommand extends BaseCommand {
 		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
 			return interaction
 				.reply({
-					content: this.client.locales.ticketOnlyRenamableByStaff,
+					content: this.client.locales.getValue("ticketOnlyRenamableByStaff"),
 					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
 
 		(interaction.channel as TextChannel)?.setName(interaction.options.get("name", true).value as string).catch((e) => console.log(e));
 		interaction
-			.reply({ content: this.client.locales.ticketRenamed.replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
+			.reply({ content: this.client.locales.getValue("ticketRenamed").replace("NEWNAME", (interaction.channel as TextChannel | null)?.toString() ?? "Unknown"), ephemeral: false })
 			.catch((e) => console.log(e));	}
 }
 

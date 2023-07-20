@@ -33,7 +33,7 @@ export default class CloseCommand extends BaseCommand {
 		)
 			return interaction
 				.reply({
-					content: this.client.locales.ticketOnlyClosableByStaff,
+					content: this.client.locales.getValue("ticketOnlyClosableByStaff"),
 					ephemeral: true,
 				})
 				.catch((e) => console.log(e));
