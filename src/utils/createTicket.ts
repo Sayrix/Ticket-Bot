@@ -107,13 +107,13 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 					.catch((e) => console.log(e));
 			});
 		}
-		const footer = locale.getSubValue("ticketOpened", "footer", "text").replace("ticket.pm", "");
+		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
 		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
 		const ticketOpenedEmbed = new EmbedBuilder({
 			color: 0,
 		})
 			.setColor(ticketType.color ?? client.config.mainColor)
-			.setTitle(locale.getSubValue("ticketOpened", "title").replace("CATEGORYNAME", ticketType.name))
+			.setTitle(locale.getSubValue("embeds", "ticketOpened", "title").replace("CATEGORYNAME", ticketType.name))
 			.setDescription(
 				ticketType.customDescription
 					? ticketType.customDescription
@@ -130,7 +130,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("REASON7", reason[6])
 						.replace("REASON8", reason[7])
 						.replace("REASON9", reason[8])
-					: locale.getSubValue("ticketOpened", "description")
+					: locale.getSubValue("embeds", "ticketOpened", "description")
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
@@ -149,7 +149,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconURL: locale.getSubValue("ticketOpened", "footer", "iconUrl")
+				iconURL: locale.getSubValue("embeds", "ticketOpened", "footer", "iconUrl")
 			});
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
