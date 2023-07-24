@@ -2,7 +2,9 @@ from django.contrib import admin
 from .models import Tickets, Tickets_Info
 
 class TicketsAdmin(admin.ModelAdmin):
-    list_display = ('channelid', 'messageid', 'reason', 'creator', 'claimedby', 'claimedat', 'closedby', 'closedat', 'closereason', 'transcript')
+    list_display = ('channelid', 'messageid', 'reason', 'creator', 'claimedby', 
+                    'claimedat', 'closedby', 'closedat', 'closereason', 'transcript')
+    readonly_fields = ('claimedat', 'closedat', 'createdat')
 
 class Tickets_InfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'category_codeName',
