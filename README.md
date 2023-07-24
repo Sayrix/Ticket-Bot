@@ -9,10 +9,10 @@ The purpose of this fork is to transform the table that by default is stored lik
 ![Screenshot](tickets.png)
 
 And create an auxiliary table so that it looks like this:
-![Screenshot](admin1.png)
+![Screenshot](tickets_info.png)
 
 In Django Admin it is possible to query, search and filter data
-![Screenshot](tickets_info.png)
+![Screenshot](admin1.png)
 
 # Fork Features
 * Request from discord API to get usernames
