@@ -36,7 +36,7 @@ class Tickets_Temp_Log(models.Model):
         db_table = 'tickets_temp_log'
 
 class Tickets_Info(models.Model):
-    category_ticket = models.OneToOneField(Tickets, on_delete=models.CASCADE)
+    ticket_info_ticket = models.OneToOneField(Tickets, on_delete=models.CASCADE)
     category_codeName = models.CharField(max_length=255, null=True)
     category_name = models.CharField(max_length=255, null=True)
     creator_username = models.CharField(max_length=255, null=True)
