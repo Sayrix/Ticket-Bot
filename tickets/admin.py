@@ -7,16 +7,14 @@ class TicketsAdmin(admin.ModelAdmin):
 class Tickets_InfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'category_codeName',
                     'category_name', 'creator_username', 
-                    'create_displayname', 'claimedby_username', 
-                    'claimedby_displayname', 'closedby_username', 
-                    'closedby_displayname', )
+                    'claimedby_username', 
+                    'closedby_username',)
     list_filter = ('category_name', 'category_codeName', )
     list_display_links = ('id', 'category_codeName', 'category_name', )
     search_fields = ('id', 'category_codeName',
                     'category_name', 'creator_username', 
-                    'create_displayname', 'claimedby_username', 
-                    'claimedby_displayname', 'closedby_username', 
-                    'closedby_displayname', )
+                    'claimedby_username', 
+                    'closedby_username',)
 
 
 admin.site.register(Tickets_Info, Tickets_InfoAdmin)
