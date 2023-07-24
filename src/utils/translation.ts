@@ -49,10 +49,16 @@ export class Translation {
 
 	/**
      * Get the translation value that isn't on the top of the JSON object
-     * @param key All the keys leading to the value
+     * @param key All the keys leading to the value (or the classic dot access `"first.second"`)
      * @returns the translation data or throw error if the translation data cannot be found at all
      */
+	getSubValue(keys: string): string;
+	getSubValue(...keys: string[]): string;
 	getSubValue(...keys: string[]): string {
+		// Convert the dot to array
+		if(keys.length === 1)
+			keys = keys[0].split(".");
+
 		// Check the primary value first
 		let main: {[k: string]: string | undefined} | string | undefined = this.primaryData;
 		let bkup: {[k: string]: string | undefined} | string | undefined = this.backupData;
