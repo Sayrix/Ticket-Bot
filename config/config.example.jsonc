@@ -99,5 +99,7 @@
 	Whether or not to minimizing the tracking data that are being sent
 	Enabling this will cause the telemetry to only send the software version and node version
 	*/
-	"minimalTracking": false
+	"minimalTracking": false,
+	// Hide internal websocket logs
+	"showWSLog": false
 }
