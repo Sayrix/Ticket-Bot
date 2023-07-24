@@ -4,6 +4,7 @@ I'm implementing a django admin panel to the project to have more control over t
 I'm not changing anything that could break or affect how the bot works. (All I'm doing in the database is using existing tables, or creating new tables, I'm not changing existing tables.)
 
 # Fork Features
+* Request from discord API to get all usernames and display names
 * Provide ways to query and filter tickets
 * CRUD
 

@@ -37,7 +37,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	if (!canClaim)
 	   return interaction
 		   .reply({
-			   content: client.locales.ticketOnlyClaimableByStaff,
+			   content: client.locales.getValue("ticketOnlyClaimableByStaff"),
 			   ephemeral: true,
 		   })
 		   .catch((e) => console.log(e));
@@ -45,7 +45,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	if (claimed)
 	   return interaction
 		   .reply({
-			   content: client.locales.ticketAlreadyClaimed,
+			   content: client.locales.getValue("ticketAlreadyClaimed"),
 			   ephemeral: true,
 		   })
 		   .catch((e) => console.log(e));
@@ -74,7 +74,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	const msg = await interaction.channel?.messages.fetch(ticket.messageid);
 	const oldEmbed = msg?.embeds[0].data;
 	const newEmbed = new EmbedBuilder(oldEmbed)
-		.setDescription(oldEmbed?.description + `\n\n ${client.locales.other.claimedBy.replace("USER", `<@${interaction.user.id}>`)}`);
+		.setDescription(oldEmbed?.description + `\n\n ${client.locales.getSubValue("other", "claimedBy").replace("USER", `<@${interaction.user.id}>`)}`);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	msg?.components[0].components.map((x) => {
@@ -91,7 +91,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 
    	interaction
 	   .reply({
-		   content: client.locales.ticketClaimedMessage.replace("USER", `<@${interaction.user.id}>`),
+		   content: client.locales.getValue("ticketClaimedMessage").replace("USER", `<@${interaction.user.id}>`),
 		   ephemeral: false,
 	   })
 	   .catch((e) => console.log(e));

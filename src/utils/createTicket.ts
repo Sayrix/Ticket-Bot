@@ -25,6 +25,7 @@ limitations under the License.
  * @param {Object|string} reasons
  */
 export const createTicket = async (interaction: StringSelectMenuInteraction | ModalSubmitInteraction, client: ExtendedClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent> | string) => {
+	const locale = client.locales;
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise(async function (resolve, reject) {
 		await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
@@ -106,15 +107,13 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 					.catch((e) => console.log(e));
 			});
 		}
-		const lEmbeds = client.locales.embeds;
-		const footer = lEmbeds.ticketOpened.footer.text.replace("ticket.pm", "");
+		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
 		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
 		const ticketOpenedEmbed = new EmbedBuilder({
-			...lEmbeds.ticketOpened,
 			color: 0,
 		})
 			.setColor(ticketType.color ?? client.config.mainColor)
-			.setTitle(lEmbeds.ticketOpened.title.replace("CATEGORYNAME", ticketType.name))
+			.setTitle(locale.getSubValue("embeds", "ticketOpened", "title").replace("CATEGORYNAME", ticketType.name))
 			.setDescription(
 				ticketType.customDescription
 					? ticketType.customDescription
@@ -131,7 +130,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("REASON7", reason[6])
 						.replace("REASON8", reason[7])
 						.replace("REASON9", reason[8])
-					: lEmbeds.ticketOpened.description
+					: locale.getSubValue("embeds", "ticketOpened", "description")
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
@@ -150,7 +149,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconURL: lEmbeds.ticketOpened.footer.iconUrl
+				iconURL: locale.getSubValue("embeds", "ticketOpened", "footer", "iconUrl")
 			});
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
@@ -160,16 +159,16 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				row.addComponents(
 					new ButtonBuilder()
 						.setCustomId("close_askReason")
-						.setLabel(client.locales.buttons.close.label)
-						.setEmoji(client.locales.buttons.close.emoji)
+						.setLabel(locale.getSubValue("buttons", "close", "label"))
+						.setEmoji(locale.getSubValue("buttons", "close", "emoji"))
 						.setStyle(ButtonStyle.Danger)
 				);
 			} else {
 				row.addComponents(
 					new ButtonBuilder()
 						.setCustomId("close")
-						.setLabel(client.locales.buttons.close.label)
-						.setEmoji(client.locales.buttons.close.emoji)
+						.setLabel(locale.getSubValue("buttons", "close", "emoji"))
+						.setEmoji(locale.getSubValue("buttons", "close", "emoji"))
 						.setStyle(ButtonStyle.Danger)
 				);
 			}
@@ -179,8 +178,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			row.addComponents(
 				new ButtonBuilder()
 					.setCustomId("claim")
-					.setLabel(client.locales.buttons.claim.label)
-					.setEmoji(client.locales.buttons.claim.emoji)
+					.setLabel(locale.getSubValue("buttons", "claim", "label"))
+					.setEmoji(locale.getSubValue("buttons", "claim", "emoji"))
 					.setStyle(ButtonStyle.Primary)
 			);
 		}
@@ -213,7 +212,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				});
 				interaction
 					.editReply({
-						content: client.locales.ticketOpenedMessage.replace("TICKETCHANNEL", `<#${channel.id}>`),
+						content: client.locales.getValue("ticketOpenedMessage").replace("TICKETCHANNEL", `<#${channel.id}>`),
 						components: [],
 
 					})
