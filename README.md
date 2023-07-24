@@ -45,6 +45,9 @@ Run ```python manage.py createsuperuser``` and follow the steps to create a supe
 
 than, run ```python manage.py runserver``` to start the django server, than enter on your browser http://127.0.0.1:8000/admin, log into yout super user, and you are good to go
 
+# Possible future changes
+* Convert timestamp from the tickets table, to datetime into tickets_info table
+
 # Ticket Bot
 
 Ticket Bot is a open source project of an ticket discord bot using [discord.js](https://discord.js.org) v14
