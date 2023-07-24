@@ -9,32 +9,32 @@ django.setup()
 from tickets.models import Tickets, Tickets_Info
 
 # Retrieve JSON field from database
-ticket = Tickets.objects.all()
+tickets = Tickets.objects.all()
 
 # Loop to insert the obtained data into the new table
-for t in ticket:
+for ticket in tickets:
     try:
-        Ticket_InfoCategory = Tickets_Info()
-        Ticket_InfoCategory.category_ticket = t
-        Ticket_InfoCategory.category_codeName = t.category['codeName']
-        Ticket_InfoCategory.category_name = t.category['name']
+        ticket_info = Tickets_Info()
+        ticket_info.ticket_info_ticket = ticket
+        ticket_info.category_codeName = ticket.category['codeName']
+        ticket_info.category_name = ticket.category['name']
         
         # Verify if each of the fields isn't null
-        if t.creator:
-            Ticket_InfoCategory.creator_username = discord_user_request(t.creator, 'username')
+        if ticket.creator:
+            ticket_info.creator_username = discord_user_request(ticket.creator, 'username')
             
-        if t.claimedby:
-            Ticket_InfoCategory.claimedby_username = discord_user_request(t.claimedby, 'username')
+        if ticket.claimedby:
+            ticket_info.claimedby_username = discord_user_request(ticket.claimedby, 'username')
             
-        if t.closedby:
-            Ticket_InfoCategory.closedby_username = discord_user_request(t.closedby, 'username')
+        if ticket.closedby:
+            ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')
         
         
-        Ticket_InfoCategory.save()
+        ticket_info.save()
         print('')
-        print(f'Ticket: {Ticket_InfoCategory.pk} saved')
+        print(f'Ticket: {ticket_info.pk} saved')
     except:
         print('')
-        print(f'Something went wrong when trying to save {Ticket_InfoCategory}')
+        print(f'Something went wrong when trying to save {ticket_info}')
         
         
