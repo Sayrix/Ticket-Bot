@@ -22,18 +22,17 @@ for t in ticket:
         # Verify if each of the fields isn't null
         if t.creator:
             Ticket_InfoCategory.creator_username = discord_user_request(t.creator, 'username')
-            Ticket_InfoCategory.creator_displayname = discord_user_request(t.creator, 'display_name')
+            
         if t.claimedby:
             Ticket_InfoCategory.claimedby_username = discord_user_request(t.claimedby, 'username')
-            Ticket_InfoCategory.claimedby_displayname = discord_user_request(t.claimedby, 'display_name')
             
         if t.closedby:
             Ticket_InfoCategory.closedby_username = discord_user_request(t.closedby, 'username')
-            Ticket_InfoCategory.closedby_displayname = discord_user_request(t.closedby, 'display_name')
+        
         
         Ticket_InfoCategory.save()
         print('')
-        print(f'{Ticket_InfoCategory} saved')
+        print(f'Ticket: {Ticket_InfoCategory.pk} saved')
     except:
         print('')
         print(f'Something went wrong when trying to save {Ticket_InfoCategory}')
