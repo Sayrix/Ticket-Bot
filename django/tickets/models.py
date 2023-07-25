@@ -43,9 +43,6 @@ class Tickets_Info(models.Model):
     claimedby_username = models.CharField(max_length=255, null=True, blank=True)
     closedby_username = models.CharField(max_length=255, null=True, blank=True)
     
-    # def __str__(self):
-    #     return f'{self.category_ticket}, {self.category_codeName}, {self.category_name}'
-    
     class Meta:
         managed = True
         db_table = 'tickets_info'
