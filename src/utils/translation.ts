@@ -78,6 +78,7 @@ export class Translation {
 		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
 		return bkup;
 	}
+
 	/**
      * Used for translation keys that can be empty
      * @param keys All the keys leading to the value
@@ -89,6 +90,38 @@ export class Translation {
 		} catch(ex) {
 			return;
 		}
+	}
+
+	/**
+     * Get the raw translation value (getSubValue but without string/number checks)
+     * @param key All the keys leading to the value (or the classic dot access `"first.second"`)
+     * @returns the translation data or throw error if the translation data cannot be found at all
+     */
+	// eslint-disable-next-line no-unused-vars
+	getSubRawValue(keys: string): string | number | null | object;
+	// eslint-disable-next-line no-unused-vars
+	getSubRawValue(...keys: string[]): string | number | null | object;
+	getSubRawValue(...keys: string[]): string | number | null | object {
+		// Convert the dot to array
+		if(keys.length === 1)
+			keys = keys[0].split(".");
+
+		// Check the primary value first
+		let main: {[k: string]: string | undefined} | string | undefined = this.primaryData;
+		let bkup: {[k: string]: string | undefined} | string | undefined = this.backupData;
+		
+		for(const key of keys) {
+			if(typeof(main) === "object")
+				main = main[key];
+			if(this.backupData && typeof(bkup) === "object")
+				bkup = bkup[key];
+		}
+
+		if(main !== undefined) return main;
+		if(bkup === undefined)
+			throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indicates this key data does not exist at all.`);
+		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
+		return bkup;
 	}
 }
 
