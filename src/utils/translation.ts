@@ -120,7 +120,7 @@ export class Translation {
 		if(main !== undefined) return main;
 		if(bkup === undefined)
 			throw new TranslationError(`TRANSLATION: Key '${keys.join(".")}' failed to pull backup translation. This indicates this key data does not exist at all.`);
-		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. If you can, please help fill in the translation and make PR for it.`);
+		console.warn(`TRANSLATION: Key '${keys.join(".")}' is missing translation. This is a raw value operation so please contact the dev before translating it.`);
 		return bkup;
 	}
 }
