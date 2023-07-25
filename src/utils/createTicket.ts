@@ -149,7 +149,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconURL: locale.getSubValue("embeds", "ticketOpened", "footer", "iconUrl")
+				iconURL: locale.getNoErrorSubValue("embeds", "ticketOpened", "footer", "iconUrl")
 			});
 
 		const row = new ActionRowBuilder<ButtonBuilder>();

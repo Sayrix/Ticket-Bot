@@ -18,7 +18,9 @@ export default class ExtendedClient extends Client {
 		super(options);
 
 		this.config = config;
-		this.prisma = new PrismaClient();
+		this.prisma = new PrismaClient({
+			errorFormat: "minimal"
+		});
 		this.locales = new Translation(this.config.lang, path.join(__dirname, "../../locales/"));
 		this.commands = new Collection([
 			[AddCommand.data.name, new AddCommand(this)],
