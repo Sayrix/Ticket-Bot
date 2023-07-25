@@ -178,7 +178,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconURL: locale.getSubValue("embeds", "ticketClosedDM", "footer", "iconUrl")
+				iconURL: locale.getNoErrorSubValue("embeds", "ticketClosedDM", "footer", "iconUrl")
 			});
 
 		client.users.fetch(creator).then((user) => {
