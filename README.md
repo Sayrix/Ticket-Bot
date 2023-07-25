@@ -31,6 +31,21 @@ Linux: ```source venv/bin/activate```
 
 Run ```pip install -r requirements.txt``` to install Django and its dependencies
 
+Than, you need to go into ticketbotdjango/settings.py and change the constant DATABASES to your postgre database settings, or create a file named local_settings.py and put the constant there
+Something like:
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'Ticket-Bot',
+        'HOST': '127.0.0.1',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'PORT': '',
+    }
+}
+```
+
 Run ```python manage.py makemigrations``` and ```python managa.py migrate``` to create the new tables
 
 After that, run the triggers.sql file to create the triggers to insert the actions into the tickets_temp_log
