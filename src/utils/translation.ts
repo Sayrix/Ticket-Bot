@@ -52,7 +52,9 @@ export class Translation {
      * @param key All the keys leading to the value (or the classic dot access `"first.second"`)
      * @returns the translation data or throw error if the translation data cannot be found at all
      */
+	// eslint-disable-next-line no-unused-vars
 	getSubValue(keys: string): string;
+	// eslint-disable-next-line no-unused-vars
 	getSubValue(...keys: string[]): string;
 	getSubValue(...keys: string[]): string {
 		// Convert the dot to array
