@@ -30,6 +30,7 @@ In Django Admin it is possible to query, search and filter data
 * CRUD
 
 # How to use
+Go to Django folder ```cd django```
 (Optional but recommended) create a python virtual environment
 
 For Windows: ```python -m venv .venv```
