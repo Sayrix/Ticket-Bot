@@ -1,15 +1,15 @@
-from tickets.models import Tickets_Info, Tickets_Temp_Log, Tickets
-from discord_requests import discord_user_request
-import os
 import time
+import os
 import django
+from discord_requests import discord_user_request
 
 # Setting Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ticketbotdjango.settings')
 django.setup()
 
+from tickets.models import Tickets_Info, Tickets_Temp_Log, Tickets
+
 while True:
-    
     # Retrieve all temp logs from database
     tickets_temp_log = Tickets_Temp_Log.objects.all()
 
@@ -36,10 +36,10 @@ while True:
                 
             if ticket.closedby:
                 ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')
-            
+                
+                
             # Create the ticket info to the database
             ticket_info.save()
-            print('')
             print(f'Ticket: {ticket_info.pk} saved')
             
             # Detele the temp log
@@ -65,7 +65,6 @@ while True:
             # Update the ticket info to the database
             ticket_info.save()
             
-            print('')
             print(f'Ticket: {ticket_info.pk} saved')
             # Detele the temp log
             temp.delete()
@@ -75,9 +74,7 @@ while True:
             print('Something is wrong with your trigger')
             break
         
-        # Sleep of 1 minute for the loot
-        time.sleep(60)
-        
-        
-
+    print('Waiting 1 minute to check again...')
+    # Sleep of 1 minute for the loot
+    time.sleep(60)
             
