@@ -150,7 +150,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		interaction.channel?.send({
 			embeds: [
 				JSON.parse(
-					JSON.stringify(locale.getSubValue("embeds", "ticketClosed"))
+					JSON.stringify(locale.getSubRawValue("embeds", "ticketClosed"))
 						.replace("TICKETCOUNT", ticket.id.toString())
 						.replace("REASON", (ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven")).replace(/[\n\r]/g, "\\n"))
 						.replace("CLOSERNAME", interaction.user.tag)
@@ -166,7 +166,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 		const ticketClosedDMEmbed = new EmbedBuilder({
 			color: 0,
 		})
-			.setColor(locale.getSubValue("embeds", "ticketClosedDM", "color") as ColorResolvable ?? client.config.mainColor)
+			.setColor(locale.getNoErrorSubValue("embeds", "ticketClosedDM", "color") as ColorResolvable ?? client.config.mainColor)
 			.setDescription(
 				client.locales.getSubValue("embeds", "ticketClosedDM", "description")
 					.replace("TICKETCOUNT", ticket.id.toString())
