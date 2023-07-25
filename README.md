@@ -20,7 +20,7 @@ In Django Admin it is possible to query, search and filter data
 * CRUD
 
 # How to use
-(Optional but recommended) create a python vitual environment
+(Optional but recommended) create a python virtual environment
 
 For Windows: ```python -m venv .venv```
 For Linux: ```python3 -m venv .venv```
