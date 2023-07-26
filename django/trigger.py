@@ -2,6 +2,7 @@ import time
 import os
 import django
 from discord_requests import discord_user_request
+from timestamp_converter import timestamp_to_datetime
 
 # Setting Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ticketbotdjango.settings')
@@ -37,6 +38,24 @@ while True:
             if ticket.closedby:
                 ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')
                 
+            if ticket.createdat:
+                ticket_info.createdat = timestamp_to_datetime(ticket.createdat)
+            print('aaaaa')
+            print(ticket.createdat)
+            print(ticket_info.createdat)
+            
+            if ticket.claimedat:
+                ticket_info.claimedat = timestamp_to_datetime(ticket.claimedat)
+            print('aaaaa')
+            print(ticket.claimedat)
+            print(ticket_info.claimedat)
+                
+            if ticket.closedat:
+                ticket_info.closedat = timestamp_to_datetime(ticket.closedat)
+            print('aaaaa')
+            print(ticket.closedat)
+            print(ticket_info.closedat)
+                
                 
             # Create the ticket info to the database
             ticket_info.save()
@@ -61,6 +80,21 @@ while True:
                 
             if ticket.closedby:
                 ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')
+                
+            if ticket.createdat:
+                ticket_info.createdat = timestamp_to_datetime(ticket.createdat)
+            
+            if ticket.claimedat:
+                ticket_info.claimedat = timestamp_to_datetime(ticket.claimedat)
+            print('aaaaa')
+            print(ticket.claimedat)
+            print(ticket_info.claimedat)
+                
+            if ticket.closedat:
+                ticket_info.closedat = timestamp_to_datetime(ticket.closedat)
+            print('aaaaa')
+            print(ticket.closedat)
+            print(ticket_info.closedat)
                 
             # Update the ticket info to the database
             ticket_info.save()

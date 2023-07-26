@@ -43,6 +43,10 @@ class Tickets_Info(models.Model):
     claimedby_username = models.CharField(max_length=255, null=True, blank=True)
     closedby_username = models.CharField(max_length=255, null=True, blank=True)
     
+    createdat = models.DateTimeField(null=True, blank=True)
+    claimedat = models.DateTimeField(null=True, blank=True)
+    closedat = models.DateTimeField(null=True, blank=True)
+    
     class Meta:
         managed = True
         db_table = 'tickets_info'

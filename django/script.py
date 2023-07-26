@@ -1,6 +1,7 @@
 import os
 import django
 from discord_requests import discord_user_request
+from timestamp_converter import timestamp_to_datetime
 
 # Setting Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ticketbotdjango.settings')
@@ -27,8 +28,18 @@ for ticket in tickets:
         ticket_info.claimedby_username = discord_user_request(ticket.claimedby, 'username')
         
     if ticket.closedby:
-        ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')    
+        ticket_info.closedby_username = discord_user_request(ticket.closedby, 'username')
+        
+    if ticket.createdat:
+        ticket_info.createdat = timestamp_to_datetime(ticket.createdat)
     
+    if ticket.claimedat:
+        ticket_info.claimedat = timestamp_to_datetime(ticket.claimedat)
+        
+    if ticket.closedat:
+        ticket_info.closedat = timestamp_to_datetime(ticket.closedat)
+        
+        
     ticket_info.save()
     print('')
     print(f'Ticket: {ticket_info.pk} saved')
