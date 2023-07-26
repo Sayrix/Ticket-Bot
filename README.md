@@ -6,7 +6,6 @@ If there is no big change in the functioning of the bot, or in its database, I b
 
 
 The purpose of this fork is to transform the table that by default is stored like this:
-<<<<<<< HEAD
 ![Screenshot](./django/tickets.png)
 
 And create an auxiliary table so that it looks like this:
@@ -14,15 +13,7 @@ And create an auxiliary table so that it looks like this:
 
 In Django Admin it is possible to query, search and filter data
 ![Screenshot](./django/admin1.png)
-=======
-![Screenshot](tickets.png)
 
-And create an auxiliary table so that it looks like this:
-![Screenshot](tickets_info.png)
-
-In Django Admin it is possible to query, search and filter data
-![Screenshot](admin1.png)
->>>>>>> 085104d4962035a5f9b9900ac09df54f75b5926a
 
 # Fork Features
 * Request from discord API to get usernames
