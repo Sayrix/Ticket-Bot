@@ -31,7 +31,7 @@ To activate the virtual environment:
 Windows: ```.\.venv\Scripts\activate```
 Linux: ```source venv/bin/activate```
 
-Run ```pip install -r requirements.txt``` to install Django and its dependencies
+Run ```pip install -r requirements.txt``` to install Django and its dependencies.
 
 Than, you need to go into ticketbotdjango/settings.py and change the constant DATABASES to your postgre database settings, or create a file named local_settings.py and put the constant there
 Something like:
@@ -48,9 +48,9 @@ DATABASES = {
 }
 ```
 
-Run ```python manage.py makemigrations``` and ```python managa.py migrate``` to create the new tables
+Run ```python manage.py makemigrations``` and ```python managa.py migrate``` to create the new tables.
 
-After that, run the triggers.sql file to create the triggers to insert the actions into the tickets_temp_log
+After that, run the triggers.sql file to create the triggers to insert the actions into the tickets_temp_log.
 
 If you are already using the bot, run the script.py file ONCE, this will already insert all existing rows in the tickets_info table.
 
@@ -58,12 +58,9 @@ After that (or if you haven't used the bot before), whenever you run trigger.py,
 
 # How to use django admin
 
-Run ```python manage.py createsuperuser``` and follow the steps to create a super user
+Run ```python manage.py createsuperuser``` and follow the steps to create a super user.
 
-than, run ```python manage.py runserver``` to start the django server, than enter on your browser http://127.0.0.1:8000/admin, log into yout super user, and you are good to go
-
-# Possible future changes
-* Convert timestamp from the tickets table, to datetime into tickets_info table
+Than, run ```python manage.py runserver``` to start the django server, than enter on your browser http://127.0.0.1:8000/admin, log into yout super user, and you are good to go.
 
 # Ticket Bot
 
