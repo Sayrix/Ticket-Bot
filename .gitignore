@@ -4,3 +4,10 @@ token.json
 dist
 .env
 *.db
+
+
+test.sql
+__pycache__/
+*.py[cod]
+local_settings.py
+.venv
