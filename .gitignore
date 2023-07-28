@@ -7,7 +7,6 @@ dist
 
 
 test.sql
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 local_settings.py
