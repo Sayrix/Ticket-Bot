@@ -174,7 +174,7 @@ export default class ReadyEvent extends BaseEvent {
 		`.replace(/\t/g, ""));
 		}
 
-		this.connect();
+		this.connect(this.client.config.showWSLog);
 
 		this.client.deployCommands();
 	}
@@ -214,31 +214,34 @@ export default class ReadyEvent extends BaseEvent {
 		}
 	}
 
-	private connect(): void {
+	private connect(enableLog?: boolean): void {
 		if (this.connected) return;
 		const ws = new WebSocketClient();
-
 		ws.on("connectFailed", (e) => {
 			this.connected = false;
-			setTimeout(()=>this.connect(), Math.random() * 1e4);
-			console.log(`❌  WebSocket Error: ${e.toString()}`);
+			setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
+			if(enableLog)
+				console.log(`❌  WebSocket Error: ${e.toString()}`);
 		});
 
 		ws.on("connect", (connection) => {
 			connection.on("error", (e) => {
 				this.connected = false;
-				setTimeout(()=>this.connect(), Math.random() * 1e4);
-				console.log(`❌  WebSocket Error: ${e.toString()}`);
+				setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
+				if(enableLog)
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
 			connection.on("close", (e) => {
 				this.connected = false;
-				setTimeout(()=>this.connect(), Math.random() * 1e4);
-				console.log(`❌  WebSocket Error: ${e.toString()}`);
+				setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
+				if(enableLog)
+					console.log(`❌  WebSocket Error: ${e.toString()}`);
 			});
 
 			this.connected = true;
-			console.log("✅  Connected to WebSocket server.");
+			if(enableLog)
+				console.log("✅  Connected to WebSocket server.");
 			this.telemetry(connection);
 
 			setInterval(() => {

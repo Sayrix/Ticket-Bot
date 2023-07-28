@@ -40,6 +40,7 @@ export type ConfigType = {
     },
     maxTicketOpened: number;
     minimalTracking: boolean;
+    showWSLog: boolean;
 }
 
 export type LocaleType = {
