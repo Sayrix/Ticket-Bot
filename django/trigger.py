@@ -40,19 +40,16 @@ while True:
                 
             if ticket.createdat:
                 ticket_info.createdat = timestamp_to_datetime(ticket.createdat)
-            print('aaaaa')
             print(ticket.createdat)
             print(ticket_info.createdat)
             
             if ticket.claimedat:
                 ticket_info.claimedat = timestamp_to_datetime(ticket.claimedat)
-            print('aaaaa')
             print(ticket.claimedat)
             print(ticket_info.claimedat)
                 
             if ticket.closedat:
                 ticket_info.closedat = timestamp_to_datetime(ticket.closedat)
-            print('aaaaa')
             print(ticket.closedat)
             print(ticket_info.closedat)
                 
@@ -86,13 +83,11 @@ while True:
             
             if ticket.claimedat:
                 ticket_info.claimedat = timestamp_to_datetime(ticket.claimedat)
-            print('aaaaa')
             print(ticket.claimedat)
             print(ticket_info.claimedat)
                 
             if ticket.closedat:
                 ticket_info.closedat = timestamp_to_datetime(ticket.closedat)
-            print('aaaaa')
             print(ticket.closedat)
             print(ticket_info.closedat)
                 
