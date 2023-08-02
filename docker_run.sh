@@ -16,4 +16,5 @@ if [ ! -f "./config/config.json" ]; then
 fi
 
 npx prisma db push --schema=./prisma/docker.prisma
+npm run startsma
 npm run start
