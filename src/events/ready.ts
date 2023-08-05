@@ -66,12 +66,17 @@ export default class ReadyEvent extends BaseEvent {
 		footer = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
 		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 		const embed = new EmbedBuilder({
+			...locale.getSubRawValue("embeds.openTicket") as object,
 			color: 0,
 		})
-			.setTitle(locale.getSubValue("embeds", "openTicket", "title"))
-			.setDescription(locale.getSubValue("embeds", "openTicket", "description"))
-			.setColor(locale.getNoErrorSubValue("embeds", "openTicket", "color") as ColorResolvable | undefined ?? this.client.config.mainColor)
-			.setFooter({text: footer});
+			.setColor(
+				locale.getNoErrorSubValue("embeds", "openTicket", "color") as ColorResolvable | undefined ??
+				this.client.config.mainColor
+			)
+			.setFooter({
+				text: footer,
+				iconURL: locale.getNoErrorSubValue("embeds.openTicket.footer.iconURL")
+			});
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId("openTicket").setLabel(this.client.locales.getSubValue("other", "openTicketButtonMSG")).setStyle(ButtonStyle.Primary)

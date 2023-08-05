@@ -8,5 +8,5 @@ README.md
 LICENSE
 package.json
 package-lock.json
-.eslintrc.js
+.eslintrc.json
 .prettierrc
