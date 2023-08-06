@@ -50,9 +50,9 @@
 	},
 	"invalidConfig": "Недійсна конфігурація, будь ласка, повідомте про це відповідального за бота!",
 	"ticketOpenedMessage": "Тікет закрито! TICKETCHANNEL",
-    "ticketOnlyClaimableByStaff": "The ticket can only be claimed by a staff!",
-    "ticketAlreadyClaimed": "The ticket is already claimed!",
-	"ticketClaimedMessage": "> Ticket claimed by USER",
+    "ticketOnlyClaimableByStaff": "Тікети можуть присвоювати собі тільки модератори!",
+    "ticketAlreadyClaimed": "Цей тікет вже був присвоєний!",
+	"ticketClaimedMessage": "> Тікет був присвоєний модераторові USER",
 	"ticketOnlyClosableByStaff": "Тільки персонал може закривати тікети!",
 	"ticketAlreadyClosed": "Тікет вже закритий!",
 	"ticketCreatingTranscript": "> Створення транскрипції...",
@@ -66,7 +66,7 @@
 		"openTicketButtonMSG": "Відкрити тікет",
 		"deleteTicketButtonMSG": "Видалити тікет",
 		"selectTicketTypePlaceholder": "Вибрати тип тікету",
-		"claimedBy": "**Claimed By**: USER",
+		"claimedBy": "**Присвоєно**: USER",
 		"noReasonGiven": "Причину не вказано",
 		"unavailable": "Недоступно"
 	}
