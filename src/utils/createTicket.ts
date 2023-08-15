@@ -75,7 +75,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 		// Client.db is set here and incremented ticket count
 		ticketCount++;
 
-		channel.permissionOverwrites
+		await channel.permissionOverwrites
 			.edit(interaction.user, {
 				SendMessages: true,
 				AddReactions: true,
@@ -87,7 +87,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		if (client.config.rolesWhoHaveAccessToTheTickets.length > 0) {
 			client.config.rolesWhoHaveAccessToTheTickets.forEach(async (role) => {
-				channel.permissionOverwrites
+				await channel.permissionOverwrites
 					.edit(role, {
 						SendMessages: true,
 						AddReactions: true,
