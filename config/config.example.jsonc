@@ -19,7 +19,8 @@
 			"customDescription": "", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"cantAccess": ["1111111111111111111"], // The roles who can't access to this ticket type
 			"askQuestions": false, // If the bot should ask the reason of the ticket
-			"questions": [] // Leave blank if you don't want to ask questions
+			"questions": [], // Leave blank if you don't want to ask questions
+			"staffRoles": [] // Category specific staff role (instead of the default ones)
 		},
 		{
 			"codeName": "category-two", // The name need to be in lowercase
@@ -32,7 +33,8 @@
 			"customDescription": "Please explain your report in detail. If you have any images, please attach them to your message.", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"cantAccess": ["2222222222222222222"], // The roles who can't access to this ticket type
 			"askQuestions": false, // If the bot should ask the reason of the ticket
-			"questions": [] // Leave blank if you don't want to ask questions
+			"questions": [], // Leave blank if you don't want to ask questions
+			"staffRoles": [] // Category specific staff role (instead of the default ones)
 		},
 		{
 			"codeName": "other", // The name need to be in lowercase
@@ -45,6 +47,7 @@
 			"customDescription": "Thank you for your ticket, a staff will reply you as soon as possible\n\n__**What is the reason of the ticket?**__: REASON1", // The custom description of the ticket type, here is all parameter: USERNAME, USERID, TICKETCOUNT, REASON1, 2, ect (set to blank to use the default description)
 			"cantAccess": [], // The roles who can't access to this ticket type
 			"askQuestions": true, // If the bot should ask the reason of the ticket
+			"staffRoles": [], // Category specific staff role (instead of the default ones)
 			"questions": [
 				// Maximum of 5 questions can be set due to discord's limit
 				{

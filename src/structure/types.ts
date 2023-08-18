@@ -161,4 +161,5 @@ export type TicketType = {
     cantAccess: string[];
     askQuestions: boolean;
     questions: TicketQuestionType[];
+    staffRoles?: string[];
 }
