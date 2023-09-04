@@ -46,7 +46,7 @@
     "@types/node": "^20.5.7",
     "@types/pg": "^8.10.2",
     "@types/websocket": "^1.0.5",
-    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.4.1",
     "eslint": "^8.45.0",
     "eslint-config-airbnb-base": "^15.0.0",
