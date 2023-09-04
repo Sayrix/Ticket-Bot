@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/Sayrix/ticket-bot#readme",
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.2.0",
     "axios": "^1.5.0",
     "better-sqlite3": "^8.5.1",
     "discord.js": "^14.13.0",
