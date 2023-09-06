@@ -36,6 +36,9 @@ You can see all perks here: https://github.com/sponsors/Sayrix
   </a>
 </p>
 
+## 🎥 Videos  
+[Tutorial in french + english subtitle](https://youtu.be/24zAFj8w9gE?si=OvikXeNIJglz4FJV)
+
 ## Please leave a ⭐ to help the project!
 
 
