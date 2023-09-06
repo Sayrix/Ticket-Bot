@@ -5,7 +5,7 @@ Licensed under the Creative Commons Attribution 4.0 International
 please check https://creativecommons.org/licenses/by/4.0 for more informations.
 */
 
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import { APIButtonComponent, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
 import { log } from "./logs";
 import {ExtendedClient} from "../structure";
 
@@ -69,7 +69,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	msg?.components[0].components.map((x) => {
-		const btnBuilder = new ButtonBuilder(x.data);
+		const btnBuilder = new ButtonBuilder(x.data as APIButtonComponent);
 	   	if (x.customId === "claim") btnBuilder.setDisabled(true);
 		row.addComponents(btnBuilder);
 	});
