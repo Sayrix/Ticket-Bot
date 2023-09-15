@@ -96,7 +96,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						ViewChannel: true,
 					})
 					.catch((e) => console.log(e));
-			};
+			}
 		}
 		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
 		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;

@@ -209,7 +209,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 						},
 						this.client
 					);
-				};
+				}
 
 				interaction
 					.update({
