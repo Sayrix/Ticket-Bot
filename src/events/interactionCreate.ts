@@ -194,8 +194,8 @@ export default class InteractionCreateEvent extends BaseEvent {
 					}
 				});
 
-				interaction.values.forEach((value) => {
-					(interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
+				for (const value of interaction.values) {
+					await (interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
 
 					log(
 						{
@@ -209,7 +209,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 						},
 						this.client
 					);
-				});
+				}
 
 				interaction
 					.update({

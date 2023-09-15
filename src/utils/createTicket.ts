@@ -86,7 +86,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			.catch((e) => console.log(e));
 
 		if (client.config.rolesWhoHaveAccessToTheTickets.length > 0) {
-			client.config.rolesWhoHaveAccessToTheTickets.forEach(async (role) => {
+			for (const role of client.config.rolesWhoHaveAccessToTheTickets) {
 				await channel.permissionOverwrites
 					.edit(role, {
 						SendMessages: true,
@@ -96,7 +96,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						ViewChannel: true,
 					})
 					.catch((e) => console.log(e));
-			});
+			}
 		}
 		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
 		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
