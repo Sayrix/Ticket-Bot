@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.4",
     "@types/fs-extra": "^11.0.2",
-    "@types/node": "^20.6.1",
+    "@types/node": "^20.6.2",
     "@types/pg": "^8.10.2",
     "@types/websocket": "^1.0.6",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
