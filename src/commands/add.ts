@@ -56,10 +56,9 @@ export default class AddCommand extends BaseCommand {
 				ReadMessageHistory: true,
 				AttachFiles: true,
 				ViewChannel: true,
-			})
-			.catch((e) => console.log(e));
+			});
 
-		interaction.reply({ content: `> Added <@${added.id}> to the ticket` }).catch((e) => console.log(e));
+		await interaction.reply({ content: `> Added <@${added.id}> to the ticket` }).catch((e) => console.log(e));
 
 		log(
 			{
