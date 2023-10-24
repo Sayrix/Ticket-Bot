@@ -213,22 +213,21 @@ export default class InteractionCreateEvent extends BaseEvent {
 				// Update the data in the database
 				await this.client.prisma.tickets.update({
 					data: {
-						invited: JSON.stringify((JSON.parse(ticket?.invited || "[]") as string[])
-							.filter(userid=>!interaction.values.find(rUID=>rUID===userid)))
+						invited: JSON.stringify((JSON.parse(ticket?.invited ?? "[]") as string[])
+							.filter(userid=>interaction.values.find(rUID=>rUID===userid) === undefined))
 					},
 					where: {
 						channelid: interaction.channel?.id
 					}
 				});
 
-				interaction
+				await interaction
 					.update({
 						content: `> Removed ${
 							interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
 						} from the ticket`,
 						components: [],
-					})
-					.catch((e) => console.log(e));
+					});
 			}
 		}
 
