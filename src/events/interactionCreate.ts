@@ -188,16 +188,15 @@ export default class InteractionCreateEvent extends BaseEvent {
 				const ticket = await this.client.prisma.tickets.findUnique({
 					select: {
 						id: true,
+						invited: true,
 					},
 					where: {
 						channelid: interaction.message.channelId
 					}
 				});
-
 				for (const value of interaction.values) {
 					await (interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
-
-					log(
+					await log(
 						{
 							LogType: "userRemoved",
 							user: interaction.user,
@@ -210,6 +209,17 @@ export default class InteractionCreateEvent extends BaseEvent {
 						this.client
 					);
 				}
+
+				// Update the data in the database
+				await this.client.prisma.tickets.update({
+					data: {
+						invited: JSON.stringify((JSON.parse(ticket?.invited || "[]") as string[])
+							.filter(userid=>!interaction.values.find(rUID=>rUID===userid)))
+					},
+					where: {
+						channelid: interaction.channel?.id
+					}
+				});
 
 				interaction
 					.update({
