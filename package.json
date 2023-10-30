@@ -41,7 +41,7 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.5",
+    "@types/better-sqlite3": "^7.6.6",
     "@types/fs-extra": "^11.0.3",
     "@types/node": "^20.8.6",
     "@types/pg": "^8.10.7",
