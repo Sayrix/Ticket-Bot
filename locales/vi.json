@@ -1,0 +1,73 @@
+{
+	"embeds": {
+		"openTicket": {
+			"title": "Mở một phiếu hỗ trợ",
+			"description": "Nhấn vào nút để bắt đầu mở một phiếu hỗ trợ",
+			"footer": {
+				"text": "ticket.pm"
+			}
+		},
+		"ticketOpened": {
+			"title": "Phiếu hỗ trợ CATEGORYNAME",
+			"description": "Một nhân viên sẽ phản hồi bạn ngay lập tức!",
+			"footer": {
+				"text": "ticket.pm"
+			}
+		},
+		"ticketClosed": {
+			"title": "Phiếu hỗ trợ đã đóng",
+			"description": "Phiếu hỗ trợ đã được CLOSERNAME đóng với lý do sau: `REASON`"
+		},
+		"ticketClosedDM": {
+			"title": "Phiếu hỗ trợ đã đóng",
+			"description": "Phiếu hỗ trợ số n°TICKETCOUNT đã được CLOSERNAME đóng với lý do sau: `REASON`\n\nDưới đây là bản ghi chép của phiếu hỗ trợ: TRANSCRIPTURL",
+			"footer": {
+				"text": "ticket.pm"
+			}
+		}
+	},
+	"modals": {
+		"reasonTicketOpen": {
+			"title": "Mở phiếu hỗ trợ",
+			"label": "Lý do của phiếu hỗ trợ của bạn",
+			"placeholder": "Vui lòng nhập lý do bạn đang mở một phiếu hỗ trợ"
+		},
+		"reasonTicketClose": {
+			"title": "Đóng phiếu hỗ trợ",
+			"label": "Lý do đóng phiếu hỗ trợ",
+			"placeholder": "Vui lòng nhập lý do bạn đang đóng phiếu hỗ trợ"
+		}
+	},
+	"buttons": {
+		"close": {
+			"label": "Đóng phiếu hỗ trợ",
+			"emoji": "🔒"
+		},
+		"claim": {
+			"label": "Đăng ký",
+			"emoji": "🙋"
+		}
+	},
+	"invalidConfig": "Phát hiện cấu hình không hợp lệ, vui lòng yêu cầu người quản trị bot sửa chữa!",
+	"ticketOpenedMessage": "Phiếu hỗ trợ đã mở! TICKETCHANNEL",
+	"ticketOnlyClaimableByStaff": "Chỉ nhân viên có thể đăng ký phiếu hỗ trợ này!",
+	"ticketAlreadyClaimed": "Phiếu hỗ trợ này đã được đăng ký!",
+	"ticketClaimedMessage": "> Phiếu hỗ trợ đã được đăng ký bởi USER",
+	"ticketOnlyClosableByStaff": "Chỉ nhân viên có thể đóng phiếu hỗ trợ!",
+	"ticketAlreadyClosed": "Phiếu hỗ trợ này đã được đóng!",
+	"ticketCreatingTranscript": "> Đang tạo bản ghi chép...",
+	"ticketTranscriptCreated": "> Bản ghi chép đã được tạo! TRANSCRIPTURL",
+	"ticketOnlyRenamableByStaff": "Chỉ nhân viên có thể đổi tên phiếu hỗ trợ!",
+	"ticketRenamed": "> Phiếu hỗ trợ đã được đổi tên thành NEWNAME",
+	"ticketLimitReached": "Bạn chỉ có thể mở tối đa TICKETLIMIT phiếu hỗ trợ cùng một lúc!",
+	"noTickets": "Bạn không có quyền truy cập vào bất kỳ phiếu hỗ trợ nào",
+
+	"other": {
+		"openTicketButtonMSG": "Mở một phiếu hỗ trợ",
+		"deleteTicketButtonMSG": "Xóa phiếu hỗ trợ",
+		"selectTicketTypePlaceholder": "Chọn loại phiếu hỗ trợ",
+		"claimedBy": "**Được đăng ký bởi**: USER",
+		"noReasonGiven": "Không có lý do nào được cung cấp",
+		"unavailable": "Không khả dụng"
+	}
+}
