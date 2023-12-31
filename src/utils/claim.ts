@@ -7,7 +7,7 @@ please check https://creativecommons.org/licenses/by/4.0 for more informations.
 
 import { APIButtonComponent, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
 import { log } from "./logs";
-import {ExtendedClient} from "../structure";
+import {ExtendedClient, TicketType} from "../structure";
 
 export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: ExtendedClient) => {
 	let ticket = await client.prisma.tickets.findUnique({
@@ -23,7 +23,9 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		   ephemeral: true,
 	   });
 
-	const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id));
+	// @TODO: Breaking change refactor happens here as well..
+	const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
+	const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) || ticketType?.staffRoles?.includes(r.id));
 
 	if (!canClaim)
 	   return interaction

@@ -191,6 +191,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			.then((msg) => {
 				client.prisma.tickets.create({
 					data: {
+						// @TODO: When releasing a new breaking version, store only the codeName for the category...
 						category: JSON.stringify(ticketType),
 						reason: allReasons,
 						creator: interaction.user.id,
