@@ -69,7 +69,7 @@
 		"categoryWhenClaimed": "" // The category the ticket is moved to when claimed
 	},
 
-	"rolesWhoHaveAccessToTheTickets": ["1111111111111111111", "2222222222222222222"], // Roles who can access to the tickets (Like the staff)
+	"rolesWhoHaveAccessToTheTickets": ["1111111111111111111", "2222222222222222222"], // Roles who can access to the tickets (Like the staff)/ Treat this as global admin role type of thing.
 
 	"rolesWhoCanNotCreateTickets": [], // Roles who can	not create a tickets (Like a blacklist)
 
