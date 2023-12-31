@@ -126,7 +126,7 @@ export class Translation {
 }
 
 export class TranslationError {
-	name: string = "TranslationError";
+	name = "TranslationError";
 	message: string;
 	constructor(msg: string) {
 		this.message = msg;

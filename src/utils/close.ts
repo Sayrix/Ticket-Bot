@@ -161,7 +161,7 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 			.setDescription(
 				client.locales.getSubValue("embeds", "ticketClosedDM", "description")
 					.replace("TICKETCOUNT", ticket.id.toString())
-					.replace("TRANSCRIPTURL", `[\`${domain}${id}\`](${domain}${id})`)
+					.replace("TRANSCRIPTURL", `${domain}${id}`)
 					.replace("REASON", ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven"))
 					.replace("CLOSERNAME", interaction.user.tag)
 			)
