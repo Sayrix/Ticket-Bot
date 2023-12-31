@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildMember, SlashCommandBuilder, TextChannel } from "discord.js";
-import {BaseCommand, ExtendedClient} from "../structure";
+import {BaseCommand, ExtendedClient, TicketType} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -23,8 +23,12 @@ export default class RenameCommand extends BaseCommand {
 				channelid: interaction.channel?.id
 			}
 		});
+		// @TODO: Breaking change refactor happens here as well..
+		const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
+
 		if (!ticket) return interaction.reply({ content: "Ticket not found", ephemeral: true }).catch((e) => console.log(e));
-		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id)))
+		if (!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+			ticketType?.staffRoles?.includes(r.id)))
 			return interaction
 				.reply({
 					content: this.client.locales.getValue("ticketOnlyRenamableByStaff"),

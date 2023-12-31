@@ -25,7 +25,8 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 
 	// @TODO: Breaking change refactor happens here as well..
 	const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
-	const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) || ticketType?.staffRoles?.includes(r.id));
+	const canClaim = (interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+	ticketType?.staffRoles?.includes(r.id));
 
 	if (!canClaim)
 	   return interaction

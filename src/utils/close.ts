@@ -3,7 +3,7 @@ import zlib from "zlib";
 import axios from "axios";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Collection, ColorResolvable, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { log } from "./logs";
-import {ExtendedClient} from "../structure";
+import {ExtendedClient, TicketType} from "../structure";
 let domain = "https://ticket.pm/";
 
 /*
@@ -41,9 +41,12 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 	const ticketClosed = ticket?.closedat && ticket.closedby;
 	if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
 
+	// @TODO: Breaking change refactor happens here as well..
+	const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
+		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+		ticketType?.staffRoles?.includes(r.id))
 	)
 		return interaction
 			.editReply({

@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, SlashCommandBuilder } from "discord.js";
 import { closeAskReason } from "../utils/close_askReason";
 import {close} from "../utils/close.js";
-import {BaseCommand, ExtendedClient} from "../structure";
+import {BaseCommand, ExtendedClient, TicketType} from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -18,9 +18,20 @@ export default class CloseCommand extends BaseCommand {
 	}
 
 	async execute(interaction: CommandInteraction) {
+		
+		// @TODO: Breaking change refactor happens here as well..
+		
+		const ticket = await this.client.prisma.tickets.findUnique({
+			where: {
+				channelid: interaction.channel?.id
+			}
+		});
+		const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
+
 		if (
 			this.client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id))
+			!(interaction.member as GuildMember | null)?.roles.cache.some((r) => this.client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+			ticketType?.staffRoles?.includes(r.id))
 		)
 			return interaction
 				.reply({
