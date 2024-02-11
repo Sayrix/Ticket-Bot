@@ -18,10 +18,13 @@ export default class AddCommand extends BaseCommand {
 	async execute(interaction: CommandInteraction) {
 		const dm = await interaction.user.createDM();
 
-		let messages = await dm.messages.fetch({ limit: 100 });
+		let messages = (await dm.messages.fetch({ limit: 100 }))
+			.filter((message) => message.author.id === this.client.user?.id);
 		while(messages.size > 0) {
 			for(const message of messages)
 				await message[1].delete();
+			if(messages.size < 100)
+				break;
 			messages = await dm.messages.fetch({ limit: 100 });
 		}
 		await interaction.reply({ content: "Cleared all of your DM history", ephemeral: true });
