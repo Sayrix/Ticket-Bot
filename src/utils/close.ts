@@ -43,10 +43,11 @@ export async function close(interaction: ButtonInteraction | CommandInteraction 
 
 	// @TODO: Breaking change refactor happens here as well..
 	const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
+	
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-		((interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
-		ticketType?.staffRoles?.includes(r.id)))
+		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+		ticketType?.staffRoles?.includes(r.id))
 	)
 		return interaction
 			.editReply({

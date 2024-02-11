@@ -20,7 +20,7 @@ export const closeAskReason = async(interaction: CommandInteraction | ButtonInte
 	
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-		(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
+		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
 		ticketType?.staffRoles?.includes(r.id))
 	)
 		return interaction
