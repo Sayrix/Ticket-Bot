@@ -1,7 +1,7 @@
 /*
-Copyright © 2023 小兽兽/zhiyan114 (github.com/zhiyan114)
-File is licensed respectively under the terms of the Apache License 2.0
-or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/main/LICENSE
+Copyright © 2024 小兽兽/zhiyan114 (github.com/zhiyan114)
+File is licensed respectively under the terms of the Creative Commons Attribution 4.0 International
+or whichever license the project is using at the time https://github.com/Sayrix/Ticket-Bot/blob/main/LICENSE.md
 */
 
 import path from "node:path";
