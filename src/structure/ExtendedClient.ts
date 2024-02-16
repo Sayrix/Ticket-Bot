@@ -3,7 +3,7 @@ import {BaseCommand, ConfigType} from "./";
 import {PrismaClient} from "@prisma/client";
 import fs from "fs-extra";
 import path from "node:path";
-import {AddCommand, ClaimCommand, CloseCommand, RemoveCommand, RenameCommand} from "../commands";
+import {AddCommand, MassAddCommand, ClaimCommand, CloseCommand, RemoveCommand, RenameCommand, clearDM} from "../commands";
 import {InteractionCreateEvent, ReadyEvent} from "../events";
 import {jsonc} from "jsonc";
 import {REST} from "@discordjs/rest";
@@ -24,10 +24,12 @@ export default class ExtendedClient extends Client {
 		this.locales = new Translation(this.config.lang, path.join(__dirname, "../../locales/"));
 		this.commands = new Collection([
 			[AddCommand.data.name, new AddCommand(this)],
+			[MassAddCommand.data.name, new MassAddCommand(this)],
 			[ClaimCommand.data.name, new ClaimCommand(this)],
 			[CloseCommand.data.name, new CloseCommand(this)],
 			[RemoveCommand.data.name, new RemoveCommand(this)],
 			[RenameCommand.data.name, new RenameCommand(this)],
+			[clearDM.data.name, new clearDM(this)],
 		]);
 		this.loadEvents();
 
@@ -66,7 +68,8 @@ export default class ExtendedClient extends Client {
 			ClaimCommand.data.toJSON(),
 			CloseCommand.data.toJSON(),
 			RemoveCommand.data.toJSON(),
-			RenameCommand.data.toJSON()
+			RenameCommand.data.toJSON(),
+			clearDM.data.toJSON(),
 		];
 
 		const { guildId } = jsonc.parse(fs.readFileSync(path.join(__dirname, "../../config/config.jsonc"), "utf8"));
