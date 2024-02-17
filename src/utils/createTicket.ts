@@ -159,7 +159,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				row.addComponents(
 					new ButtonBuilder()
 						.setCustomId("close")
-						.setLabel(locale.getSubValue("buttons", "close", "emoji"))
+						.setLabel(locale.getSubValue("buttons", "close", "label"))
 						.setEmoji(locale.getSubValue("buttons", "close", "emoji"))
 						.setStyle(ButtonStyle.Danger)
 				);
