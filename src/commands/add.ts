@@ -1,5 +1,5 @@
 import {BaseCommand, ExtendedClient} from "../structure";
-import {CommandInteraction, SlashCommandBuilder, TextChannel} from "discord.js";
+import {CommandInteraction, SlashCommandBuilder, TextChannel, User} from "discord.js";
 import {log} from "../utils/logs";
 
 /*
@@ -20,7 +20,7 @@ export default class AddCommand extends BaseCommand {
 
 	async execute(interaction: CommandInteraction) {
 
-		const added = interaction.options.getUser("user", true);
+		const added = interaction.options.get("user", true).user as User;
 		const ticket = await this.client.prisma.tickets.findUnique({
 			select: {
 				id: true,
