@@ -1,6 +1,16 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, StringSelectMenuInteraction, TextInputComponent } from "discord.js";
-import { log } from "./logs";
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	Collection,
+	EmbedBuilder,
+	ModalSubmitInteraction,
+	PermissionFlagsBits,
+	StringSelectMenuInteraction,
+	TextInputComponent
+} from "discord.js";
 import { ExtendedClient, TicketType } from "../structure";
+import { log } from "./logs";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -15,7 +25,12 @@ please check https://creativecommons.org/licenses/by/4.0 for more informations.
  * @param {Object} ticketType
  * @param {Object|string} reasons
  */
-export const createTicket = async (interaction: StringSelectMenuInteraction | ModalSubmitInteraction, client: ExtendedClient, ticketType: TicketType, reasons?: Collection<string, TextInputComponent> | string) => {
+export const createTicket = async (
+	interaction: StringSelectMenuInteraction | ModalSubmitInteraction,
+	client: ExtendedClient,
+	ticketType: TicketType,
+	reasons?: Collection<string, TextInputComponent> | string
+) => {
 	const locale = client.locales;
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise(async function (resolve, reject) {
@@ -34,8 +49,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		let ticketName = "";
 
-		let ticketCount = (await client.prisma.$queryRaw<[{ count: bigint }]>
-			`SELECT COUNT(*) as count FROM tickets`)[0].count;
+		let ticketCount = (await client.prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM tickets`)[0].count;
 
 		if (ticketType.ticketNameOption) {
 			ticketName = ticketType.ticketNameOption
@@ -56,9 +70,9 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			permissionOverwrites: [
 				{
 					id: interaction.guild.roles.everyone,
-					deny: [PermissionFlagsBits.ViewChannel],
-				},
-			],
+					deny: [PermissionFlagsBits.ViewChannel]
+				}
+			]
 		});
 
 		if (!channel) return reject("Couldn't create the ticket channel.");
@@ -72,35 +86,32 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			client
 		);
 
-
 		await channel.permissionOverwrites
 			.edit(interaction.user, {
 				SendMessages: true,
 				AddReactions: true,
 				ReadMessageHistory: true,
 				AttachFiles: true,
-				ViewChannel: true,
+				ViewChannel: true
 			})
 			.catch((e) => console.log(e));
 
 		// Role Access Stuff
 		if (client.config.rolesWhoHaveAccessToTheTickets.length > 0 || (ticketType.staffRoles?.length ?? 0) > 0) {
 			for (const role of [...client.config.rolesWhoHaveAccessToTheTickets, ...(ticketType.staffRoles ?? [])])
-				await channel.permissionOverwrites
-					.edit(role, {
-						SendMessages: true,
-						AddReactions: true,
-						ReadMessageHistory: true,
-						AttachFiles: true,
-						ViewChannel: true,
-					});
+				await channel.permissionOverwrites.edit(role, {
+					SendMessages: true,
+					AddReactions: true,
+					ReadMessageHistory: true,
+					AttachFiles: true,
+					ViewChannel: true
+				});
 		}
-
 
 		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
 		if (ticketType.color?.toString().trim() === "") ticketType.color = undefined;
 		const ticketOpenedEmbed = new EmbedBuilder({
-			color: 0,
+			color: 0
 		})
 			.setColor(ticketType.color ?? client.config.mainColor)
 			.setTitle(locale.getSubValue("embeds", "ticketOpened", "title").replace("CATEGORYNAME", ticketType.name))
@@ -120,7 +131,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("REASON7", reason[6])
 						.replace("REASON8", reason[7])
 						.replace("REASON9", reason[8])
-					: locale.getSubValue("embeds", "ticketOpened", "description")
+					: locale
+						.getSubValue("embeds", "ticketOpened", "description")
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
@@ -142,7 +154,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				iconURL: locale.getNoErrorSubValue("embeds", "ticketOpened", "footer", "iconUrl")
 			});
 
-		// Client.db is set here and incremented ticket count
+		// client.db is set here and incremented ticket count
 		ticketCount++;
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
@@ -179,9 +191,10 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		const body = {
 			embeds: [ticketOpenedEmbed],
-			content: `<@${interaction.user.id}> ${client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
-				}`,
-			components: [] as ActionRowBuilder<ButtonBuilder>[],
+			content: `<@${interaction.user.id}> ${
+				client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
+			}`,
+			components: [] as ActionRowBuilder<ButtonBuilder>[]
 		};
 
 		if (row.components.length > 0) body.components = [row];
@@ -189,25 +202,26 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 		channel
 			.send(body)
 			.then((msg) => {
-				client.prisma.tickets.create({
-					data: {
-						// @TODO: When releasing a new breaking version, store only the codeName for the category...
-						category: JSON.stringify(ticketType),
-						reason: allReasons,
-						creator: interaction.user.id,
-						createdat: Date.now(),
-						channelid: channel.id,
-						messageid: msg.id
-					}
-				}).then(); // Again why tf do I need .then()?!?!?
+				client.prisma.tickets
+					.create({
+						data: {
+							// @TODO: When releasing a new breaking version, store only the codeName for the category...
+							category: JSON.stringify(ticketType),
+							reason: allReasons,
+							creator: interaction.user.id,
+							createdat: Date.now(),
+							channelid: channel.id,
+							messageid: msg.id
+						}
+					})
+					.then(); // Again why tf do I need .then()?!?!?
 				msg.pin().then(() => {
 					msg.channel.bulkDelete(1);
 				});
 				interaction
 					.editReply({
 						content: client.locales.getValue("ticketOpenedMessage").replace("TICKETCHANNEL", `<#${channel.id}>`),
-						components: [],
-
+						components: []
 					})
 					.catch((e) => console.log(e));
 
