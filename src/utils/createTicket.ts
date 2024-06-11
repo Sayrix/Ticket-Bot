@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, EmbedBuilder, ModalSubmitInteraction, PermissionFlagsBits, StringSelectMenuInteraction, TextInputComponent } from "discord.js";
 import { log } from "./logs";
-import {ExtendedClient, TicketType} from "../structure";
+import { ExtendedClient, TicketType } from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -30,12 +30,12 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			});
 			allReasons = reason.map((r, i) => `Question ${i + 1}: ${r}`).join(", ");
 		}
-		if(typeof reasons === "string") allReasons = reasons;
+		if (typeof reasons === "string") allReasons = reasons;
 
 		let ticketName = "";
 
-		let ticketCount = (await client.prisma.$queryRaw<[{count: bigint}]>
-		`SELECT COUNT(*) as count FROM tickets`)[0].count;
+		let ticketCount = (await client.prisma.$queryRaw<[{ count: bigint }]>
+			`SELECT COUNT(*) as count FROM tickets`)[0].count;
 
 		if (ticketType.ticketNameOption) {
 			ticketName = ticketType.ticketNameOption
@@ -48,8 +48,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				.replace("USERID", interaction.user.id)
 				.replace("TICKETCOUNT", ticketCount.toString() ?? "0");
 		}
-		if(!interaction.guild) return console.error("Interaction createTicket was not executed in a guild");
-		
+		if (!interaction.guild) return console.error("Interaction createTicket was not executed in a guild");
+
 		const channel = await client.guilds.cache.get(client.config.guildId)?.channels.create({
 			name: ticketName,
 			parent: ticketType.categoryId,
@@ -72,8 +72,6 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 			client
 		);
 
-		// Client.db is set here and incremented ticket count
-		ticketCount++;
 
 		await channel.permissionOverwrites
 			.edit(interaction.user, {
@@ -84,7 +82,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				ViewChannel: true,
 			})
 			.catch((e) => console.log(e));
-		
+
 		// Role Access Stuff
 		if (client.config.rolesWhoHaveAccessToTheTickets.length > 0 || (ticketType.staffRoles?.length ?? 0) > 0) {
 			for (const role of [...client.config.rolesWhoHaveAccessToTheTickets, ...(ticketType.staffRoles ?? [])])
@@ -100,7 +98,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 
 		const footer = locale.getSubValue("embeds", "ticketOpened", "footer", "text").replace("ticket.pm", "");
-		if(ticketType.color?.toString().trim() === "") ticketType.color = undefined;
+		if (ticketType.color?.toString().trim() === "") ticketType.color = undefined;
 		const ticketOpenedEmbed = new EmbedBuilder({
 			color: 0,
 		})
@@ -112,7 +110,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
-						.replace("TICKETCOUNT", ticketCount.toString() || "0")
+						.replace("TICKETCOUNT", ticketCount.toString() ?? "0")
 						.replace("REASON1", reason[0])
 						.replace("REASON2", reason[1])
 						.replace("REASON3", reason[2])
@@ -126,7 +124,7 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 						.replace("CATEGORYNAME", ticketType.name)
 						.replace("USERNAME", interaction.user.username)
 						.replace("USERID", interaction.user.id)
-						.replace("TICKETCOUNT", ticketCount.toString() || "0")
+						.replace("TICKETCOUNT", ticketCount.toString() ?? "0")
 						.replace("REASON1", reason[0])
 						.replace("REASON2", reason[1])
 						.replace("REASON3", reason[2])
@@ -143,6 +141,9 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				iconURL: locale.getNoErrorSubValue("embeds", "ticketOpened", "footer", "iconUrl")
 			});
+
+		// Client.db is set here and incremented ticket count
+		ticketCount++;
 
 		const row = new ActionRowBuilder<ButtonBuilder>();
 
@@ -178,9 +179,8 @@ export const createTicket = async (interaction: StringSelectMenuInteraction | Mo
 
 		const body = {
 			embeds: [ticketOpenedEmbed],
-			content: `<@${interaction.user.id}> ${
-				client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
-			}`,
+			content: `<@${interaction.user.id}> ${client.config.pingRoleWhenOpened ? client.config.roleToPingWhenOpenedId.map((x) => `<@&${x}>`).join(", ") : ""
+				}`,
 			components: [] as ActionRowBuilder<ButtonBuilder>[],
 		};
 
