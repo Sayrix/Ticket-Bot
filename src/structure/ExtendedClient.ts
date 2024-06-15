@@ -1,6 +1,6 @@
 import {Client, ClientOptions, Collection, Routes} from "discord.js";
 import {BaseCommand, ConfigType} from "./";
-import {PrismaClient} from "../../node_modules/.prisma/client";
+import {PrismaClient} from "@prisma/client";
 import fs from "fs-extra";
 import path from "node:path";
 import {AddCommand, MassAddCommand, ClaimCommand, CloseCommand, RemoveCommand, RenameCommand, clearDM} from "../commands";
