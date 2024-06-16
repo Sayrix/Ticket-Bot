@@ -16,7 +16,8 @@
 		},
 		"ticketClosed": {
 			"title": "Ticket closed",
-			"description": "The ticket has been closed by CLOSERNAME with the following reason: `REASON`"
+			"description": "The ticket has been closed by CLOSERNAME with the following reason: `REASON`",
+			"deleteTicketInfo": "> The ticket will be deleted in 15 seconds"
 		},
 		"ticketClosedDM": {
 			"title": "Ticket closed",
