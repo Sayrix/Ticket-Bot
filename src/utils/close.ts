@@ -1,5 +1,3 @@
-import { generateMessages } from "ticket-bot-transcript-uploader";
-import zlib from "zlib";
 import axios from "axios";
 import {
 	ActionRowBuilder,
@@ -14,10 +12,12 @@ import {
 	GuildMember,
 	Message,
 	ModalSubmitInteraction,
-	TextChannel,
+	TextChannel
 } from "discord.js";
-import { log } from "./logs";
+import { generateMessages } from "ticket-bot-transcript-uploader";
+import zlib from "zlib";
 import { ExtendedClient, TicketType } from "../structure";
+import { log } from "./logs";
 let domain = "https://ticket.pm/";
 
 /*
@@ -48,14 +48,14 @@ export async function close(
 	interaction: ButtonInteraction | CommandInteraction | ModalSubmitInteraction,
 	client: ExtendedClient,
 	reason?: string,
-	deleteTicket: boolean = false,
+	deleteTicket: boolean = false
 ) {
 	if (!client.config.closeOption.createTranscript) domain = client.locales.getSubValue("other", "unavailable");
 
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
-			channelid: interaction.channel?.id,
-		},
+			channelid: interaction.channel?.id
+		}
 	});
 	const ticketClosed = ticket?.closedat && ticket.closedby;
 	if (!ticket) return interaction.editReply({ content: "Ticket not found" }).catch((e) => console.log(e));
@@ -66,19 +66,19 @@ export async function close(
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
 		!(interaction.member as GuildMember | null)?.roles.cache.some(
-			(r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) || ticketType?.staffRoles?.includes(r.id),
+			(r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) || ticketType?.staffRoles?.includes(r.id)
 		)
 	)
 		return interaction
 			.editReply({
-				content: client.locales.getValue("ticketOnlyClosableByStaff"),
+				content: client.locales.getValue("ticketOnlyClosableByStaff")
 			})
 			.catch((e) => console.log(e));
 
 	if (ticketClosed)
 		return interaction
 			.editReply({
-				content: client.locales.getValue("ticketAlreadyClosed"),
+				content: client.locales.getValue("ticketAlreadyClosed")
 			})
 			.catch((e) => console.log(e));
 
@@ -89,9 +89,9 @@ export async function close(
 			ticketId: ticket.id,
 			ticketChannelId: interaction.channel?.id,
 			ticketCreatedAt: ticket.createdat,
-			reason: reason,
+			reason: reason
 		},
-		client,
+		client
 	);
 
 	// Normally the user that closes the ticket will get posted here, but we'll do it when the ticket finalizes
@@ -101,20 +101,20 @@ export async function close(
 
 	(interaction.channel as TextChannel | null)?.permissionOverwrites
 		.edit(creator, {
-			ViewChannel: false,
+			ViewChannel: false
 		})
 		.catch((e: unknown) => console.log(e));
 	invited.forEach(async (user) => {
 		(interaction.channel as TextChannel | null)?.permissionOverwrites
 			.edit(user, {
-				ViewChannel: false,
+				ViewChannel: false
 			})
 			.catch((e) => console.log(e));
 	});
 
 	interaction
 		.editReply({
-			content: client.locales.getValue("ticketCreatingTranscript"),
+			content: client.locales.getValue("ticketCreatingTranscript")
 		})
 		.catch((e) => console.log(e));
 	async function _close(id: string, ticket: ticketType) {
@@ -137,7 +137,7 @@ export async function close(
 			?.edit({
 				content: msg.content,
 				embeds: [embed],
-				components: [rowAction],
+				components: [rowAction]
 			})
 			.catch((e) => console.log(e));
 
@@ -147,8 +147,8 @@ export async function close(
 					.getValue("ticketTranscriptCreated")
 					.replace(
 						"TRANSCRIPTURL",
-						domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `<${domain}${id}>`,
-					),
+						domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `<${domain}${id}>`
+					)
 			})
 			.catch((e) => console.log(e));
 
@@ -157,11 +157,11 @@ export async function close(
 				closedby: interaction.user.id,
 				closedat: Date.now(),
 				closereason: reason,
-				transcript: domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `${domain}${id}`,
+				transcript: domain === client.locales.getSubValue("other", "unavailable") ? client.locales.getSubValue("other", "unavailable") : `${domain}${id}`
 			},
 			where: {
-				channelid: interaction.channel?.id,
-			},
+				channelid: interaction.channel?.id
+			}
 		});
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -169,7 +169,7 @@ export async function close(
 				.setCustomId("deleteTicket")
 				.setLabel(client.locales.getSubValue("other", "deleteTicketButtonMSG"))
 				.setStyle(ButtonStyle.Danger)
-				.setDisabled(deleteTicket),
+				.setDisabled(deleteTicket)
 		);
 		const locale = client.locales;
 		interaction.channel
@@ -179,10 +179,10 @@ export async function close(
 						JSON.stringify(locale.getSubRawValue("embeds", "ticketClosed"))
 							.replace("TICKETCOUNT", ticket.id.toString())
 							.replace("REASON", (ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven")).replace(/[\n\r]/g, "\\n"))
-							.replace("CLOSERNAME", interaction.user.tag),
-					),
+							.replace("CLOSERNAME", interaction.user.tag)
+					)
 				],
-				components: [row],
+				components: [row]
 			})
 			.catch((e) => console.log(e));
 
@@ -193,18 +193,21 @@ export async function close(
 					user: interaction.user,
 					ticketId: ticket.id,
 					ticketCreatedAt: ticket.createdat,
-					transcriptURL: ticket.transcript ?? undefined,
+					transcriptURL: ticket.transcript ?? undefined
 				},
-				client,
+				client
 			);
 
+			interaction.channel?.send({
+				content: client.locales.getSubValue("embeds", "ticketClosed", "deleteTicketInfo")
+			});
 			setTimeout(() => interaction.channel?.delete().catch((e) => console.log(e)), 15000); // ticket will be deleted within 15 seconds
 		}
 
 		if (!client.config.closeOption.dmUser) return;
 		const footer = locale.getSubValue("embeds", "ticketClosedDM", "footer", "text").replace("ticket.pm", "");
 		const ticketClosedDMEmbed = new EmbedBuilder({
-			color: 0,
+			color: 0
 		})
 			.setColor((locale.getNoErrorSubValue("embeds", "ticketClosedDM", "color") as ColorResolvable) ?? client.config.mainColor)
 			.setDescription(
@@ -213,19 +216,19 @@ export async function close(
 					.replace("TICKETCOUNT", ticket.id.toString())
 					.replace("TRANSCRIPTURL", `${domain}${id}`)
 					.replace("REASON", ticket.closereason ?? client.locales.getSubValue("other", "noReasonGiven"))
-					.replace("CLOSERNAME", interaction.user.tag),
+					.replace("CLOSERNAME", interaction.user.tag)
 			)
 			.setFooter({
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
 				text: `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`, // Please respect the LICENSE :D
 				// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-				iconURL: locale.getNoErrorSubValue("embeds", "ticketClosedDM", "footer", "iconUrl"),
+				iconURL: locale.getNoErrorSubValue("embeds", "ticketClosedDM", "footer", "iconUrl")
 			});
 
 		client.users.fetch(creator).then((user) => {
 			user
 				.send({
-					embeds: [ticketClosedDMEmbed],
+					embeds: [ticketClosedDMEmbed]
 				})
 				.catch((e) => console.log(e));
 		});
@@ -268,8 +271,8 @@ export async function close(
 			const ts = await axios
 				.post(`${domain}upload?key=${premiumKey}&uuid=${client.config.uuidType}`, JSON.stringify(compressed), {
 					headers: {
-						"Content-Type": "application/json",
-					},
+						"Content-Type": "application/json"
+					}
 				})
 				.catch(console.error);
 			_close(ts?.data, ticket);
