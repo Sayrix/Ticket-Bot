@@ -6,22 +6,22 @@ please check https://creativecommons.org/licenses/by/4.0 for more informations.
 */
 
 import { ActionRowBuilder, ButtonInteraction, CommandInteraction, GuildMember, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import {ExtendedClient, TicketType} from "../structure";
+import { ExtendedClient, TicketType } from "../structure";
 
-export const closeAskReason = async(interaction: CommandInteraction | ButtonInteraction, client: ExtendedClient) => {
-
+export const closeAskReason = async (interaction: CommandInteraction | ButtonInteraction, client: ExtendedClient, deleteTicket: boolean = false) => {
 	// @TODO: Breaking change refactor happens here as well..
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
-			channelid: interaction.channel?.id
-		}
+			channelid: interaction.channel?.id,
+		},
 	});
-	const ticketType = ticket ? JSON.parse(ticket.category) as TicketType : undefined;
-	
+	const ticketType = ticket ? (JSON.parse(ticket.category) as TicketType) : undefined;
+
 	if (
 		client.config.closeOption.whoCanCloseTicket === "STAFFONLY" &&
-		!(interaction.member as GuildMember | null)?.roles.cache.some((r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) ||
-		ticketType?.staffRoles?.includes(r.id))
+		!(interaction.member as GuildMember | null)?.roles.cache.some(
+			(r) => client.config.rolesWhoHaveAccessToTheTickets.includes(r.id) || ticketType?.staffRoles?.includes(r.id),
+		)
 	)
 		return interaction
 			.reply({
@@ -30,11 +30,11 @@ export const closeAskReason = async(interaction: CommandInteraction | ButtonInte
 			})
 			.catch((e) => console.log(e));
 
-	const modal = new ModalBuilder().setCustomId("askReasonClose").setTitle(client.locales.getSubValue("modals", "reasonTicketClose", "title"));
+	const modal = new ModalBuilder().setCustomId(!deleteTicket ? "askReasonClose" : "askReasonDelete").setTitle(client.locales.getSubValue("modals", "reasonTicketClose", "title"));
 
 	const input = new TextInputBuilder()
 		.setCustomId("reason")
-		.setLabel(client.locales.getSubValue("modals","reasonTicketClose", "label"))
+		.setLabel(client.locales.getSubValue("modals", "reasonTicketClose", "label"))
 		.setStyle(TextInputStyle.Paragraph)
 		.setPlaceholder(client.locales.getSubValue("modals", "reasonTicketClose", "placeholder"))
 		.setMaxLength(256);

@@ -1,11 +1,21 @@
-import { ActionRowBuilder, GuildChannel, GuildMember, Interaction, ModalBuilder, SelectMenuComponentOptionData, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import {
+	ActionRowBuilder,
+	GuildChannel,
+	GuildMember,
+	Interaction,
+	ModalBuilder,
+	SelectMenuComponentOptionData,
+	StringSelectMenuBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+} from "discord.js";
 import { log } from "../utils/logs";
-import {createTicket} from "../utils/createTicket";
+import { createTicket } from "../utils/createTicket";
 import { close } from "../utils/close";
 import { claim } from "../utils/claim";
 import { closeAskReason } from "../utils/close_askReason";
 import { deleteTicket } from "../utils/delete";
-import {BaseEvent, ExtendedClient} from "../structure";
+import { BaseEvent, ExtendedClient } from "../structure";
 
 /*
 Copyright 2023 Sayrix (github.com/Sayrix)
@@ -19,7 +29,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 		super(client);
 	}
 
-	public async execute(interaction: Interaction): Promise<void>  {
+	public async execute(interaction: Interaction): Promise<void> {
 		if (interaction.isChatInputCommand()) {
 			const command = this.client.commands.get(interaction.commandName);
 			if (!command) return;
@@ -30,7 +40,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 				console.error(error);
 				await interaction.reply({
 					content: "There was an error while executing this command!",
-					ephemeral: true
+					ephemeral: true,
 				});
 			}
 		}
@@ -40,8 +50,8 @@ export default class InteractionCreateEvent extends BaseEvent {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
 
 				const tCount = this.client.config.ticketTypes.length;
-				if(tCount === 0 || tCount > 25) {
-					await interaction.followUp({content: this.client.locales.getValue("invalidConfig"), ephemeral: true});
+				if (tCount === 0 || tCount > 25) {
+					await interaction.followUp({ content: this.client.locales.getValue("invalidConfig"), ephemeral: true });
 					throw new Error("ticketTypes either has nothing or exceeded 25 entries. Please check the config and restart the bot");
 				}
 
@@ -49,23 +59,26 @@ export default class InteractionCreateEvent extends BaseEvent {
 					if (role && (interaction.member as GuildMember | null)?.roles.cache.has(role)) {
 						interaction
 							.editReply({
-								content: "You can't create a ticket because you are blacklisted"
+								content: "You can't create a ticket because you are blacklisted",
 							})
 							.catch((e) => console.log(e));
 						return;
 					}
 				}
-				
+
 				// Max Ticket
 				if (this.client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
+					const ticketsOpened = (
+						await this.client.prisma.$queryRaw<
+							[{ count: bigint }]
+						>`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`
+					)[0].count;
 
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
 						interaction
 							.editReply({
-								content: this.client.locales.getValue("ticketLimitReached").replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString())
+								content: this.client.locales.getValue("ticketLimitReached").replace("TICKETLIMIT", this.client.config.maxTicketOpened.toString()),
 							})
 							.catch((e) => console.log(e));
 						return;
@@ -101,7 +114,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 				if (options.length <= 0) {
 					interaction.editReply({
-						content: this.client.locales.getValue("noTickets")
+						content: this.client.locales.getValue("noTickets"),
 					});
 					return;
 				}
@@ -111,7 +124,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 						.setCustomId("selectTicketType")
 						.setPlaceholder(this.client.locales.getSubValue("other", "selectTicketTypePlaceholder"))
 						.setMaxValues(1)
-						.addOptions(options)
+						.addOptions(options),
 				);
 
 				interaction
@@ -127,11 +140,11 @@ export default class InteractionCreateEvent extends BaseEvent {
 
 			if (interaction.customId === "close") {
 				await interaction.deferReply({ ephemeral: true }).catch((e) => console.log(e));
-				close(interaction, this.client, this.client.locales.getSubValue("other", "noReasonGiven"));
+				close(interaction, this.client, this.client.locales.getSubValue("other", "noReasonGiven"), this.client.config.closeOption.deleteTicket);
 			}
 
 			if (interaction.customId === "close_askReason") {
-				closeAskReason(interaction, this.client);
+				closeAskReason(interaction, this.client, this.client.config.closeOption.deleteTicket);
 			}
 
 			if (interaction.customId === "deleteTicket") {
@@ -142,8 +155,11 @@ export default class InteractionCreateEvent extends BaseEvent {
 		if (interaction.isStringSelectMenu()) {
 			if (interaction.customId === "selectTicketType") {
 				if (this.client.config.maxTicketOpened > 0) {
-					const ticketsOpened = (await this.client.prisma.$queryRaw<[{count: bigint}]>
-					`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`)[0].count;
+					const ticketsOpened = (
+						await this.client.prisma.$queryRaw<
+							[{ count: bigint }]
+						>`SELECT COUNT(*) as count FROM tickets WHERE closedby IS NULL AND creator = ${interaction.user.id}`
+					)[0].count;
 					// If maxTicketOpened is 0, it means that there is no limit
 					if (ticketsOpened >= this.client.config.maxTicketOpened) {
 						interaction
@@ -161,7 +177,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 				if (ticketType.askQuestions) {
 					// Sanity Check
 					const qCount = ticketType.questions.length;
-					if(qCount === 0 || qCount > 5)
+					if (qCount === 0 || qCount > 5)
 						throw new Error(`${ticketType.codeName} has either no questions or exceeded 5 questions. Check your config and restart the bot`);
 
 					const modal = new ModalBuilder().setCustomId("askReason").setTitle(this.client.locales.getSubValue("modals", "reasonTicketOpen", "title"));
@@ -191,8 +207,8 @@ export default class InteractionCreateEvent extends BaseEvent {
 						invited: true,
 					},
 					where: {
-						channelid: interaction.message.channelId
-					}
+						channelid: interaction.message.channelId,
+					},
 				});
 				for (const value of interaction.values) {
 					await (interaction.channel as GuildChannel | null)?.permissionOverwrites.delete(value).catch((e) => console.log(e));
@@ -206,28 +222,26 @@ export default class InteractionCreateEvent extends BaseEvent {
 								id: value,
 							},
 						},
-						this.client
+						this.client,
 					);
 				}
 
 				// Update the data in the database
 				await this.client.prisma.tickets.update({
 					data: {
-						invited: JSON.stringify((JSON.parse(ticket?.invited ?? "[]") as string[])
-							.filter(userid=>interaction.values.find(rUID=>rUID===userid) === undefined))
+						invited: JSON.stringify(
+							(JSON.parse(ticket?.invited ?? "[]") as string[]).filter((userid) => interaction.values.find((rUID) => rUID === userid) === undefined),
+						),
 					},
 					where: {
-						channelid: interaction.channel?.id
-					}
+						channelid: interaction.channel?.id,
+					},
 				});
 
-				await interaction
-					.update({
-						content: `> Removed ${
-							interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")
-						} from the ticket`,
-						components: [],
-					});
+				await interaction.update({
+					content: `> Removed ${interaction.values.length < 1 ? interaction.values : interaction.values.map((a) => `<@${a}>`).join(", ")} from the ticket`,
+					components: [],
+				});
 			}
 		}
 
@@ -243,6 +257,9 @@ export default class InteractionCreateEvent extends BaseEvent {
 			if (interaction.customId === "askReasonClose") {
 				await interaction.deferReply().catch((e) => console.log(e));
 				close(interaction, this.client, interaction.fields.fields.first()?.value);
+			} else if (interaction.customId === "askReasonDelete") {
+				await interaction.deferReply().catch((e) => console.log(e));
+				close(interaction, this.client, interaction.fields.fields.first()?.value, true);
 			}
 		}
 	}

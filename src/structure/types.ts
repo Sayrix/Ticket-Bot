@@ -29,6 +29,7 @@ export type ConfigType = {
         askReason: boolean;
         whoCanCloseTicket: "STAFFONLY" | "EVERYONE";
         closeTicketCategoryId?: string;
+        deleteTicket: boolean,
     };
     uuidType: "uuid" | "emoji";
     status: {
