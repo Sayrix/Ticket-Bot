@@ -4,5 +4,6 @@
 	"printWidth": 150,
 	"tabWidth": 1,
 	"useTabs": true,
-	"endOfLine": "lf"
+	"endOfLine": "lf",
+	"trailingComma": "none"
 }
