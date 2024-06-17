@@ -1,0 +1,74 @@
+{
+    "embeds": {
+        "openTicket": {
+            "title": "Buka tiket",
+            "description": "Klik butang untuk mula membuka tiket",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        },
+        "ticketOpened": {
+            "title": "Tiket CATEGORYNAME",
+            "description": "Staf akan membalas anda secepat mungkin!",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        },
+        "ticketClosed": {
+            "title": "Tiket ditutup",
+            "description": "Tiket telah ditutup oleh CLOSERNAME dengan alasan berikut: `REASON`",
+            "deleteTicketInfo": "> Tiket akan dipadam dalam 15 saat"
+        },
+        "ticketClosedDM": {
+            "title": "Tiket ditutup",
+            "description": "Tiket bernombor TICKETCOUNT telah ditutup oleh CLOSERNAME dengan alasan berikut: `REASON`\n\nBerikut adalah transkrip tiket: TRANSCRIPTURL",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        }
+    },
+    "modals": {
+        "reasonTicketOpen": {
+            "title": "Buka tiket",
+            "label": "Alasan anda membuka tiket",
+            "placeholder": "Sila masukkan alasan mengapa anda membuka tiket"
+        },
+        "reasonTicketClose": {
+            "title": "Tutup tiket",
+            "label": "Alasan penutupan tiket",
+            "placeholder": "Sila masukkan alasan mengapa anda menutup tiket"
+        }
+    },
+    "buttons": {
+        "close": {
+            "label": "Tutup tiket",
+            "emoji": "🔒"
+        },
+        "claim": {
+            "label": "Tuntut",
+            "emoji": "🙋"
+        }
+    },
+    "invalidConfig": "Pengesanan konfigurasi tidak sah, sila minta pengendali bot untuk membetulkannya!",
+    "ticketOpenedMessage": "Tiket dibuka! TICKETCHANNEL",
+    "ticketOnlyClaimableByStaff": "Tiket hanya boleh dituntut oleh staf!",
+    "ticketAlreadyClaimed": "Tiket telah dituntut!",
+    "ticketClaimedMessage": "> Tiket dituntut oleh USER",
+    "ticketOnlyClosableByStaff": "Hanya staf boleh menutup tiket!",
+    "ticketAlreadyClosed": "Tiket sudah ditutup!",
+    "ticketCreatingTranscript": "> Mencipta transkrip...",
+    "ticketTranscriptCreated": "> Transkrip dicipta! TRANSCRIPTURL",
+    "ticketOnlyRenamableByStaff": "Hanya staf boleh menukar nama tiket!",
+    "ticketRenamed": "> Tiket ditukar nama kepada NEWNAME",
+    "ticketLimitReached": "Anda hanya boleh membuka TICKETLIMIT tiket pada satu masa!",
+    "noTickets": "Anda tidak mempunyai akses kepada mana-mana tiket",
+
+    "other": {
+        "openTicketButtonMSG": "Buka tiket",
+        "deleteTicketButtonMSG": "Padam tiket",
+        "selectTicketTypePlaceholder": "Pilih jenis tiket",
+        "claimedBy": "**Dituntut Oleh**: USER",
+        "noReasonGiven": "Tiada alasan diberikan",
+        "unavailable": "Tidak tersedia"
+    }
+}
