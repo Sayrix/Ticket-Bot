@@ -1,0 +1,73 @@
+{
+    "embeds": {
+        "openTicket": {
+            "title": "Apri un ticket",
+            "description": "Clicca sul pulsante per iniziare ad aprire un ticket",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        },
+        "ticketOpened": {
+            "title": "Ticket CATEGORYNAME",
+            "description": "Un membro dello staff ti risponderà il prima possibile!",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        },
+        "ticketClosed": {
+            "title": "Ticket chiuso",
+            "description": "Il ticket è stato chiuso da CLOSERNAME con la seguente motivazione: `REASON`",
+            "deleteTicketInfo": "> Il ticket verrà eliminato in 15 secondi"
+        },
+        "ticketClosedDM": {
+            "title": "Ticket chiuso",
+            "description": "Il ticket n°TICKETCOUNT è stato chiuso da CLOSERNAME con la seguente motivazione: `REASON`\n\nEcco la trascrizione del ticket: TRANSCRIPTURL",
+            "footer": {
+                "text": "ticket.pm"
+            }
+        }
+    },
+    "modals": {
+        "reasonTicketOpen": {
+            "title": "Apri ticket",
+            "label": "La motivazione del tuo ticket",
+            "placeholder": "Per favore inserisci la motivazione per cui stai aprendo un ticket"
+        },
+        "reasonTicketClose": {
+            "title": "Chiudi ticket",
+            "label": "La motivazione della chiusura del ticket",
+            "placeholder": "Per favore inserisci la motivazione per cui stai chiudendo il ticket"
+        }
+    },
+    "buttons": {
+        "close": {
+            "label": "Chiudi ticket",
+            "emoji": "🔒"
+        },
+        "claim": {
+            "label": "Richiedi",
+            "emoji": "🙋"
+        }
+    },
+    "invalidConfig": "Configurazione non valida rilevata, per favore chiedi all'operatore del bot di sistemarla!",
+    "ticketOpenedMessage": "Ticket aperto! TICKETCHANNEL",
+    "ticketOnlyClaimableByStaff": "Il ticket può essere richiesto solo dallo staff!",
+    "ticketAlreadyClaimed": "Il ticket è già stato richiesto!",
+    "ticketClaimedMessage": "> Ticket richiesto da USER",
+    "ticketOnlyClosableByStaff": "Solo lo staff può chiudere il ticket!",
+    "ticketAlreadyClosed": "Il ticket è già chiuso!",
+    "ticketCreatingTranscript": "> Creazione trascrizione...",
+    "ticketTranscriptCreated": "> Trascrizione creata! TRANSCRIPTURL",
+    "ticketOnlyRenamableByStaff": "Solo lo staff può rinominare i ticket!",
+    "ticketRenamed": "> Ticket rinominato in NEWNAME",
+    "ticketLimitReached": "Puoi avere solo TICKETLIMIT ticket aperti contemporaneamente!",
+    "noTickets": "Non hai accesso a nessun ticket",
+    "other": {
+        "openTicketButtonMSG": "Apri un ticket",
+        "deleteTicketButtonMSG": "Elimina ticket",
+        "selectTicketTypePlaceholder": "Seleziona un tipo di ticket",
+        "claimedBy": "**Richiesto Da**: USER",
+        "noReasonGiven": "Nessuna motivazione fornita",
+        "unavailable": "Non disponibile"
+    }
+}
