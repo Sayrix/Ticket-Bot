@@ -1,5 +1,4 @@
-//@TODO: Uncomment this line after typescript figure out a fix to @types/node error??!??
-//import readline from "readline";
+import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
 import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, Message} from "discord.js";
@@ -115,8 +114,7 @@ export default class ReadyEvent extends BaseEvent {
 		this.setStatus();
 		setInterval(()=>this.setStatus(), 9e5); // 15 minutes
 
-		//@TODO: Uncomment this line after typescript figure out a fix to @types/node error??!??
-		//readline.cursorTo(process.stdout, 0);
+		readline.cursorTo(process.stdout, 0);
 		process.stdout.write(
 			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${this.client.user?.tag}\x1b[0m (\x1b[37;46;1m${this.client.user?.id}\x1b[0m)
 		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
