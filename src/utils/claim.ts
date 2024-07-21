@@ -102,12 +102,16 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 	   await (interaction.channel as TextChannel | null)?.setName(newName).catch((e) => console.log(e));
    	}
 
+	// Move to claimed category when ticket is claimed
 	const categoryID = client.config.claimOption.categoryWhenClaimed;
 	if(categoryID && categoryID.trim() !== "") {
 		const category = await interaction.guild?.channels.fetch(categoryID);
 		if(category?.type !== ChannelType.GuildCategory)
 			return console.error("claim.ts: USER ERROR - Invalid categoryWhenClaimed ID. Channel must be a category.");
+		const oldPerm = (interaction.channel as TextChannel | null)?.permissionOverwrites.cache;
 		await (interaction.channel as TextChannel | null)?.setParent(category);
+		if(oldPerm)
+			await (interaction.channel as TextChannel | null)?.permissionOverwrites.set(oldPerm);
 	}
 };
 /*
