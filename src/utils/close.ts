@@ -4,6 +4,7 @@ import {
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
+	ChannelType,
 	Collection,
 	ColorResolvable,
 	CommandInteraction,
@@ -50,11 +51,18 @@ export async function close(
 	reason?: string,
 	deleteTicket: boolean = false
 ) {
+
+	if(!interaction.channel || interaction.channel.type !== ChannelType.GuildText)
+		return await interaction.reply({
+			content: "This command can only be used in a ticket channel.",
+			ephemeral: true
+		});
+
 	if (!client.config.closeOption.createTranscript) domain = client.locales.getSubValue("other", "unavailable");
 
 	const ticket = await client.prisma.tickets.findUnique({
 		where: {
-			channelid: interaction.channel?.id
+			channelid: interaction.channel.id
 		}
 	});
 	const ticketClosed = ticket?.closedat && ticket.closedby;
@@ -87,7 +95,7 @@ export async function close(
 			LogType: "ticketClose",
 			user: interaction.user,
 			ticketId: ticket.id,
-			ticketChannelId: interaction.channel?.id,
+			ticketChannelId: interaction.channel.id,
 			ticketCreatedAt: ticket.createdat,
 			reason: reason
 		},
@@ -99,7 +107,7 @@ export async function close(
 	const creator = ticket.creator;
 	const invited = JSON.parse(ticket.invited) as string[];
 
-	(interaction.channel as TextChannel | null)?.permissionOverwrites
+	interaction.channel.permissionOverwrites
 		.edit(creator, {
 			ViewChannel: false
 		})
@@ -108,8 +116,7 @@ export async function close(
 		(interaction.channel as TextChannel | null)?.permissionOverwrites
 			.edit(user, {
 				ViewChannel: false
-			})
-			.catch((e) => console.log(e));
+			});
 	});
 
 	interaction
