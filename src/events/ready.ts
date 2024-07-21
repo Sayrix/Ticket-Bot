@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";

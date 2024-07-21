@@ -5,14 +5,21 @@ Licensed under the Creative Commons Attribution 4.0 International
 please check https://creativecommons.org/licenses/by/4.0 for more informations.
 */
 
-import { APIButtonComponent, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import { APIButtonComponent, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember } from "discord.js";
 import { log } from "./logs";
 import {ExtendedClient, TicketType} from "../structure";
 
 export const claim = async(interaction: ButtonInteraction | CommandInteraction, client: ExtendedClient) => {
+	// Channel Sanity Checks to keep the code smaller ig?
+	if(!interaction.channel || interaction.channel.type !== ChannelType.GuildText)
+		return await interaction.reply({
+			content: "This command can only be used in a ticket channel.",
+			ephemeral: true
+		});
+
 	let ticket = await client.prisma.tickets.findUnique({
 		where: {
-			channelid: interaction.channel?.id
+			channelid: interaction.channel.id
 		}
 	});
 	const claimed = ticket?.claimedat && ticket.claimedby;
@@ -49,7 +56,7 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 			LogType: "ticketClaim",
 		    user: interaction.user,
 		    ticketId: ticket.id.toString(),
-		    ticketChannelId: interaction.channel?.id,
+		    ticketChannelId: interaction.channel.id,
 		    ticketCreatedAt: ticket.createdat,
 	   },
 	   client
@@ -61,11 +68,11 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 			claimedat: Date.now()
 		},
 		where: {
-			channelid: interaction.channel?.id,
+			channelid: interaction.channel.id,
 		}
 	});
 
-	const msg = await interaction.channel?.messages.fetch(ticket.messageid);
+	const msg = await interaction.channel.messages.fetch(ticket.messageid);
 	const oldEmbed = msg?.embeds[0].data;
 	const newEmbed = new EmbedBuilder(oldEmbed)
 		.setDescription(oldEmbed?.description + `\n\n ${client.locales.getSubValue("other", "claimedBy").replace("USER", `<@${interaction.user.id}>`)}`);
@@ -99,15 +106,19 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 			.replaceAll("S_USERID", interaction.user.id)
 			.replaceAll("U_USERID", creatorUser.id)
 			.replaceAll("TICKETCOUNT", ticket.id.toString());
-	   await (interaction.channel as TextChannel | null)?.setName(newName).catch((e) => console.log(e));
+	   await interaction.channel.setName(newName).catch((e) => console.log(e));
    	}
 
+	// Move to claimed category when ticket is claimed
 	const categoryID = client.config.claimOption.categoryWhenClaimed;
 	if(categoryID && categoryID.trim() !== "") {
 		const category = await interaction.guild?.channels.fetch(categoryID);
 		if(category?.type !== ChannelType.GuildCategory)
 			return console.error("claim.ts: USER ERROR - Invalid categoryWhenClaimed ID. Channel must be a category.");
-		await (interaction.channel as TextChannel | null)?.setParent(category);
+		const oldPerm = interaction.channel.permissionOverwrites.cache;
+		await interaction.channel.setParent(category);
+		if(oldPerm)
+			await interaction.channel.permissionOverwrites.set(oldPerm);
 	}
 };
 /*
