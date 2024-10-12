@@ -87,7 +87,8 @@ export default class ReadyEvent extends BaseEvent {
 				});
 			} else {
 				const channel = this.client.channels.cache.get(this.client.config.openTicketChannelId);
-				if(!channel || channel.type !== ChannelType.GuildText) return console.error("Invalid openTicketChannelId");
+				if(channel?.type !== ChannelType.GuildText) 
+					return console.error("Invalid openTicketChannelId");
 				channel.send({
 					embeds: [embed],
 					components: [row]
