@@ -147,6 +147,10 @@ export async function close(
 				components: [rowAction]
 			})
 			.catch((e) => console.log(e));
+		
+		// Workaround for type handling, rewrite should not follow this.
+		if(interaction.channel && interaction.channel.type !== ChannelType.GuildText) 
+			throw Error("Close util used in a non-text channel");
 
 		interaction.channel
 			?.send({
