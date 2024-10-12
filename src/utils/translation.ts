@@ -87,7 +87,7 @@ export class Translation {
 	getNoErrorSubValue(...keys: string[]): string | undefined {
 		try {
 			return this.getSubValue(...keys);
-		} catch(ex) {
+		} catch {
 			return;
 		}
 	}

@@ -14,6 +14,7 @@
 	"rules": {
 		"no-unused-vars": "warn",
 		"no-console": "off",
+		"@typescript-eslint/no-require-imports": "off",
 		"no-undef": "warn",
 		"no-constant-condition": "warn",
 		"indent": ["error", "tab"],
