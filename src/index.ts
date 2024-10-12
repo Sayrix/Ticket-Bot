@@ -14,7 +14,7 @@ import {ConfigType, ExtendedClient} from "./structure";
 
 // Initalize .env file as environment
 try {envconf();}
-catch(ex) {console.log(".env failed to load");}
+catch {console.log(".env failed to load");}
 
 // Although invalid type, it should be good enough for now until more stuff needs to be handled here
 process.on("unhandledRejection", (reason: string, promise: string, a: string) => {

@@ -1,7 +1,7 @@
 import readline from "readline";
 import axios from "axios";
 import {client as WebSocketClient, connection} from "websocket";
-import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, Message} from "discord.js";
+import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ColorResolvable, EmbedBuilder, Message} from "discord.js";
 import os from "os";
 import {BaseEvent, ExtendedClient, SponsorType} from "../structure";
 
@@ -87,7 +87,8 @@ export default class ReadyEvent extends BaseEvent {
 				});
 			} else {
 				const channel = this.client.channels.cache.get(this.client.config.openTicketChannelId);
-				if(!channel || !channel.isTextBased()) return console.error("Invalid openTicketChannelId");
+				if(channel?.type !== ChannelType.GuildText) 
+					return console.error("Invalid openTicketChannelId");
 				channel.send({
 					embeds: [embed],
 					components: [row]
