@@ -193,8 +193,11 @@ export default class ReadyEvent extends BaseEvent {
 			case "WATCHING":
 				type = 3;
 				break;
-			case "COMPETING":
+			case "CUSTOM":
 				type = 4;
+				break;
+			case "COMPETING":
+				type = 5;
 				break;
 			}
 
