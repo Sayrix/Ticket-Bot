@@ -5,7 +5,7 @@ Licensed under the Creative Commons Attribution 4.0 International
 please check https://creativecommons.org/licenses/by/4.0 for more informations.
 */
 
-import { APIButtonComponent, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember } from "discord.js";
+import { APIButtonComponent, ActionRow, ActionRowBuilder, ButtonBuilder, ButtonInteraction, ChannelType, CommandInteraction, EmbedBuilder, GuildMember, MessageActionRowComponent } from "discord.js";
 import { log } from "./logs";
 import {ExtendedClient, TicketType} from "../structure";
 
@@ -78,12 +78,11 @@ export const claim = async(interaction: ButtonInteraction | CommandInteraction, 
 		.setDescription(oldEmbed?.description + `\n\n ${client.locales.getSubValue("other", "claimedBy").replace("USER", `<@${interaction.user.id}>`)}`);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	msg?.components[0].components.map((x) => {
+	(msg?.components[0] as ActionRow<MessageActionRowComponent>)?.components.map((x) => {
 		const btnBuilder = new ButtonBuilder(x.data as APIButtonComponent);
 	   	if (x.customId === "claim") btnBuilder.setDisabled(true);
 		row.addComponents(btnBuilder);
 	});
-
    	msg?.edit({
 		   content: msg.content,
 		   embeds: [newEmbed],

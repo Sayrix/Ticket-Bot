@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+	ActionRow,
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonInteraction,
@@ -12,6 +13,7 @@ import {
 	EmbedBuilder,
 	GuildMember,
 	Message,
+	MessageActionRowComponent,
 	ModalSubmitInteraction,
 	TextChannel
 } from "discord.js";
@@ -132,7 +134,7 @@ export async function close(
 		const embed = new EmbedBuilder(msg?.embeds[0].data);
 
 		const rowAction = new ActionRowBuilder<ButtonBuilder>();
-		msg?.components[0]?.components?.map((x) => {
+		(msg?.components[0] as ActionRow<MessageActionRowComponent>)?.components?.map((x) => {
 			if (x.type !== ComponentType.Button) return;
 			const builder = new ButtonBuilder(x.data);
 			if (x.customId === "close") builder.setDisabled(true);
