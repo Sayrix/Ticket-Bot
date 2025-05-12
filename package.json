@@ -44,7 +44,7 @@
     "@types/better-sqlite3": "^7.6.5",
     "@types/fs-extra": "^11.0.3",
     "@types/node": "^22.7.5",
-    "@types/pg": "^8.10.7",
+    "@types/pg": "^8.15.1",
     "@types/websocket": "^1.0.8",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
