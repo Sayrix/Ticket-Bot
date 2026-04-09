@@ -1,0 +1,54 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"useConst": "error",
+				"noNonNullAssertion": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "off",
+				"noAsyncPromiseExecutor": "off",
+				"noUnknownAtRules": {
+					"level": "off",
+					"options": {
+						"ignore": ["theme"]
+					}
+				}
+			}
+		},
+		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 130,
+		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+	},
+	"html": {
+		"formatter": {
+			"enabled": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"trailingCommas": "none"
+		},
+		"globals": ["Bun"]
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		},
+		"formatter": {
+			"enabled": false
+		}
+	},
+	"files": {
+		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+	}
+}
