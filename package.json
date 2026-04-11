@@ -1,6 +1,7 @@
 {
 	"name": "ticket-bot",
 	"version": "4.0.0",
+	"license": "AGPL-3.0-only",
 	"description": "Open-source Discord ticket bot.",
 	"main": "src/index.ts",
 	"scripts": {
