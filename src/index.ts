@@ -1,4 +1,23 @@
-import "dotenv/config";
-import { drizzle } from "drizzle-orm/libsql";
+import { config } from "dotenv";
+import { createBotApp } from "@/app";
 
-const db = drizzle(process.env.DB_FILE_NAME);
+config({ path: "./config/.env" });
+
+async function main() {
+	const { start, stop } = await createBotApp();
+
+	process.on("SIGINT", () => {
+		void stop().finally(() => process.exit(0));
+	});
+
+	process.on("SIGTERM", () => {
+		void stop().finally(() => process.exit(0));
+	});
+
+	await start();
+}
+
+main().catch(async (error) => {
+	console.error("[boot] Failed to start bot", error);
+	process.exit(1);
+});
