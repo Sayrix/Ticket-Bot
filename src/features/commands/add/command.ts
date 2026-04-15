@@ -1,0 +1,82 @@
+import { MessageFlags } from "@discordjs/core";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
+import { getUserOption } from "@/features/commands/shared/options";
+import { defineCommand } from "@/core/defineCommand";
+import { reply } from "@/core/respond";
+import {
+	getInvitedUserIds,
+	grantTicketParticipantAccess,
+	MAX_INVITED_TICKET_USERS,
+	updateInvitedUserIds
+} from "@/features/tickets/participants";
+import { getOpenTicketByChannel } from "@/features/tickets/records";
+
+export default defineCommand({
+	data: {
+		name: "add",
+		description: "Add someone to the current ticket",
+		options: [
+			{
+				name: "user",
+				description: "The user to add",
+				required: true,
+				type: ApplicationCommandOptionType.User
+			}
+		]
+	},
+	async execute({ app }, interaction) {
+		const selectedUser = getUserOption(interaction, "user");
+
+		if (!selectedUser) {
+			await reply(app, interaction, {
+				content: "Choose a user to add to this ticket.",
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		const openTicket = await getOpenTicketByChannel(app, interaction.channel_id);
+
+		if (!openTicket.ok) {
+			await reply(app, interaction, {
+				content: openTicket.message,
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		const invitedUserIds = getInvitedUserIds(openTicket.ticket);
+
+		if (selectedUser.userId === openTicket.ticket.createdBy) {
+			await reply(app, interaction, {
+				content: "That user already has access to this ticket.",
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		if (invitedUserIds.includes(selectedUser.userId)) {
+			await reply(app, interaction, {
+				content: "That user is already invited to this ticket.",
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		if (invitedUserIds.length >= MAX_INVITED_TICKET_USERS) {
+			await reply(app, interaction, {
+				content: `You cannot invite more than ${MAX_INVITED_TICKET_USERS} users to one ticket.`,
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		await grantTicketParticipantAccess(app, openTicket.ticket.channelId, selectedUser.userId);
+		await updateInvitedUserIds(app, openTicket.ticket.channelId, [...invitedUserIds, selectedUser.userId]);
+
+		await reply(app, interaction, {
+			content: `Added <@${selectedUser.userId}> to this ticket.`,
+			flags: MessageFlags.Ephemeral
+		});
+	}
+});
