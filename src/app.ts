@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 import { WebSocketManager } from "@discordjs/ws";
 import { drizzle } from "drizzle-orm/libsql";
-import { discoverEvents, discoverFeatures } from "@/core/discovery";
+import { discoverCommands, discoverEvents, discoverFeatures } from "@/core/discovery";
 import { createLogger } from "@/core/logger";
 import { createHandlerRegistry, registerEvents } from "@/core/registry";
 import { InteractionRouter } from "@/core/router";
@@ -21,12 +21,17 @@ export async function createBotApp() {
 	});
 
 	const client = new Client({ rest, gateway: gateway as never });
-	const [events, features] = await Promise.all([discoverEvents(logger), discoverFeatures(logger)]);
-	const registry = createHandlerRegistry({ features, events, logger });
+	const [commands, events, features] = await Promise.all([
+		discoverCommands(logger),
+		discoverEvents(logger),
+		discoverFeatures(logger)
+	]);
+	const registry = createHandlerRegistry({ commands, features, events, logger });
 
 	const app = {} as BotApp;
 	app.client = client;
 	app.db = db;
+	app.config = botConfig;
 	app.logger = logger;
 	app.applicationId = botConfig.clientId;
 	app.registry = registry;

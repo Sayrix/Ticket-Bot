@@ -2,11 +2,25 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { Logger } from "@/core/logger";
-import type { EventModule, FeatureModule } from "@/core/types";
+import type { CommandModule, EventModule, FeatureModule } from "@/core/types";
 
 const srcDirectory = fileURLToPath(new URL("..", import.meta.url));
 const featuresDirectory = join(srcDirectory, "features");
 const eventsDirectory = join(srcDirectory, "events");
+
+function isCommandModule(value: unknown): value is CommandModule {
+	return (
+		typeof value === "object" &&
+		value !== null &&
+		"data" in value &&
+		typeof value.data === "object" &&
+		value.data !== null &&
+		"name" in value.data &&
+		typeof value.data.name === "string" &&
+		"execute" in value &&
+		typeof value.execute === "function"
+	);
+}
 
 function isFeatureModule(value: unknown): value is FeatureModule {
 	return typeof value === "object" && value !== null && "key" in value && typeof value.key === "string";
@@ -79,6 +93,16 @@ export async function discoverFeatures(logger: Logger) {
 		isFeatureModule,
 		logger,
 		"features"
+	);
+}
+
+export async function discoverCommands(logger: Logger) {
+	return importModules(
+		featuresDirectory,
+		(filePath) => isModuleFile(filePath) && (filePath.endsWith("command.ts") || filePath.endsWith("command.js")),
+		isCommandModule,
+		logger,
+		"commands"
 	);
 }
 

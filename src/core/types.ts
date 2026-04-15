@@ -8,6 +8,7 @@ import type {
 } from "@discordjs/core";
 import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { drizzle } from "drizzle-orm/libsql";
+import type { AnyVersionedConfig } from "@/config/index";
 import type { ParsedCustomId } from "@/core/custom-id";
 import type { Logger } from "@/core/logger";
 
@@ -17,23 +18,17 @@ export type RoutedInteraction =
 	| APIMessageComponentInteraction
 	| APIModalSubmitInteraction;
 
-export interface SlashCommandDefinition {
+export interface CommandModule {
 	data: RESTPostAPIChatInputApplicationCommandsJSONBody;
-	execute(context: FeatureContext, interaction: APIChatInputApplicationCommandInteraction): Promise<void>;
-	autocomplete?(context: FeatureContext, interaction: APIApplicationCommandAutocompleteInteraction): Promise<void>;
+	execute(context: CommandExecutionContext, interaction: APIChatInputApplicationCommandInteraction): Promise<void>;
+	autocomplete?(context: CommandExecutionContext, interaction: APIApplicationCommandAutocompleteInteraction): Promise<void>;
 }
 
 export interface FeatureModule {
 	key: string;
-	commands?: SlashCommandDefinition[];
 	buttons?: Record<string, ButtonHandler>;
 	stringSelects?: Record<string, StringSelectHandler>;
 	modals?: Record<string, ModalHandler>;
-}
-
-export interface RegisteredCommand {
-	command: SlashCommandDefinition;
-	feature: FeatureModule;
 }
 
 export interface EventModule<TArgs extends unknown[] = unknown[]> {
@@ -45,7 +40,7 @@ export interface EventModule<TArgs extends unknown[] = unknown[]> {
 export interface HandlerRegistry {
 	events: EventModule[];
 	features: Map<string, FeatureModule>;
-	commands: Map<string, RegisteredCommand>;
+	commands: Map<string, CommandModule>;
 	applicationCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[];
 }
 
@@ -56,6 +51,7 @@ export interface InteractionRouterContract {
 export interface BotApp {
 	client: Client;
 	db: ReturnType<typeof drizzle>;
+	config: AnyVersionedConfig;
 	applicationId: string;
 	logger: Logger;
 	registry: HandlerRegistry;
@@ -65,6 +61,10 @@ export interface BotApp {
 export interface FeatureContext {
 	app: BotApp;
 	feature: FeatureModule;
+}
+
+export interface CommandExecutionContext {
+	app: BotApp;
 }
 
 export interface ComponentExecutionContext extends FeatureContext {

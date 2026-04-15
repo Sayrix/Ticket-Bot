@@ -12,15 +12,29 @@ type ReplyableInteraction =
 	| APIMessageComponentInteraction
 	| APIModalSubmitInteraction;
 
+type ModalCapableInteraction = APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction;
+
 export async function reply(app: BotApp, interaction: ReplyableInteraction, body: any) {
 	return app.client.api.interactions.reply(interaction.id, interaction.token, body);
+}
+
+export async function deferReply(app: BotApp, interaction: ReplyableInteraction, body?: any) {
+	return app.client.api.interactions.defer(interaction.id, interaction.token, body);
+}
+
+export async function editReply(app: BotApp, interaction: ReplyableInteraction, body: any) {
+	return app.client.api.interactions.editReply(app.applicationId, interaction.token, body);
+}
+
+export async function followUp(app: BotApp, interaction: ReplyableInteraction, body: any) {
+	return app.client.api.interactions.followUp(app.applicationId, interaction.token, body);
 }
 
 export async function updateMessage(app: BotApp, interaction: APIMessageComponentInteraction, body: any) {
 	return app.client.api.interactions.updateMessage(interaction.id, interaction.token, body);
 }
 
-export async function showModal(app: BotApp, interaction: APIMessageComponentInteraction, body: any) {
+export async function showModal(app: BotApp, interaction: ModalCapableInteraction, body: any) {
 	return app.client.api.interactions.createModal(interaction.id, interaction.token, body);
 }
 

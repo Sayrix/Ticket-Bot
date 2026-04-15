@@ -2,6 +2,13 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // NOTE: Columns that does not have notNull constraint ARE nullable.
 
+export const panelMessagesTable = sqliteTable("panel_messages", {
+	panelKey: text().primaryKey(),
+	channelId: text().notNull(),
+	messageId: text().notNull(),
+	updatedAt: int().notNull()
+});
+
 export const ticketsTable = sqliteTable("tickets", {
 	id: int().primaryKey({ autoIncrement: true }),
 	/** The ID of the channel where the ticket was created. */
@@ -19,9 +26,12 @@ export const ticketsTable = sqliteTable("tickets", {
 	/** UNIX time */
 	claimedAt: int(),
 	claimedBy: text(),
+	invitedUserIds: text().notNull().default("[]"),
 	/** UNIX time */
 	closedAt: int(),
 	closedBy: text(),
 	closedReason: text(),
 	transcriptUrl: text()
 });
+
+export type TicketRecord = typeof ticketsTable.$inferSelect;

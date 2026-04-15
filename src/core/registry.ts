@@ -1,15 +1,16 @@
 import type { Logger } from "@/core/logger";
-import type { BotApp, EventModule, FeatureModule, HandlerRegistry, RegisteredCommand } from "@/core/types";
+import type { BotApp, CommandModule, EventModule, FeatureModule, HandlerRegistry } from "@/core/types";
 
 interface CreateHandlerRegistryInput {
+	commands: CommandModule[];
 	events: EventModule[];
 	features: FeatureModule[];
 	logger: Logger;
 }
 
-export function createHandlerRegistry({ events, features, logger }: CreateHandlerRegistryInput): HandlerRegistry {
+export function createHandlerRegistry({ commands, events, features, logger }: CreateHandlerRegistryInput): HandlerRegistry {
 	const featureMap = new Map<string, FeatureModule>();
-	const commandMap = new Map<string, RegisteredCommand>();
+	const commandMap = new Map<string, CommandModule>();
 
 	for (const feature of features) {
 		if (featureMap.has(feature.key)) {
@@ -17,17 +18,14 @@ export function createHandlerRegistry({ events, features, logger }: CreateHandle
 		}
 
 		featureMap.set(feature.key, feature);
+	}
 
-		for (const command of feature.commands ?? []) {
-			if (commandMap.has(command.data.name)) {
-				throw new Error(`Duplicate slash command "${command.data.name}" detected.`);
-			}
-
-			commandMap.set(command.data.name, {
-				command,
-				feature
-			});
+	for (const command of commands) {
+		if (commandMap.has(command.data.name)) {
+			throw new Error(`Duplicate slash command "${command.data.name}" detected.`);
 		}
+
+		commandMap.set(command.data.name, command);
 	}
 
 	logger.info(`Registered ${featureMap.size} feature modules.`);
@@ -36,7 +34,7 @@ export function createHandlerRegistry({ events, features, logger }: CreateHandle
 		events,
 		features: featureMap,
 		commands: commandMap,
-		applicationCommands: [...commandMap.values()].map(({ command }) => command.data)
+		applicationCommands: [...commandMap.values()].map((command) => command.data)
 	};
 }
 

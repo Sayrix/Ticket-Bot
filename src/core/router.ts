@@ -8,7 +8,7 @@ import type {
 import { ApplicationCommandType, ComponentType, InteractionType } from "@discordjs/core";
 import { parseCustomId } from "@/core/custom-id";
 import { replyWithError } from "@/core/respond";
-import type { BotApp, ComponentExecutionContext, FeatureContext, RoutedInteraction } from "@/core/types";
+import type { BotApp, CommandExecutionContext, ComponentExecutionContext, RoutedInteraction } from "@/core/types";
 
 function isChatInputCommand(
 	interaction: APIApplicationCommandInteraction
@@ -58,34 +58,32 @@ export class InteractionRouter {
 	}
 
 	private async handleSlashCommand(interaction: APIChatInputApplicationCommandInteraction) {
-		const registeredCommand = this.app.registry.commands.get(interaction.data.name);
+		const command = this.app.registry.commands.get(interaction.data.name);
 
-		if (!registeredCommand) {
+		if (!command) {
 			this.app.logger.warn(`No slash command registered for "${interaction.data.name}".`);
 			return;
 		}
 
-		const context: FeatureContext = {
-			app: this.app,
-			feature: registeredCommand.feature
+		const context: CommandExecutionContext = {
+			app: this.app
 		};
 
-		await registeredCommand.command.execute(context, interaction);
+		await command.execute(context, interaction);
 	}
 
 	private async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction) {
-		const registeredCommand = this.app.registry.commands.get(interaction.data.name);
+		const command = this.app.registry.commands.get(interaction.data.name);
 
-		if (!registeredCommand?.command.autocomplete) {
+		if (!command?.autocomplete) {
 			return;
 		}
 
-		const context: FeatureContext = {
-			app: this.app,
-			feature: registeredCommand.feature
+		const context: CommandExecutionContext = {
+			app: this.app
 		};
 
-		await registeredCommand.command.autocomplete(context, interaction);
+		await command.autocomplete(context, interaction);
 	}
 
 	private async handleMessageComponent(interaction: APIMessageComponentInteraction) {
