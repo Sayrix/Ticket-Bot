@@ -5,19 +5,22 @@
 	"description": "Open-source Discord ticket bot.",
 	"main": "src/index.ts",
 	"scripts": {
-		"start": "bun src/index.ts",
-		"deploy:commands": "bun src/deploy-commands.ts",
 		"typecheck": "tsgo --noEmit",
+		"i18n": "bunx typesafe-i18n --no-watch",
+		"lint": "biome lint",
 		"format": "biome format",
 		"format:fix": "biome format --write",
-		"lint": "biome lint",
-		"i18n": "bunx typesafe-i18n --no-watch"
+		"drizzle:push": "bunx drizzle-kit push",
+		"deploy:commands": "bun src/deploy-commands.ts",
+		"start": "bun src/index.ts"
 	},
 	"dependencies": {
 		"@discordjs/core": "2.4.0",
 		"@discordjs/rest": "^2.6.1",
 		"@discordjs/ws": "^2.0.4",
 		"@libsql/client": "^0.17.2",
+		"@ticketpm/core": "^0.0.6",
+		"@ticketpm/discord-api": "^0.0.6",
 		"discord-api-types": "^0.38.44",
 		"dotenv": "^17.4.1",
 		"drizzle-orm": "^0.45.2",

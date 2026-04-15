@@ -12,7 +12,6 @@
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
-		"baseUrl": ".",
 		"ignoreDeprecations": "6.0",
 
 		// Best practices
