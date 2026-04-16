@@ -1,12 +1,12 @@
 import { ComponentType } from "@discordjs/core";
-import { createMessageSlot } from "@/features/tickets/messages";
+import { createMessageSlot, createRuntimeTextSlot } from "@/features/tickets/messages";
 import type { LoadedMessageTemplate } from "@/features/tickets/types";
 
 const ticketOpenedMessage: LoadedMessageTemplate = {
 	components: [
 		{
 			type: ComponentType.TextDisplay,
-			content: "{createdByMention}"
+			content: "{createdByMention}{staffMentions}"
 		},
 		{
 			type: ComponentType.Container,
@@ -24,6 +24,7 @@ const ticketOpenedMessage: LoadedMessageTemplate = {
 					type: ComponentType.TextDisplay,
 					content: "**Details**\n{reason}"
 				},
+				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
 					content: "**Claim Status**\n{claimStatus}"

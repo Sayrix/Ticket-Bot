@@ -31,6 +31,10 @@ export function createPanelOpenerSlot() {
 	return createMessageSlot("panel-opener");
 }
 
+export function createRuntimeTextSlot() {
+	return createMessageSlot("runtime-text");
+}
+
 export async function loadMessageTemplate(
 	reference: string,
 	tokens?: Record<string, string | undefined>
@@ -49,7 +53,13 @@ export function finalizeMessageTemplate(payload: LoadedMessageTemplate) {
 	return sanitizeMessageTemplate(applyComponentsV2Defaults(payload));
 }
 
-export function appendMessageText(payload: LoadedMessageTemplate, text: string | undefined) {
+export function appendMessageText(
+	payload: LoadedMessageTemplate,
+	text: string | undefined,
+	options?: {
+		slot?: string;
+	}
+) {
 	const normalizedText = text?.trim();
 
 	if (!normalizedText) {
@@ -64,7 +74,7 @@ export function appendMessageText(payload: LoadedMessageTemplate, text: string |
 				type: ComponentType.TextDisplay,
 				content: normalizedText
 			}
-		]);
+		], options?.slot);
 	}
 
 	return {

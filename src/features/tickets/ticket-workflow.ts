@@ -43,6 +43,11 @@ import type {
 } from "@/features/tickets/types";
 import { getInteractionUser, getMemberRoleIds, renderChannelName, renderTemplate } from "@/features/tickets/utils";
 
+interface TicketOpenReasonData {
+	answers: string[];
+	combined: string;
+}
+
 export async function handleOpenFormSubmit(context: ComponentExecutionContext, interaction: APIModalSubmitInteraction) {
 	const ticketTypeKey = context.route.state[0];
 
@@ -53,7 +58,7 @@ export async function handleOpenFormSubmit(context: ComponentExecutionContext, i
 	const ticketType = getTicketType(context.app, ticketTypeKey);
 	const questions = ticketType.openForm?.questions ?? [];
 	const answers = extractSubmittedValues(interaction);
-	const reason = questions.length > 0 ? formatQuestionAnswers(questions, answers) : DEFAULT_NO_REASON;
+	const reason = questions.length > 0 ? createTicketOpenReason(questions, answers) : createDefaultTicketOpenReason();
 
 	await createTicket(context.app, interaction, ticketTypeKey, ticketType, reason);
 }
@@ -108,13 +113,13 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 	if (interaction.data.component_type === ComponentType.StringSelect) {
 		// Update the open panel message so that it resets the selection of the user, letting them open another ticket later.
 		await updateMessage(app, interaction, {});
-		await createTicket(app, interaction, context.ticketTypeKey, ticketType, DEFAULT_NO_REASON, {
+		await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(), {
 			responseMode: "follow-up"
 		});
 		return;
 	}
 
-	await createTicket(app, interaction, context.ticketTypeKey, ticketType, DEFAULT_NO_REASON);
+	await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason());
 }
 
 async function createTicket(
@@ -122,7 +127,7 @@ async function createTicket(
 	interaction: APIMessageComponentInteraction | APIModalSubmitInteraction,
 	ticketTypeKey: string,
 	ticketType: TicketTypeConfig,
-	reason: string,
+	reason: TicketOpenReasonData,
 	options?: {
 		responseMode?: "deferred-reply" | "follow-up";
 	}
@@ -149,17 +154,16 @@ async function createTicket(
 		parent_id: ticketType.categoryId,
 		permission_overwrites: buildTicketPermissionOverwrites(app, user.id, ticketType)
 	});
-
-	const tokens: TicketRenderTokens = {
+	const tokens = createTicketRenderTokens({
 		channelId: channel.id,
 		createdByMention: `<@${user.id}>`,
-		reason,
+		openReason: reason,
 		ticketNumber,
 		ticketTypeKey,
 		ticketTypeName: ticketType.name,
 		userId: user.id,
 		username: user.username
-	};
+	});
 
 	const ticketMessage = await app.client.api.channels.createMessage(
 		channel.id,
@@ -171,7 +175,7 @@ async function createTicket(
 		channelId: channel.id,
 		creationMessageId: ticketMessage.id,
 		type: ticketTypeKey,
-		reason,
+		reason: serializeTicketOpenReason(reason),
 		createdBy: user.id,
 		createdAt: Date.now(),
 		invitedUserIds: "[]"
@@ -220,19 +224,18 @@ export async function buildTicketWelcomeMessage(
 	const closeButtonCustomId = createCustomId("tickets", "close");
 	const claimButtonCustomId = createCustomId("tickets", "claim");
 	const unclaimButtonCustomId = createCustomId("tickets", "unclaim");
+	const roleMentions = app.config.tickets.mentionRoleIds.map((roleId) => `<@&${roleId}>`);
+	const renderedTokens = {
+		...tokens,
+		closeButtonCustomId,
+		staffMentions: roleMentions.length ? ` ${roleMentions.join(" ")}` : ""
+	};
 	const messageTemplate = messageReference
-		? await loadMessageTemplate(messageReference, {
-				...tokens,
-				closeButtonCustomId
-			})
+		? await loadMessageTemplate(messageReference, renderedTokens)
 		: {};
 	const configuredContent = ticketType.welcomeContent ?? app.config.tickets.defaultWelcomeContent;
-	const roleMentions = app.config.tickets.mentionRoleIds.map((roleId) => `<@&${roleId}>`);
-	const runtimeText = [configuredContent ? renderTemplate(configuredContent, tokens) : undefined, ...roleMentions]
-		.filter((part): part is string => Boolean(part?.trim()))
-		.join("\n")
-		.trim();
-	const withRuntimeText = appendMessageText(messageTemplate, runtimeText);
+	const runtimeText = configuredContent ? renderTemplate(configuredContent, renderedTokens) : undefined;
+	const withRuntimeText = appendMessageText(messageTemplate, runtimeText, { slot: "runtime-text" });
 	const buttons = buildTicketActionButtons(app, withRuntimeText, {
 		closeButtonCustomId,
 		claimButtonCustomId,
@@ -254,19 +257,19 @@ export async function buildTicketWelcomeMessage(
 
 export async function syncTicketWelcomeMessage(app: BotApp, ticket: TicketRecord, ticketType = getTicketType(app, ticket.type)) {
 	const creator = await app.client.api.users.get(ticket.createdBy).catch(() => null);
-	const tokens: TicketRenderTokens = {
+	const tokens = createTicketRenderTokens({
 		channelId: ticket.channelId,
 		claimStatus: formatClaimStatus(ticket.claimedBy),
 		claimerId: ticket.claimedBy ?? undefined,
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : undefined,
 		createdByMention: `<@${ticket.createdBy}>`,
-		reason: ticket.reason ?? DEFAULT_NO_REASON,
+		openReason: parseStoredTicketOpenReason(ticket.reason),
 		ticketNumber: ticket.id.toString(),
 		ticketTypeKey: ticket.type,
 		ticketTypeName: ticketType.name,
 		userId: ticket.createdBy,
 		username: creator?.username ?? ticket.createdBy
-	};
+	});
 	const message = await buildTicketWelcomeMessage(app, ticketType, tokens);
 
 	await app.client.api.channels.editMessage(ticket.channelId, ticket.creationMessageId, message);
@@ -398,11 +401,106 @@ function extractSubmittedValues(interaction: APIModalSubmitInteraction) {
 	return values;
 }
 
-function formatQuestionAnswers(questions: TicketQuestionConfig[], answers: Map<string, string>) {
-	const lines = questions.map((question) => `${question.label}: ${answers.get(question.key)?.trim() || DEFAULT_NO_REASON}`);
+function createDefaultTicketOpenReason(): TicketOpenReasonData {
+	return {
+		answers: [],
+		combined: DEFAULT_NO_REASON
+	};
+}
+
+function createTicketOpenReason(questions: TicketQuestionConfig[], answers: Map<string, string>): TicketOpenReasonData {
+	const normalizedAnswers = questions.map((question) => normalizeAnswer(answers.get(question.key)));
+
+	return {
+		answers: normalizedAnswers,
+		combined: formatQuestionAnswers(questions, normalizedAnswers)
+	};
+}
+
+function createTicketRenderTokens(input: {
+	channelId?: string;
+	claimStatus?: string;
+	claimerId?: string;
+	claimerMention?: string;
+	createdByMention?: string;
+	openReason: TicketOpenReasonData;
+	ticketNumber: string;
+	ticketTypeKey: string;
+	ticketTypeName: string;
+	userId: string;
+	username: string;
+}) {
+	const tokens: TicketRenderTokens = {
+		channelId: input.channelId,
+		claimStatus: input.claimStatus ?? formatClaimStatus(input.claimerId ?? null),
+		claimerId: input.claimerId,
+		claimerMention: input.claimerMention,
+		createdByMention: input.createdByMention,
+		reason: input.openReason.combined,
+		ticketNumber: input.ticketNumber,
+		ticketTypeKey: input.ticketTypeKey,
+		ticketTypeName: input.ticketTypeName,
+		userId: input.userId,
+		username: input.username
+	};
+
+	for (const [index, answer] of input.openReason.answers.entries()) {
+		const placeholderNumber = (index + 1).toString();
+
+		tokens[`reason${placeholderNumber}`] = answer;
+	}
+
+	return tokens;
+}
+
+function formatQuestionAnswers(questions: TicketQuestionConfig[], answers: string[]) {
+	const lines = questions.map((question, index) => `${question.label}: ${answers[index] ?? DEFAULT_NO_REASON}`);
 	return lines.join("\n");
 }
 
 function formatClaimStatus(claimedBy: string | null) {
 	return claimedBy ? `Claimed by <@${claimedBy}>` : "Unclaimed";
+}
+
+function normalizeAnswer(answer: string | undefined) {
+	return answer?.trim() || DEFAULT_NO_REASON;
+}
+
+function serializeTicketOpenReason(reason: TicketOpenReasonData) {
+	if (!reason.answers.length) {
+		return reason.combined;
+	}
+
+	return JSON.stringify({
+		answers: reason.answers,
+		combined: reason.combined,
+		version: 1
+	});
+}
+
+function parseStoredTicketOpenReason(reason: string | null | undefined): TicketOpenReasonData {
+	if (!reason) {
+		return createDefaultTicketOpenReason();
+	}
+
+	try {
+		const parsed = JSON.parse(reason) as Partial<TicketOpenReasonData> & { version?: number };
+
+		if (parsed.version !== 1 || !Array.isArray(parsed.answers) || typeof parsed.combined !== "string") {
+			return {
+				answers: [],
+				combined: reason
+			};
+		}
+
+		return {
+			answers: parsed.answers.map((answer) => normalizeAnswer(typeof answer === "string" ? answer : undefined)),
+			combined: parsed.combined
+		};
+	} catch {
+		return {
+			answers: [],
+			combined: reason
+		};
+	}
 }
