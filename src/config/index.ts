@@ -69,6 +69,10 @@ interface ConfigV0_0_1 {
 			channelNameTemplate?: string;
 			message?: string;
 			welcomeContent?: string;
+			close?: {
+				channelMessage?: string;
+				dmMessage?: string;
+			};
 			blockedRoleIds?: string[];
 			staffRoleIds?: string[];
 			openForm?: {

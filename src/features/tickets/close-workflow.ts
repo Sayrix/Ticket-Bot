@@ -164,7 +164,7 @@ async function closeTicket(
 	const status = createCloseStatusUpdater(app, interaction);
 	await status.start(app.config.tickets.close.createTranscript ? "Preparing transcript..." : "Closing ticket...");
 
-	const { ticket } = closable;
+	const { ticket, ticketType } = closable;
 	const closer = getInteractionUser(interaction);
 	const normalizedReason = normalizeCloseReason(reason);
 
@@ -223,7 +223,7 @@ async function closeTicket(
 
 	if (app.config.tickets.close.dmUserOnClose) {
 		await status.update("Sending close confirmation...");
-		await sendCloseDm(app, ticket.createdBy, closeMessageTokens);
+		await sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens);
 	}
 
 	if (app.config.tickets.close.deleteChannelOnClose) {
@@ -237,7 +237,7 @@ async function closeTicket(
 	}
 
 	await status.update("Posting close summary...");
-	await app.client.api.channels.createMessage(ticket.channelId, await buildCloseChannelMessage(app, closeMessageTokens));
+	await app.client.api.channels.createMessage(ticket.channelId, await buildCloseChannelMessage(app, ticketType, closeMessageTokens));
 
 	await status.update("Ticket closed.");
 }
@@ -383,6 +383,7 @@ async function moveClosedTicketChannel(app: BotApp, channelId: string) {
 async function sendCloseDm(
 	app: BotApp,
 	userId: string,
+	ticketType: ReturnType<typeof getTicketType>,
 	tokens: {
 		channelId: string;
 		closerId: string;
@@ -400,7 +401,7 @@ async function sendCloseDm(
 		return;
 	}
 
-	const messageTemplate = await loadMessageTemplate(app.config.tickets.close.dmMessage ?? DEFAULT_CLOSE_DM_MESSAGE, tokens);
+	const messageTemplate = await loadMessageTemplate(resolveCloseDmMessageReference(app, ticketType), tokens);
 
 	await app.client.api.channels
 		.createMessage(dmChannel.id, {
@@ -411,6 +412,7 @@ async function sendCloseDm(
 
 async function buildCloseChannelMessage(
 	app: BotApp,
+	ticketType: ReturnType<typeof getTicketType>,
 	tokens: {
 		channelId: string;
 		closerId: string;
@@ -426,10 +428,13 @@ async function buildCloseChannelMessage(
 	}
 ) {
 	const deleteButtonCustomId = createCustomId("tickets", "delete-closed");
-	const messageTemplate = await loadMessageTemplate(app.config.tickets.close.channelMessage ?? DEFAULT_CLOSE_CHANNEL_MESSAGE, {
-		...tokens,
-		deleteButtonCustomId
-	});
+	const messageTemplate = await loadMessageTemplate(
+		resolveCloseChannelMessageReference(app, ticketType),
+		{
+			...tokens,
+			deleteButtonCustomId
+		}
+	);
 
 	return finalizeMessageTemplate(
 		appendMessageButton(
@@ -444,6 +449,14 @@ async function buildCloseChannelMessage(
 				: undefined
 		)
 	);
+}
+
+function resolveCloseDmMessageReference(app: BotApp, ticketType: ReturnType<typeof getTicketType>) {
+	return ticketType.close?.dmMessage ?? app.config.tickets.close.dmMessage ?? DEFAULT_CLOSE_DM_MESSAGE;
+}
+
+function resolveCloseChannelMessageReference(app: BotApp, ticketType: ReturnType<typeof getTicketType>) {
+	return ticketType.close?.channelMessage ?? app.config.tickets.close.channelMessage ?? DEFAULT_CLOSE_CHANNEL_MESSAGE;
 }
 
 function createCloseStatusUpdater(

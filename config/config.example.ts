@@ -50,7 +50,10 @@ export default defineConfig("0.0.1", {
 		blockedRoleIds: ["222222222222222222"],
 		// Roles mentioned in the welcome message when a ticket is opened.
 		mentionRoleIds: ["333333333333333333"],
-		// Message template path inside the messages directory.
+		// Fallback open-ticket template path inside the messages directory.
+		// Create your own file under messages/ and point a ticket type at it.
+		// Example file: messages/tickets/ticket-opened-billing.ts
+		// Example config path: "tickets/ticket-opened-billing"
 		defaultWelcomeMessage: "tickets/ticket-opened",
 		// Optional plain text appended to the welcome message template.
 		// Available parameters here:
@@ -99,9 +102,11 @@ export default defineConfig("0.0.1", {
 			// Optional category for closed tickets when the channel is not deleted.
 			// Leave blank to keep the ticket where it is.
 			closeTicketCategoryId: "666666666666666666",
-			// Message template path used for the DM sent on close.
+			// Global fallback template path for the DM sent on close.
+			// A ticket type can override this with ticketTypes.<key>.close.dmMessage.
 			dmMessage: "tickets/ticket-closed-dm",
-			// Message template path posted in the closed ticket channel.
+			// Global fallback template path posted in the closed ticket channel.
+			// A ticket type can override this with ticketTypes.<key>.close.channelMessage.
 			channelMessage: "tickets/ticket-closed"
 		}
 	},
@@ -117,7 +122,9 @@ export default defineConfig("0.0.1", {
 			// Available parameters here:
 			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			channelNameTemplate: "{ticketNumber}-general-{username}",
-			// Optional per-type welcome message template override.
+			// Optional per-type open-ticket template override.
+			// Copy messages/tickets/ticket-opened.ts to a new file if this type
+			// needs its own embed/container layout, then link it here.
 			message: "tickets/ticket-opened",
 			// Optional plain text appended after the message template.
 			// Available parameters here:
@@ -135,11 +142,21 @@ export default defineConfig("0.0.1", {
 			description: "Payments, invoices, and subscription issues.",
 			emoji: "<:billing:181818181818181818>",
 			categoryId: "101010101010101010",
+			// This ticket type still uses the global open-ticket template.
+			// If you want a custom open layout, create another file in messages/
+			// and set `message` here the same way as the close overrides below.
 			// Available parameters here:
 			// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
 			// {reason} {reason1} {reason2} ... {reasonN}
 			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			welcomeContent: "Please include invoice numbers, order IDs, or the last payment date if you have them.",
+			// Optional per-type close templates.
+			// These override tickets.close.dmMessage and tickets.close.channelMessage.
+			// The sample files below are included in this repository.
+			close: {
+				dmMessage: "tickets/ticket-closed-dm-billing",
+				channelMessage: "tickets/ticket-closed-billing"
+			},
 			staffRoleIds: ["121212121212121212"],
 			openForm: {
 				title: "Billing Ticket",
@@ -199,7 +216,9 @@ export default defineConfig("0.0.1", {
 	panels: {
 		supportSelect: {
 			channelId: "141414141414141414",
-			// Message template path inside the messages directory.
+			// Each panel can use its own template file inside the messages directory.
+			// Example: create messages/tickets/open-panel-billing.ts and point this
+			// to "tickets/open-panel-billing" if you want a different panel layout.
 			message: "tickets/open-panel",
 			// Optional text posted alongside the panel template.
 			content: "Choose the ticket type that fits your issue best.",
