@@ -11,11 +11,17 @@ import { getInteractionUser, getMemberRoleIds, renderChannelName } from "@/featu
 
 type ClaimInteraction = APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction;
 
-export async function executeClaimCommand(context: CommandExecutionContext, interaction: APIChatInputApplicationCommandInteraction) {
+export async function executeClaimCommand(
+	context: CommandExecutionContext,
+	interaction: APIChatInputApplicationCommandInteraction
+) {
 	await claimTicket(context.app, interaction);
 }
 
-export async function executeUnclaimCommand(context: CommandExecutionContext, interaction: APIChatInputApplicationCommandInteraction) {
+export async function executeUnclaimCommand(
+	context: CommandExecutionContext,
+	interaction: APIChatInputApplicationCommandInteraction
+) {
 	await unclaimTicket(context.app, interaction);
 }
 
@@ -70,11 +76,7 @@ async function claimTicket(app: BotApp, interaction: ClaimInteraction) {
 
 	await updateClaimedTicketPresentation(app, nextTicketState, ticketType.name, actor.username);
 
-	await syncTicketWelcomeMessage(
-		app,
-		nextTicketState,
-		ticketType
-	);
+	await syncTicketWelcomeMessage(app, nextTicketState, ticketType);
 
 	await replyWithContent(
 		app,

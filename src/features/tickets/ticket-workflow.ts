@@ -5,16 +5,42 @@ import type {
 	APIModalSubmitInteraction,
 	APIModalSubmitTextInputComponent
 } from "@discordjs/core";
-import { ButtonStyle, ChannelType, ComponentType, MessageFlags, OverwriteType, PermissionFlagsBits, TextInputStyle } from "@discordjs/core";
+import {
+	ButtonStyle,
+	ChannelType,
+	ComponentType,
+	MessageFlags,
+	OverwriteType,
+	PermissionFlagsBits,
+	TextInputStyle
+} from "@discordjs/core";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
 import { deferReply, editReply, followUp, reply, showModal, updateMessage } from "@/core/respond";
 import type { BotApp, ComponentExecutionContext } from "@/core/types";
 import { type TicketRecord, ticketsTable } from "@/db/schema";
-import { getPanel, getPanelTicketTypeKeys, getTicketType, getTicketStaffRoleIds, userCanAccessTicketType } from "@/features/tickets/config-access";
+import {
+	getPanel,
+	getPanelTicketTypeKeys,
+	getTicketType,
+	getTicketStaffRoleIds,
+	userCanAccessTicketType
+} from "@/features/tickets/config-access";
 import { DEFAULT_NO_REASON, TICKET_ACCESS_ALLOW } from "@/features/tickets/constants";
-import { appendMessageComponents, appendMessageText, finalizeMessageTemplate, hasMessageComponentCustomId, loadMessageTemplate } from "@/features/tickets/messages";
-import type { LoadedMessageTemplate, TicketOpenContext, TicketQuestionConfig, TicketRenderTokens, TicketTypeConfig } from "@/features/tickets/types";
+import {
+	appendMessageComponents,
+	appendMessageText,
+	finalizeMessageTemplate,
+	hasMessageComponentCustomId,
+	loadMessageTemplate
+} from "@/features/tickets/messages";
+import type {
+	LoadedMessageTemplate,
+	TicketOpenContext,
+	TicketQuestionConfig,
+	TicketRenderTokens,
+	TicketTypeConfig
+} from "@/features/tickets/types";
 import { getInteractionUser, getMemberRoleIds, renderChannelName, renderTemplate } from "@/features/tickets/utils";
 
 export async function handleOpenFormSubmit(context: ComponentExecutionContext, interaction: APIModalSubmitInteraction) {
@@ -176,10 +202,12 @@ export async function buildTicketWelcomeMessage(
 	const closeButtonCustomId = createCustomId("tickets", "close");
 	const claimButtonCustomId = createCustomId("tickets", "claim");
 	const unclaimButtonCustomId = createCustomId("tickets", "unclaim");
-	const messageTemplate = messageReference ? await loadMessageTemplate(messageReference, {
-		...tokens,
-		closeButtonCustomId
-	}) : {};
+	const messageTemplate = messageReference
+		? await loadMessageTemplate(messageReference, {
+				...tokens,
+				closeButtonCustomId
+			})
+		: {};
 	const configuredContent = ticketType.welcomeContent ?? app.config.tickets.defaultWelcomeContent;
 	const roleMentions = app.config.tickets.mentionRoleIds.map((roleId) => `<@&${roleId}>`);
 	const runtimeText = [configuredContent ? renderTemplate(configuredContent, tokens) : undefined, ...roleMentions]

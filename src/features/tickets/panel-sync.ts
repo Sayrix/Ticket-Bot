@@ -159,7 +159,10 @@ async function buildPanelMessage(app: BotApp, panelKey: string, panel: PanelConf
 	});
 }
 
-function placePanelOpener(payload: Awaited<ReturnType<typeof loadMessageTemplate>>, openerComponents: APIMessageTopLevelComponent[]) {
+function placePanelOpener(
+	payload: Awaited<ReturnType<typeof loadMessageTemplate>>,
+	openerComponents: APIMessageTopLevelComponent[]
+) {
 	if (!openerComponents.length) {
 		return payload;
 	}

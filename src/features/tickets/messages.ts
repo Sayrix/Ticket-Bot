@@ -69,7 +69,10 @@ export function appendMessageText(payload: LoadedMessageTemplate, text: string |
 
 	return {
 		...payload,
-		content: [payload.content, normalizedText].filter((part): part is string => Boolean(part?.trim())).join("\n").trim()
+		content: [payload.content, normalizedText]
+			.filter((part): part is string => Boolean(part?.trim()))
+			.join("\n")
+			.trim()
 	};
 }
 
@@ -168,7 +171,10 @@ export function hasMessageComponentCustomId(payload: LoadedMessageTemplate, cust
 }
 
 function usesComponentsV2(payload: LoadedMessageTemplate) {
-	return payload.useComponentsV2 ?? (Boolean((payload.flags ?? 0) & MessageFlags.IsComponentsV2) || hasComponentsV2Components(payload.components));
+	return (
+		payload.useComponentsV2 ??
+		(Boolean((payload.flags ?? 0) & MessageFlags.IsComponentsV2) || hasComponentsV2Components(payload.components))
+	);
 }
 
 async function resolveMessageTemplatePath(reference: string) {
@@ -343,7 +349,13 @@ function appendComponentsToFirstContainer(
 			return value;
 		}
 
-		if (!replaced && "type" in value && value.type === ComponentType.Container && "components" in value && Array.isArray(value.components)) {
+		if (
+			!replaced &&
+			"type" in value &&
+			value.type === ComponentType.Container &&
+			"components" in value &&
+			Array.isArray(value.components)
+		) {
 			replaced = true;
 			return {
 				...value,
@@ -379,7 +391,9 @@ function stripTemplateSlots(components: APIMessageTopLevelComponent[] | undefine
 
 		if (value && typeof value === "object") {
 			const nextValue = Object.fromEntries(
-				Object.entries(value).map(([key, entry]) => [key, visit(entry)]).filter(([, entry]) => entry !== undefined)
+				Object.entries(value)
+					.map(([key, entry]) => [key, visit(entry)])
+					.filter(([, entry]) => entry !== undefined)
 			);
 
 			return nextValue;

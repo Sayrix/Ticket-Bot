@@ -12,7 +12,12 @@ import { editReply, reply, showModal } from "@/core/respond";
 import type { BotApp, CommandExecutionContext, ComponentExecutionContext } from "@/core/types";
 import { ticketsTable } from "@/db/schema";
 import { getTicketType, hasTicketStaffAccess } from "@/features/tickets/config-access";
-import { appendMessageButton, finalizeMessageTemplate, hasMessageComponentCustomId, loadMessageTemplate } from "@/features/tickets/messages";
+import {
+	appendMessageButton,
+	finalizeMessageTemplate,
+	hasMessageComponentCustomId,
+	loadMessageTemplate
+} from "@/features/tickets/messages";
 import { getInvitedUserIds, revokeTicketParticipantAccess } from "@/features/tickets/participants";
 import { findTicketByChannel, getOpenTicketByChannel } from "@/features/tickets/records";
 import { startTranscriptJob } from "@/features/tickets/transcripts";
@@ -21,7 +26,10 @@ import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 const DEFAULT_CLOSE_DM_MESSAGE = "tickets/ticket-closed-dm";
 const DEFAULT_CLOSE_CHANNEL_MESSAGE = "tickets/ticket-closed";
 
-export async function executeCloseCommand(context: CommandExecutionContext, interaction: APIChatInputApplicationCommandInteraction) {
+export async function executeCloseCommand(
+	context: CommandExecutionContext,
+	interaction: APIChatInputApplicationCommandInteraction
+) {
 	await beginCloseFlow(context.app, interaction);
 }
 
@@ -69,7 +77,13 @@ async function beginCloseFlow(
 	app: BotApp,
 	interaction: APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction
 ) {
-	const closable = await getClosableTicket(app, interaction.channel_id, getMemberRoleIds(interaction), getInteractionUser(interaction).id, true);
+	const closable = await getClosableTicket(
+		app,
+		interaction.channel_id,
+		getMemberRoleIds(interaction),
+		getInteractionUser(interaction).id,
+		true
+	);
 
 	if (!closable.ok) {
 		await reply(app, interaction, {
@@ -404,15 +418,15 @@ async function buildCloseChannelMessage(
 
 	return finalizeMessageTemplate(
 		appendMessageButton(
-		messageTemplate,
-		!hasMessageComponentCustomId(messageTemplate, deleteButtonCustomId)
-			? ({
-					type: ComponentType.Button,
-					custom_id: deleteButtonCustomId,
-					label: "Delete Ticket",
-					style: ButtonStyle.Danger
-				} satisfies APIButtonComponentWithCustomId)
-			: undefined
+			messageTemplate,
+			!hasMessageComponentCustomId(messageTemplate, deleteButtonCustomId)
+				? ({
+						type: ComponentType.Button,
+						custom_id: deleteButtonCustomId,
+						label: "Delete Ticket",
+						style: ButtonStyle.Danger
+					} satisfies APIButtonComponentWithCustomId)
+				: undefined
 		)
 	);
 }
