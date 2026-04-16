@@ -9,6 +9,18 @@ export default defineConfig("0.0.1", {
 	// Transcript ID style used by ticket.pm uploads.
 	// "uuid" matches the current default. "emoji" keeps the older style.
 	uuidType: "uuid",
+	status: {
+		// Set to false to leave the bot presence untouched.
+		enabled: true,
+		// Activity text shown in the member list.
+		text: "github.com/Sayrix",
+		// PLAYING, STREAMING, LISTENING, WATCHING, CUSTOM, COMPETING
+		type: "WATCHING",
+		// Only used for STREAMING.
+		url: "https://twitch.tv/example",
+		// online, idle, dnd, invisible
+		status: "online"
+	},
 
 	tickets: {
 		// Fallback channel name used when a ticket type does not override it.
@@ -26,6 +38,10 @@ export default defineConfig("0.0.1", {
 		// Message template path inside the messages directory.
 		defaultWelcomeMessage: "tickets/ticket-opened",
 		// Optional plain text appended to the welcome message template.
+		// Available parameters here:
+		// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+		// {reason} {reason1} {reason2} ... {reasonN}
+		// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 		defaultWelcomeContent: "A staff member will be with you shortly. Please explain your issue clearly.",
 
 		claims: {
@@ -83,10 +99,16 @@ export default defineConfig("0.0.1", {
 			emoji: "<:ticket:171717171717171717>",
 			categoryId: "777777777777777777",
 			// Optional per-type channel name override.
+			// Available parameters here:
+			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			channelNameTemplate: "{ticketNumber}-general-{username}",
 			// Optional per-type welcome message template override.
 			message: "tickets/ticket-opened",
 			// Optional plain text appended after the message template.
+			// Available parameters here:
+			// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+			// {reason} {reason1} {reason2} ... {reasonN}
+			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			welcomeContent: "Tell us what you need help with and include screenshots if they matter.",
 			// Optional per-type block list.
 			blockedRoleIds: ["888888888888888888"],
@@ -98,6 +120,10 @@ export default defineConfig("0.0.1", {
 			description: "Payments, invoices, and subscription issues.",
 			emoji: "<:billing:181818181818181818>",
 			categoryId: "101010101010101010",
+			// Available parameters here:
+			// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+			// {reason} {reason1} {reason2} ... {reasonN}
+			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			welcomeContent: "Please include invoice numbers, order IDs, or the last payment date if you have them.",
 			staffRoleIds: ["121212121212121212"],
 			openForm: {
@@ -128,6 +154,8 @@ export default defineConfig("0.0.1", {
 			description: "Report a player, member, or rule violation.",
 			emoji: "<:report:191919191919191919>",
 			categoryId: "131313131313131313",
+			welcomeContent:
+				"Details: {reason1}\n\nAdditional info: {reason2}\n\nPlease provide any evidence you have and our staff will review it as soon as possible.",
 			openForm: {
 				title: "Report Details",
 				questions: [

@@ -7,6 +7,13 @@ interface ConfigV0_0_1 {
 	lang: "en";
 	/** Controls the transcript ID style when uploading to ticket.pm */
 	uuidType?: "uuid" | "emoji";
+	status?: {
+		enabled: boolean;
+		text?: string;
+		type?: "PLAYING" | "STREAMING" | "LISTENING" | "WATCHING" | "CUSTOM" | "COMPETING";
+		url?: string;
+		status: "online" | "idle" | "dnd" | "invisible";
+	};
 	tickets: {
 		channelNameTemplate: string;
 		maxOpenPerUser: number;
