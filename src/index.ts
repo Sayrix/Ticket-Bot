@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { createBotApp } from "@/app";
 
-config({ path: "./config/.env" });
+config({ path: "./config/.env", quiet: true });
 
 async function main() {
 	const { start, stop } = await createBotApp();

@@ -7,7 +7,7 @@ import { createLogger, type Logger } from "@/core/logger";
 import { createHandlerRegistry } from "@/core/registry";
 import botConfig from "../config/config.ts";
 
-config({ path: "./config/.env" });
+config({ path: "./config/.env", quiet: true });
 const logger = createLogger("deploy");
 
 export async function deployApplicationCommands(options: {
