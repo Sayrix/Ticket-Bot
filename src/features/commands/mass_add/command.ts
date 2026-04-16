@@ -1,8 +1,8 @@
 import { MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { getStringOption } from "@/features/commands/shared/options";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
+import { getStringOption } from "@/features/commands/shared/options";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
@@ -13,7 +13,7 @@ import { getOpenTicketByChannel } from "@/features/tickets/records";
 
 export default defineCommand({
 	data: {
-		name: "massadd",
+		name: "mass_add",
 		description: "Add multiple users to the current ticket",
 		options: [
 			{

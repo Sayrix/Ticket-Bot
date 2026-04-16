@@ -1,11 +1,11 @@
 import type { APIChatInputApplicationCommandInteraction, APIMessageComponentInteraction } from "@discordjs/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { getUserOption } from "@/features/commands/shared/options";
 import { createCustomId } from "@/core/custom-id";
 import { defineCommand } from "@/core/defineCommand";
 import { reply, updateMessage } from "@/core/respond";
 import type { ComponentExecutionContext } from "@/core/types";
+import { getUserOption } from "@/features/commands/shared/options";
 import { getInvitedUserIds, revokeTicketParticipantAccess, updateInvitedUserIds } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
 

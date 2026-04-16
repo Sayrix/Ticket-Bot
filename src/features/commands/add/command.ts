@@ -1,8 +1,8 @@
 import { MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { getUserOption } from "@/features/commands/shared/options";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
+import { getUserOption } from "@/features/commands/shared/options";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
