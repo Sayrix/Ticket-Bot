@@ -5,6 +5,8 @@ interface ConfigV0_0_1 {
 	guildId: string;
 	/** The lang of the bot */
 	lang: "en";
+	/** Controls the transcript ID style when uploading to ticket.pm */
+	uuidType?: "uuid" | "emoji";
 	tickets: {
 		channelNameTemplate: string;
 		maxOpenPerUser: number;

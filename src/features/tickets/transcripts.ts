@@ -1,4 +1,3 @@
-import type { APIMessage } from "@discordjs/core";
 import { TicketPmUploadClient } from "@ticketpm/core";
 import { buildEnrichedDiscordApiTranscriptData } from "@ticketpm/discord-api";
 import { eq } from "drizzle-orm";
@@ -10,6 +9,7 @@ const TRANSCRIPT_VIEW_BASE_URL = "https://ticket.pm/";
 const TRANSCRIPT_TIMEOUT_MS = 15 * 60 * 1000;
 
 type TranscriptStatusHandler = (content: string) => Promise<void> | void;
+type TranscriptSourceMessage = Parameters<typeof buildEnrichedDiscordApiTranscriptData>[0]["messages"][number];
 
 export async function startTranscriptJob(
 	app: BotApp,
@@ -106,9 +106,11 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 	await reportStatus(onStatus, "Uploading transcript...");
 
 	const uploadClient = new TicketPmUploadClient({
-		baseUrl: TRANSCRIPT_BASE_URL
+		baseUrl: TRANSCRIPT_BASE_URL,
+		token: process.env.TICKETPM_PASSKEY
 	});
 	const result = await uploadClient.uploadDraftTranscript(draftTranscript, {
+		uuidStyleIds: app.config.uuidType !== "emoji",
 		avatarProgress: createProgressHandler("Uploading avatars...", onStatus),
 		mediaProgress: createProgressHandler("Uploading attachments...", onStatus)
 	});
@@ -117,7 +119,7 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 }
 
 async function fetchAllMessages(app: BotApp, channelId: string) {
-	const messages: APIMessage[] = [];
+	const messages: TranscriptSourceMessage[] = [];
 	let before: string | undefined;
 
 	while (true) {
@@ -130,7 +132,9 @@ async function fetchAllMessages(app: BotApp, channelId: string) {
 			break;
 		}
 
-		messages.push(...batch);
+		// discord.js/core and @ticketpm/discord-api may resolve different
+		// discord-api-types package instances, so keep the cast local here.
+		messages.push(...(batch as TranscriptSourceMessage[]));
 
 		if (batch.length < 100) {
 			break;
