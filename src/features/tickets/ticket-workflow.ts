@@ -22,8 +22,8 @@ import { type TicketRecord, ticketsTable } from "@/db/schema";
 import {
 	getPanel,
 	getPanelTicketTypeKeys,
-	getTicketType,
 	getTicketStaffRoleIds,
+	getTicketType,
 	userCanAccessTicketType
 } from "@/features/tickets/config-access";
 import { DEFAULT_NO_REASON, TICKET_ACCESS_ALLOW } from "@/features/tickets/constants";
@@ -165,6 +165,7 @@ async function createTicket(
 		channel.id,
 		await buildTicketWelcomeMessage(app, ticketType, tokens)
 	);
+	await pinTicketWelcomeMessage(app, channel.id, ticketMessage.id);
 
 	await app.db.insert(ticketsTable).values({
 		channelId: channel.id,
@@ -188,6 +189,23 @@ async function createTicket(
 	}
 
 	await editReply(app, interaction, successMessage);
+}
+
+async function pinTicketWelcomeMessage(app: BotApp, channelId: string, messageId: string) {
+	try {
+		await app.client.api.channels.pinMessage(channelId, messageId);
+
+		const messages = await app.client.api.channels.getMessages(channelId, { limit: 5 }).catch(() => []);
+		const pinNotice = messages.find((message) => message.id !== messageId && message.type === 6);
+
+		if (!pinNotice) {
+			return;
+		}
+
+		await app.client.api.channels.deleteMessage(channelId, pinNotice.id).catch(() => null);
+	} catch (error) {
+		app.logger.warn(`Failed to pin the welcome message in ticket channel ${channelId}.`, error);
+	}
 }
 
 export async function buildTicketWelcomeMessage(
