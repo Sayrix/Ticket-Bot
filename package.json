@@ -11,7 +11,6 @@
 		"format": "biome format",
 		"format:fix": "biome format --write",
 		"drizzle:push": "bunx drizzle-kit push",
-		"deploy:commands": "bun src/deploy-commands.ts",
 		"start": "bun src/index.ts"
 	},
 	"dependencies": {
