@@ -32,15 +32,11 @@ const billingTicketClosedMessage: LoadedMessageTemplate = {
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Close Reason**\n{reason}"
+					content: "**Close Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Handled By**\n{closerMention}"
-				},
-				{
-					type: ComponentType.TextDisplay,
-					content: "**Transcript**\n{transcriptStatus}"
+					content: "-# _Closed by {closerName}_"
 				},
 				{
 					type: ComponentType.ActionRow,

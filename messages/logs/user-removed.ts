@@ -24,8 +24,10 @@ const userRemovedLogMessage: LoadedMessageTemplate = {
 			components: [
 				{ type: ComponentType.TextDisplay, content: "## User Removed" },
 				{ type: ComponentType.TextDisplay, content: "{actorMention} removed {targetMention} from {ticketChannelMention}." },
-				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
-				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" }
+				{
+					type: ComponentType.TextDisplay,
+					content: "**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}"
+				}
 			]
 		}
 	]

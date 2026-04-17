@@ -32,15 +32,11 @@ const reportTicketClosedMessage: LoadedMessageTemplate = {
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Resolution Note**\n{reason}"
+					content: "**Resolution Note**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim**\n{claimStatus}"
-				},
-				{
-					type: ComponentType.TextDisplay,
-					content: "**Transcript**\n{transcriptStatus}"
+					content: "-# _Closed by {closerName}_"
 				},
 				{
 					type: ComponentType.ActionRow,

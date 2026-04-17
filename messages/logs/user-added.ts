@@ -24,8 +24,10 @@ const userAddedLogMessage: LoadedMessageTemplate = {
 			components: [
 				{ type: ComponentType.TextDisplay, content: "## User Added" },
 				{ type: ComponentType.TextDisplay, content: "{actorMention} added {targetMention} to {ticketChannelMention}." },
-				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
-				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" }
+				{
+					type: ComponentType.TextDisplay,
+					content: "**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}"
+				}
 			]
 		}
 	]

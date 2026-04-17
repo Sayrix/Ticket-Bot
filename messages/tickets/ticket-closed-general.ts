@@ -32,15 +32,11 @@ const generalTicketClosedMessage: LoadedMessageTemplate = {
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**\n{reason}"
+					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim**\n{claimStatus}"
-				},
-				{
-					type: ComponentType.TextDisplay,
-					content: "_Closed by {closerName}_"
+					content: "-# _Closed by {closerName}_"
 				},
 				{
 					type: ComponentType.ActionRow,

@@ -24,10 +24,11 @@ const ticketRenamedLogMessage: LoadedMessageTemplate = {
 			components: [
 				{ type: ComponentType.TextDisplay, content: "## Ticket Renamed" },
 				{ type: ComponentType.TextDisplay, content: "{actorMention} renamed {ticketChannelMention}." },
-				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
-				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" },
-				{ type: ComponentType.TextDisplay, content: "**From**\n`{oldChannelName}`" },
-				{ type: ComponentType.TextDisplay, content: "**To**\n`{newChannelName}`" }
+				{
+					type: ComponentType.TextDisplay,
+					content:
+						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**From**: `{oldChannelName}`\n**To**: `{newChannelName}`"
+				}
 			]
 		}
 	]

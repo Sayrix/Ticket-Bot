@@ -24,12 +24,11 @@ const ticketDeletedLogMessage: LoadedMessageTemplate = {
 			components: [
 				{ type: ComponentType.TextDisplay, content: "## Ticket Deleted" },
 				{ type: ComponentType.TextDisplay, content: "{actorMention} deleted {ticketChannelMention}." },
-				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
-				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" },
-				{ type: ComponentType.TextDisplay, content: "**Claim Status**\n{claimStatus}" },
-				{ type: ComponentType.TextDisplay, content: "**Open Age**\n{ticketAge}" },
-				{ type: ComponentType.TextDisplay, content: "**Close Reason**\n{reason}" },
-				{ type: ComponentType.TextDisplay, content: "**Transcript**\n{transcriptStatus}" }
+				{
+					type: ComponentType.TextDisplay,
+					content:
+						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Claim Status**: {claimStatus}\n**Open Age**: {ticketAge}\n**Close Reason**: {reason}\n**Transcript**: {transcriptStatus}"
+				}
 			]
 		}
 	]

@@ -32,15 +32,11 @@ const reportTicketClosedDmMessage: LoadedMessageTemplate = {
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Resolution Note**\n{reason}"
+					content: "**Resolution Note**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Handled By**\n{closerName}"
-				},
-				{
-					type: ComponentType.TextDisplay,
-					content: "**Transcript**\n{transcriptStatus}"
+					content: "-# _Closed by {closerName}_"
 				}
 			]
 		}

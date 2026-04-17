@@ -24,10 +24,11 @@ const ticketCreatedLogMessage: LoadedMessageTemplate = {
 			components: [
 				{ type: ComponentType.TextDisplay, content: "## Ticket Created" },
 				{ type: ComponentType.TextDisplay, content: "{actorMention} opened {ticketChannelMention}." },
-				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
-				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" },
-				{ type: ComponentType.TextDisplay, content: "**Created**\n{createdAt}" },
-				{ type: ComponentType.TextDisplay, content: "**Reason**\n{reason}" }
+				{
+					type: ComponentType.TextDisplay,
+					content:
+						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Created**: {createdAt}\n**Reason**: {reason}"
+				}
 			]
 		}
 	]

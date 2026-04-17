@@ -42,7 +42,7 @@ const generalTicketOpenedMessage: LoadedMessageTemplate = {
 				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim Status**\n{claimStatus}"
+					content: "**Claim Status**: {claimStatus}"
 				},
 				createMessageSlot("actions")
 			]
