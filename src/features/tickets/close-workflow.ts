@@ -14,12 +14,14 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import type {
+	APIActionRowComponent,
 	APIButtonComponentWithCustomId,
 	APIChatInputApplicationCommandInteraction,
 	APIMessage,
 	APIMessageComponentInteraction,
 	APIModalSubmitInteraction
 } from "@discordjs/core";
+import type { APIComponentInMessageActionRow, APIContainerComponent } from "discord-api-types/v10";
 import { ButtonStyle, ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";
 import { eq } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
@@ -366,33 +368,58 @@ async function disableTicketActionButtons(app: BotApp, channelId: string, messag
 		return;
 	}
 
-	const nextComponents = message.components.map((row) => {
-		if (row.type !== ComponentType.ActionRow) {
-			return row;
-		}
-
-		return {
-			...row,
-			components: row.components.map((component) => {
-				if (
-					component.type !== ComponentType.Button ||
-					!("custom_id" in component) ||
-					!disabledButtonIds.has(component.custom_id)
-				) {
-					return component;
-				}
-
-				return {
-					...component,
-					disabled: true
-				};
-			})
-		};
-	}) as APIMessage["components"];
+	const nextComponents: APIMessage["components"] = disableNestedTicketActionButtons(message.components, disabledButtonIds);
 
 	await app.client.api.channels.editMessage(channelId, messageId, {
 		components: nextComponents
 	});
+}
+
+function disableNestedTicketActionButtons(
+	components: NonNullable<APIMessage["components"]>,
+	disabledButtonIds: Set<string>
+): NonNullable<APIMessage["components"]> {
+	const nextComponents: NonNullable<APIMessage["components"]> = components.map((component) => {
+		if (component.type === ComponentType.ActionRow) {
+			return disableTicketActionRow(component, disabledButtonIds);
+		}
+
+		if (component.type === ComponentType.Container) {
+			return disableTicketActionContainer(component, disabledButtonIds);
+		}
+
+		return component;
+	});
+
+	return nextComponents;
+}
+
+function disableTicketActionContainer(container: APIContainerComponent, disabledButtonIds: Set<string>): APIContainerComponent {
+	return {
+		...container,
+		components: container.components.map((component) =>
+			component.type === ComponentType.ActionRow ? disableTicketActionRow(component, disabledButtonIds) : component
+		)
+	};
+}
+
+function disableTicketActionRow<T extends APIComponentInMessageActionRow>(
+	row: APIActionRowComponent<T>,
+	disabledButtonIds: Set<string>
+): APIActionRowComponent<T> {
+	return {
+		...row,
+		components: row.components.map((component) =>
+			isTicketActionButton(component, disabledButtonIds) ? { ...component, disabled: true } : component
+		) as T[]
+	};
+}
+
+function isTicketActionButton(
+	component: APIComponentInMessageActionRow,
+	disabledButtonIds: Set<string>
+): component is APIButtonComponentWithCustomId {
+	return component.type === ComponentType.Button && "custom_id" in component && disabledButtonIds.has(component.custom_id);
 }
 
 async function moveClosedTicketChannel(app: BotApp, channelId: string) {

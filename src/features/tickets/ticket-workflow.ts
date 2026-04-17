@@ -16,10 +16,12 @@ This notice must not be removed, obscured, or replaced.
 import type {
 	APIActionRowComponent,
 	APIButtonComponentWithCustomId,
+	APIMessageTopLevelComponent,
 	APIMessageComponentInteraction,
 	APIModalSubmitInteraction,
 	APIModalSubmitTextInputComponent
 } from "@discordjs/core";
+import type { APIComponentInContainer, APIContainerComponent } from "discord-api-types/v10";
 import {
 	ButtonStyle,
 	ChannelType,
@@ -44,7 +46,6 @@ import {
 } from "@/features/tickets/config-access";
 import { DEFAULT_NO_REASON, TICKET_ACCESS_ALLOW } from "@/features/tickets/constants";
 import {
-	appendMessageComponents,
 	appendMessageText,
 	finalizeMessageTemplate,
 	hasMessageComponentCustomId,
@@ -271,7 +272,7 @@ export async function buildTicketWelcomeMessage(
 		claimedBy: tokens.claimerId,
 		disableActions: options?.disableActions ?? false
 	});
-	const body = appendMessageComponents(withRuntimeText, buttons, "actions");
+	const body = attachWelcomeMessageActions(withRuntimeText, buttons);
 
 	return finalizeMessageTemplate({
 		...body,
@@ -335,7 +336,7 @@ function buildTicketActionButtons(
 		claimedBy?: string;
 		disableActions: boolean;
 	}
-) {
+): TicketActionRows | undefined {
 	const buttons: APIButtonComponentWithCustomId[] = [];
 
 	if (app.config.tickets.close.showCloseButton && !hasMessageComponentCustomId(payload, options.closeButtonCustomId)) {
@@ -381,6 +382,80 @@ function buildTicketActionButtons(
 		} satisfies APIActionRowComponent<APIButtonComponentWithCustomId>
 	];
 }
+
+function attachWelcomeMessageActions(
+	payload: LoadedMessageTemplate,
+	components: TicketActionRows | undefined
+): LoadedMessageTemplate {
+	if (!components?.length || !payload.components?.length) {
+		return payload;
+	}
+
+	let attached = false;
+	const nextComponents = payload.components.map((component) => {
+		if (attached || component.type !== ComponentType.Container) {
+			return component;
+		}
+
+		attached = true;
+		return attachActionsToWelcomeContainer(component as WelcomeTemplateContainer, components) as APIMessageTopLevelComponent;
+	});
+
+	return {
+		...payload,
+		components: attached ? nextComponents : [...payload.components, ...cloneActionRows(components)]
+	};
+}
+
+function attachActionsToWelcomeContainer(
+	container: WelcomeTemplateContainer,
+	actions: TicketActionRows
+): WelcomeTemplateContainer {
+	const nextComponents: WelcomeTemplateContainer["components"] = [];
+	let replacedSlot = false;
+
+	for (const component of container.components) {
+		if (isActionSlot(component)) {
+			nextComponents.push(...cloneActionRows(actions));
+			replacedSlot = true;
+			continue;
+		}
+
+		nextComponents.push(component);
+	}
+
+	if (!replacedSlot) {
+		nextComponents.push(...cloneActionRows(actions));
+	}
+
+	return {
+		...container,
+		components: nextComponents
+	};
+}
+
+function cloneActionRows(components: TicketActionRows): TicketActionRows {
+	return components.map((component) => ({
+		...component,
+		components: [...component.components]
+	}));
+}
+
+function isActionSlot(value: WelcomeTemplateComponent): value is TemplateSlotComponent {
+	return "slot" in value && value.slot === "actions";
+}
+
+type TemplateSlotComponent = {
+	slot: string;
+	slot_kind?: string;
+	type?: string;
+};
+
+type WelcomeTemplateComponent = APIComponentInContainer | TemplateSlotComponent;
+type WelcomeTemplateContainer = Omit<APIContainerComponent, "components"> & {
+	components: WelcomeTemplateComponent[];
+};
+type TicketActionRows = APIActionRowComponent<APIButtonComponentWithCustomId>[];
 
 function createQuestionInput(question: TicketQuestionConfig) {
 	return {
