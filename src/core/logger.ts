@@ -19,27 +19,27 @@ export interface Logger {
 	error(message: string, ...meta: unknown[]): void;
 }
 
+function write(output: (...data: unknown[]) => void, level: string, message: string, meta: unknown[], scope: string) {
+	const prefix = `[${scope}] ${level}`;
+
+	if (meta.length === 0) {
+		output(prefix, message);
+		return;
+	}
+
+	output(prefix, message, ...meta);
+}
+
 export function createLogger(scope: string): Logger {
-	const write = (level: string, message: string, meta: unknown[]) => {
-		const prefix = `[${scope}] ${level}`;
-
-		if (meta.length === 0) {
-			console.log(prefix, message);
-			return;
-		}
-
-		console.log(prefix, message, ...meta);
-	};
-
 	return {
 		info(message, ...meta) {
-			write("INFO", message, meta);
+			write(console.log, "\x1b[39;44mINFO\x1b[0m", message, meta, scope);
 		},
 		warn(message, ...meta) {
-			write("WARN", message, meta);
+			write(console.warn, "\x1b[39;43mWARN\x1b[0m", message, meta, scope);
 		},
 		error(message, ...meta) {
-			write("ERROR", message, meta);
+			write(console.error, "\x1b[39;41mERROR\x1b[0m", message, meta, scope);
 		}
 	};
 }
