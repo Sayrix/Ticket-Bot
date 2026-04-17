@@ -18,9 +18,11 @@ import { ApplicationCommandOptionType } from "discord-api-types/v10";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
 import { getStringOption } from "@/features/commands/shared/options";
+import { sendTicketLog, shouldSendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
-import { getMemberRoleIds, sanitizeChannelName } from "@/features/tickets/utils";
+import { getInteractionUser, getMemberRoleIds, sanitizeChannelName } from "@/features/tickets/utils";
 
 export default defineCommand({
 	data: {
@@ -65,9 +67,31 @@ export default defineCommand({
 		}
 
 		const nextName = sanitizeChannelName(requestedName);
+		const ticketLogContext = createTicketLogContext(openTicket.ticket, openTicket.ticketType.name);
+		let previousName = openTicket.ticket.channelId;
+
+		if (shouldSendTicketLog(app, "ticketRename")) {
+			const currentChannel = await app.client.api.channels.get(openTicket.ticket.channelId).catch(() => null);
+			previousName =
+				currentChannel && "name" in currentChannel && typeof currentChannel.name === "string"
+					? currentChannel.name
+					: previousName;
+		}
+
 		await app.client.api.channels.edit(openTicket.ticket.channelId, {
 			name: nextName
 		});
+		const actor = getInteractionUser(interaction);
+
+		if (shouldSendTicketLog(app, "ticketRename")) {
+			void sendTicketLog(app, {
+				kind: "ticketRename",
+				actor,
+				oldChannelName: previousName,
+				newChannelName: nextName,
+				ticket: ticketLogContext
+			});
+		}
 
 		await reply(app, interaction, {
 			content: `Ticket renamed to <#${openTicket.ticket.channelId}>.`,

@@ -18,7 +18,10 @@ import { MessageFlags } from "@discordjs/core";
 import { eq } from "drizzle-orm";
 import { reply } from "@/core/respond";
 import type { BotApp, CommandExecutionContext, ComponentExecutionContext } from "@/core/types";
+import type { TicketRecord } from "@/db/schema";
 import { ticketsTable } from "@/db/schema";
+import { sendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { syncTicketWelcomeMessage } from "@/features/tickets/ticket-workflow";
@@ -92,6 +95,11 @@ async function claimTicket(app: BotApp, interaction: ClaimInteraction) {
 	await updateClaimedTicketPresentation(app, nextTicketState, ticketType.name, actor.username);
 
 	await syncTicketWelcomeMessage(app, nextTicketState, ticketType);
+	void sendTicketLog(app, {
+		kind: "ticketClaim",
+		actor,
+		ticket: createTicketLogContext(nextTicketState, ticketType.name)
+	});
 
 	await replyWithContent(
 		app,
@@ -148,6 +156,17 @@ async function unclaimTicket(app: BotApp, interaction: ClaimInteraction) {
 		},
 		ticketType
 	);
+	void sendTicketLog(app, {
+		kind: "ticketUnclaim",
+		actor,
+		ticket: createTicketLogContext(
+			{
+				...ticket,
+				claimedBy: null
+			},
+			ticketType.name
+		)
+	});
 
 	await replyWithContent(app, interaction, "You unclaimed this ticket.");
 }
@@ -190,14 +209,7 @@ function canTakeOverClaim(app: BotApp, roleIds: string[]) {
 
 async function updateClaimedTicketPresentation(
 	app: BotApp,
-	ticket: {
-		channelId: string;
-		claimedBy: string | null;
-		claimedAt: number | null;
-		createdBy: string;
-		id: number;
-		type: string;
-	},
+	ticket: Pick<TicketRecord, "channelId" | "claimedBy" | "claimedAt" | "createdBy" | "id" | "type">,
 	ticketTypeName: string,
 	claimerUsername: string
 ) {
@@ -207,13 +219,7 @@ async function updateClaimedTicketPresentation(
 
 async function renameClaimedTicketChannel(
 	app: BotApp,
-	ticket: {
-		channelId: string;
-		claimedBy: string | null;
-		createdBy: string;
-		id: number;
-		type: string;
-	},
+	ticket: Pick<TicketRecord, "channelId" | "claimedBy" | "createdBy" | "id" | "type">,
 	ticketTypeName: string,
 	claimerUsername: string
 ) {

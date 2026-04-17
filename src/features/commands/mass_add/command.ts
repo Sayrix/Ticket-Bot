@@ -18,6 +18,8 @@ import { ApplicationCommandOptionType } from "discord-api-types/v10";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
 import { getStringOption } from "@/features/commands/shared/options";
+import { sendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
@@ -25,6 +27,7 @@ import {
 	updateInvitedUserIds
 } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
+import { getInteractionUser } from "@/features/tickets/utils";
 
 export default defineCommand({
 	data: {
@@ -93,6 +96,17 @@ export default defineCommand({
 
 		if (addedUserIds.length > 0) {
 			await updateInvitedUserIds(app, openTicket.ticket.channelId, nextInvitedUserIds);
+			const actor = getInteractionUser(interaction);
+			const ticketLogContext = createTicketLogContext(openTicket.ticket, openTicket.ticketType.name);
+
+			for (const userId of addedUserIds) {
+				void sendTicketLog(app, {
+					kind: "userAdded",
+					actor,
+					targetId: userId,
+					ticket: ticketLogContext
+				});
+			}
 		}
 
 		await reply(app, interaction, {

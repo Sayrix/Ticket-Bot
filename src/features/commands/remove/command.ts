@@ -20,9 +20,13 @@ import { createCustomId } from "@/core/custom-id";
 import { defineCommand } from "@/core/defineCommand";
 import { reply, updateMessage } from "@/core/respond";
 import type { ComponentExecutionContext } from "@/core/types";
+import type { TicketRecord } from "@/db/schema";
 import { getUserOption } from "@/features/commands/shared/options";
+import { sendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import { getInvitedUserIds, revokeTicketParticipantAccess, updateInvitedUserIds } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
+import { getInteractionUser } from "@/features/tickets/utils";
 
 const REMOVE_USERS_CUSTOM_ID = createCustomId("tickets", "remove-users");
 
@@ -63,7 +67,9 @@ export default defineCommand({
 		const selectedUser = getUserOption(interaction, "user");
 
 		if (selectedUser) {
-			await removeUsersFromTicket(app, interaction, invitedUserIds, openTicket.ticket.channelId, [selectedUser.userId]);
+			await removeUsersFromTicket(app, interaction, openTicket.ticket, openTicket.ticketType.name, invitedUserIds, [
+				selectedUser.userId
+			]);
 			return;
 		}
 
@@ -117,16 +123,25 @@ export async function handleRemoveUsersSelect(context: ComponentExecutionContext
 	const invitedUserIds = getInvitedUserIds(openTicket.ticket);
 	const selectedUserIds = interaction.data.values.filter((userId: string) => invitedUserIds.includes(userId));
 
-	await removeUsersFromTicket(context.app, interaction, invitedUserIds, openTicket.ticket.channelId, selectedUserIds, {
-		responseMode: "update-message"
-	});
+	await removeUsersFromTicket(
+		context.app,
+		interaction,
+		openTicket.ticket,
+		openTicket.ticketType.name,
+		invitedUserIds,
+		selectedUserIds,
+		{
+			responseMode: "update-message"
+		}
+	);
 }
 
 async function removeUsersFromTicket(
 	app: ComponentExecutionContext["app"],
 	interaction: APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction,
+	ticket: TicketRecord,
+	ticketTypeName: string,
 	invitedUserIds: string[],
-	channelId: string,
 	selectedUserIds: string[],
 	options?: {
 		responseMode?: "reply" | "update-message";
@@ -140,14 +155,25 @@ async function removeUsersFromTicket(
 	}
 
 	for (const userId of removableUserIds) {
-		await revokeTicketParticipantAccess(app, channelId, userId);
+		await revokeTicketParticipantAccess(app, ticket.channelId, userId);
 	}
 
 	await updateInvitedUserIds(
 		app,
-		channelId,
+		ticket.channelId,
 		invitedUserIds.filter((userId) => !removableUserIds.includes(userId))
 	);
+	const actor = getInteractionUser(interaction);
+	const ticketLogContext = createTicketLogContext(ticket, ticketTypeName);
+
+	for (const userId of removableUserIds) {
+		void sendTicketLog(app, {
+			kind: "userRemoved",
+			actor,
+			targetId: userId,
+			ticket: ticketLogContext
+		});
+	}
 
 	await respond(
 		app,

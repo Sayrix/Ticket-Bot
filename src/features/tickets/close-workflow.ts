@@ -26,7 +26,10 @@ import { createCustomId } from "@/core/custom-id";
 import { editReply, reply, showModal } from "@/core/respond";
 import type { BotApp, CommandExecutionContext, ComponentExecutionContext } from "@/core/types";
 import { ticketsTable } from "@/db/schema";
+import { sendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import { getTicketType, hasTicketStaffAccess } from "@/features/tickets/config-access";
+import { DEFAULT_NO_REASON } from "@/features/tickets/constants";
 import {
 	appendMessageButton,
 	finalizeMessageTemplate,
@@ -79,6 +82,13 @@ export async function handleDeleteClosedTicketButton(
 	await reply(context.app, interaction, {
 		content: "Deleting ticket channel...",
 		flags: MessageFlags.Ephemeral
+	});
+	void sendTicketLog(context.app, {
+		kind: "ticketDelete",
+		actor: getInteractionUser(interaction),
+		reason: manageable.ticket.closedReason ?? DEFAULT_NO_REASON,
+		transcriptUrl: manageable.ticket.transcriptUrl,
+		ticket: createTicketLogContext(manageable.ticket, manageable.ticketType.name)
 	});
 	await context.app.client.api.channels.delete(channelId);
 }
@@ -220,6 +230,13 @@ async function closeTicket(
 		transcriptUrl: transcriptUrl ?? "",
 		userId: ticket.createdBy
 	};
+	void sendTicketLog(app, {
+		kind: "ticketClose",
+		actor: closer,
+		reason: normalizedReason,
+		transcriptUrl,
+		ticket: createTicketLogContext(ticket, ticketType.name)
+	});
 
 	if (app.config.tickets.close.dmUserOnClose) {
 		await status.update("Sending close confirmation...");
@@ -227,6 +244,13 @@ async function closeTicket(
 	}
 
 	if (app.config.tickets.close.deleteChannelOnClose) {
+		void sendTicketLog(app, {
+			kind: "ticketDelete",
+			actor: closer,
+			reason: normalizedReason,
+			transcriptUrl,
+			ticket: createTicketLogContext(ticket, ticketType.name)
+		});
 		await editReply(app, interaction, {
 			content: transcriptUrl
 				? "Ticket closed. The transcript is ready and the channel will now be deleted."
@@ -237,7 +261,10 @@ async function closeTicket(
 	}
 
 	await status.update("Posting close summary...");
-	await app.client.api.channels.createMessage(ticket.channelId, await buildCloseChannelMessage(app, ticketType, closeMessageTokens));
+	await app.client.api.channels.createMessage(
+		ticket.channelId,
+		await buildCloseChannelMessage(app, ticketType, closeMessageTokens)
+	);
 
 	await status.update("Ticket closed.");
 }
@@ -428,13 +455,10 @@ async function buildCloseChannelMessage(
 	}
 ) {
 	const deleteButtonCustomId = createCustomId("tickets", "delete-closed");
-	const messageTemplate = await loadMessageTemplate(
-		resolveCloseChannelMessageReference(app, ticketType),
-		{
-			...tokens,
-			deleteButtonCustomId
-		}
-	);
+	const messageTemplate = await loadMessageTemplate(resolveCloseChannelMessageReference(app, ticketType), {
+		...tokens,
+		deleteButtonCustomId
+	});
 
 	return finalizeMessageTemplate(
 		appendMessageButton(

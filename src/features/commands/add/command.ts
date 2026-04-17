@@ -18,6 +18,8 @@ import { ApplicationCommandOptionType } from "discord-api-types/v10";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
 import { getUserOption } from "@/features/commands/shared/options";
+import { sendTicketLog } from "@/features/logs/service";
+import { createTicketLogContext } from "@/features/logs/utils";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
@@ -25,6 +27,7 @@ import {
 	updateInvitedUserIds
 } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
+import { getInteractionUser } from "@/features/tickets/utils";
 
 export default defineCommand({
 	data: {
@@ -88,6 +91,12 @@ export default defineCommand({
 
 		await grantTicketParticipantAccess(app, openTicket.ticket.channelId, selectedUser.userId);
 		await updateInvitedUserIds(app, openTicket.ticket.channelId, [...invitedUserIds, selectedUser.userId]);
+		void sendTicketLog(app, {
+			kind: "userAdded",
+			actor: getInteractionUser(interaction),
+			targetId: selectedUser.userId,
+			ticket: createTicketLogContext(openTicket.ticket, openTicket.ticketType.name)
+		});
 
 		await reply(app, interaction, {
 			content: `Added <@${selectedUser.userId}> to this ticket.`,

@@ -34,6 +34,7 @@ import { createCustomId } from "@/core/custom-id";
 import { deferReply, editReply, followUp, reply, showModal, updateMessage } from "@/core/respond";
 import type { BotApp, ComponentExecutionContext } from "@/core/types";
 import { type TicketRecord, ticketsTable } from "@/db/schema";
+import { sendTicketLog } from "@/features/logs/service";
 import {
 	getPanel,
 	getPanelTicketTypeKeys,
@@ -155,6 +156,7 @@ async function createTicket(
 
 	const user = getInteractionUser(interaction);
 	const ticketNumber = (await getNextTicketNumber(app)).toString();
+	const createdAt = Date.now();
 	const channelName = renderChannelName(ticketType.channelNameTemplate ?? app.config.tickets.channelNameTemplate, {
 		ticketNumber,
 		ticketTypeKey,
@@ -192,8 +194,21 @@ async function createTicket(
 		type: ticketTypeKey,
 		reason: serializeTicketOpenReason(reason),
 		createdBy: user.id,
-		createdAt: Date.now(),
+		createdAt,
 		invitedUserIds: "[]"
+	});
+	void sendTicketLog(app, {
+		kind: "ticketCreate",
+		actor: user,
+		reason: reason.combined,
+		ticket: {
+			ticketId: ticketNumber,
+			ticketChannelId: channel.id,
+			ticketTypeKey,
+			ticketTypeName: ticketType.name,
+			createdAt,
+			createdById: user.id
+		}
 	});
 
 	const successMessage = {
@@ -245,9 +260,7 @@ export async function buildTicketWelcomeMessage(
 		closeButtonCustomId,
 		staffMentions: roleMentions.length ? ` ${roleMentions.join(" ")}` : ""
 	};
-	const messageTemplate = messageReference
-		? await loadMessageTemplate(messageReference, renderedTokens)
-		: {};
+	const messageTemplate = messageReference ? await loadMessageTemplate(messageReference, renderedTokens) : {};
 	const configuredContent = ticketType.welcomeContent ?? app.config.tickets.defaultWelcomeContent;
 	const runtimeText = configuredContent ? renderTemplate(configuredContent, renderedTokens) : undefined;
 	const withRuntimeText = appendMessageText(messageTemplate, runtimeText, { slot: "runtime-text" });
