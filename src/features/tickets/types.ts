@@ -25,6 +25,8 @@ export type ButtonPanelEntryConfig = Extract<PanelOpenerConfig, { type: "buttons
 export type ButtonStyleName = NonNullable<Extract<PanelOpenerConfig, { type: "button-select" }>["style"]>;
 export type TicketClaimsConfig = CurrentConfig["tickets"]["claims"];
 export type TicketClaimMode = TicketClaimsConfig["mode"];
+export type LogsConfig = CurrentConfig["logs"];
+export type LogEventToggleKey = keyof NonNullable<LogsConfig["events"]>;
 
 export interface LoadedMessageTemplate {
 	allowed_mentions?: APIAllowedMentions;

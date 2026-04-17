@@ -84,12 +84,16 @@ export function appendMessageText(
 	if (usesComponentsV2(payload)) {
 		// Components V2 messages cannot use the legacy `content` field, so extra
 		// runtime text is injected as a text display block instead.
-		return appendMessageComponents(payload, [
-			{
-				type: ComponentType.TextDisplay,
-				content: normalizedText
-			}
-		], options?.slot);
+		return appendMessageComponents(
+			payload,
+			[
+				{
+					type: ComponentType.TextDisplay,
+					content: normalizedText
+				}
+			],
+			options?.slot
+		);
 	}
 
 	return {

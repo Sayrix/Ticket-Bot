@@ -24,6 +24,23 @@ export default defineConfig("0.0.1", {
 	// Transcript ID style used by ticket.pm uploads.
 	// "uuid" matches the current default. "emoji" keeps the older style.
 	uuidType: "uuid",
+	logs: {
+		// Set to true to post audit logs for ticket actions.
+		enabled: true,
+		// Channel where ticket audit logs will be sent.
+		channelId: "171717171717171717",
+		// Omit this object to enable every supported log type.
+		events: {
+			ticketCreate: true,
+			ticketClaim: true,
+			ticketUnclaim: true,
+			ticketClose: true,
+			ticketDelete: true,
+			userAdded: true,
+			userRemoved: true,
+			ticketRename: true
+		}
+	},
 	status: {
 		// Set to false to leave the bot presence untouched.
 		enabled: true,

@@ -22,6 +22,20 @@ interface ConfigV0_0_1 {
 	lang: "en";
 	/** Controls the transcript ID style when uploading to ticket.pm */
 	uuidType?: "uuid" | "emoji";
+	logs: {
+		enabled: boolean;
+		channelId: string;
+		events?: {
+			ticketCreate?: boolean;
+			ticketClaim?: boolean;
+			ticketUnclaim?: boolean;
+			ticketClose?: boolean;
+			ticketDelete?: boolean;
+			userAdded?: boolean;
+			userRemoved?: boolean;
+			ticketRename?: boolean;
+		};
+	};
 	status?: {
 		enabled: boolean;
 		text?: string;

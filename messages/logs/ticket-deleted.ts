@@ -13,6 +13,30 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
+import { ComponentType } from "@discordjs/core";
+import type { LoadedMessageTemplate } from "@/features/tickets/types";
+
+const ticketDeletedLogMessage: LoadedMessageTemplate = {
+	components: [
+		{
+			type: ComponentType.Container,
+			accent_color: 13632027,
+			components: [
+				{ type: ComponentType.TextDisplay, content: "## Ticket Deleted" },
+				{ type: ComponentType.TextDisplay, content: "{actorMention} deleted {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: "**Ticket**\n#{ticketId} • {ticketTypeName}" },
+				{ type: ComponentType.TextDisplay, content: "**Opened By**\n{createdByMention}" },
+				{ type: ComponentType.TextDisplay, content: "**Claim Status**\n{claimStatus}" },
+				{ type: ComponentType.TextDisplay, content: "**Open Age**\n{ticketAge}" },
+				{ type: ComponentType.TextDisplay, content: "**Close Reason**\n{reason}" },
+				{ type: ComponentType.TextDisplay, content: "**Transcript**\n{transcriptStatus}" }
+			]
+		}
+	]
+};
+
+export default ticketDeletedLogMessage;
+
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,
 version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
