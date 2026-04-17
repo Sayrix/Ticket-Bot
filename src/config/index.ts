@@ -22,6 +22,10 @@ interface ConfigV0_0_1 {
 	lang: "en";
 	/** Controls the transcript ID style when uploading to ticket.pm */
 	uuidType?: "uuid" | "emoji";
+	/** Reduce telemetry to bot/runtime version only */
+	minimalTracking?: boolean;
+	/** Enable websocket lifecycle logs for telemetry */
+	showWSLog?: boolean;
 	logs: {
 		enabled: boolean;
 		channelId: string;

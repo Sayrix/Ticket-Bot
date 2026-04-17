@@ -25,6 +25,7 @@ import { defineEvent } from "@/core/defineEvent";
 import type { BotApp } from "@/core/types";
 import { deployApplicationCommands } from "@/deploy-commands";
 import { syncTicketPanels } from "@/features/tickets/service";
+import { announceTelemetryPrivacy, startTelemetry } from "@/telemetry";
 
 const PRESENCE_REFRESH_INTERVAL_MS = 900_000;
 const SPONSORS_URL = "https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json";
@@ -72,6 +73,8 @@ const readyEvent = defineEvent<[ToEventProps<GatewayReadyDispatchData>]>({
 			void applyConfiguredPresence(app);
 		}, PRESENCE_REFRESH_INTERVAL_MS);
 		await announceStartup(app, `${event.data.user.username}#${event.data.user.discriminator}`, event.data.user.id);
+		await announceTelemetryPrivacy(app);
+		startTelemetry(app, event.data.guilds.length);
 	}
 });
 

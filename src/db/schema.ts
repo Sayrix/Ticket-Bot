@@ -24,6 +24,12 @@ export const panelMessagesTable = sqliteTable("panel_messages", {
 	updatedAt: int().notNull()
 });
 
+export const appMetaTable = sqliteTable("app_meta", {
+	key: text().primaryKey(),
+	value: text().notNull(),
+	updatedAt: int().notNull()
+});
+
 export const ticketsTable = sqliteTable("tickets", {
 	id: int().primaryKey({ autoIncrement: true }),
 	/** The ID of the channel where the ticket was created. */
@@ -49,6 +55,7 @@ export const ticketsTable = sqliteTable("tickets", {
 	transcriptUrl: text()
 });
 
+export type AppMetaRecord = typeof appMetaTable.$inferSelect;
 export type TicketRecord = typeof ticketsTable.$inferSelect;
 
 /*

@@ -24,6 +24,10 @@ export default defineConfig("0.0.1", {
 	// Transcript ID style used by ticket.pm uploads.
 	// "uuid" matches the current default. "emoji" keeps the older style.
 	uuidType: "uuid",
+	// Reduce telemetry to the bot version and runtime version only.
+	minimalTracking: false,
+	// Log websocket connect, close, and error events for telemetry.
+	showWSLog: false,
 	logs: {
 		// Set to true to post audit logs for ticket actions.
 		enabled: true,
