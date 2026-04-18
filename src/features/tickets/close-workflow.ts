@@ -21,8 +21,8 @@ import type {
 	APIMessageComponentInteraction,
 	APIModalSubmitInteraction
 } from "@discordjs/core";
-import type { APIComponentInMessageActionRow, APIContainerComponent } from "discord-api-types/v10";
-import { ButtonStyle, ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";
+import { ButtonStyle, ComponentType, MessageFlags, OverwriteType, TextInputStyle } from "@discordjs/core";
+import type { APIComponentInMessageActionRow, APIContainerComponent, RESTAPIChannelPatchOverwrite } from "discord-api-types/v10";
 import { eq } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
 import { editReply, reply, showModal } from "@/core/respond";
@@ -192,20 +192,14 @@ async function closeTicket(
 		.where(eq(ticketsTable.channelId, ticket.channelId));
 
 	if (!app.config.tickets.close.deleteChannelOnClose) {
+		const invitedUserIds = getInvitedUserIds(ticket);
+
+		runCloseTaskInBackground(app, ticket.channelId, "disable ticket actions", async () => {
+			// Preserve the original ticket message while preventing new actions.
+			await disableTicketActionButtons(app, ticket.channelId, ticket.creationMessageId);
+		});
 		await status.update("Updating ticket access...");
-		await revokeTicketParticipantAccess(app, ticket.channelId, ticket.createdBy);
-
-		for (const invitedUserId of getInvitedUserIds(ticket)) {
-			await revokeTicketParticipantAccess(app, ticket.channelId, invitedUserId);
-		}
-	}
-
-	// Keep the original ticket message in sync with the closed state when the
-	// channel is preserved for staff review.
-	await disableTicketActionButtons(app, ticket.channelId, ticket.creationMessageId);
-
-	if (!app.config.tickets.close.deleteChannelOnClose) {
-		await moveClosedTicketChannel(app, ticket.channelId);
+		await removeClosedTicketParticipantAccess(app, ticket.channelId, ticket.createdBy, invitedUserIds);
 	}
 
 	const transcriptJob = app.config.tickets.close.createTranscript
@@ -213,6 +207,13 @@ async function closeTicket(
 				onStatus: (content) => status.update(content)
 			})
 		: null;
+
+	if (!app.config.tickets.close.deleteChannelOnClose) {
+		runCloseTaskInBackground(app, ticket.channelId, "move the closed ticket channel", async () => {
+			await moveClosedTicketChannel(app, ticket.channelId);
+		});
+	}
+
 	const transcriptUrl = transcriptJob ? await transcriptJob.waitForResult() : null;
 
 	if (app.config.tickets.close.createTranscript && !transcriptUrl) {
@@ -240,7 +241,7 @@ async function closeTicket(
 		ticket: createTicketLogContext(ticket, ticketType.name)
 	});
 
-	if (app.config.tickets.close.dmUserOnClose) {
+	if (app.config.tickets.close.deleteChannelOnClose && app.config.tickets.close.dmUserOnClose) {
 		await status.update("Sending close confirmation...");
 		await sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens);
 	}
@@ -262,11 +263,15 @@ async function closeTicket(
 		return;
 	}
 
-	await status.update("Posting close summary...");
-	await app.client.api.channels.createMessage(
-		ticket.channelId,
-		await buildCloseChannelMessage(app, ticketType, closeMessageTokens)
-	);
+	const closeSummaryMessage = await buildCloseChannelMessage(app, ticketType, closeMessageTokens);
+	const closeTasks: Promise<unknown>[] = [app.client.api.channels.createMessage(ticket.channelId, closeSummaryMessage)];
+
+	if (app.config.tickets.close.dmUserOnClose) {
+		closeTasks.push(sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens));
+	}
+
+	await status.update(app.config.tickets.close.dmUserOnClose ? "Sending close updates..." : "Posting close summary...");
+	await Promise.all(closeTasks);
 
 	await status.update("Ticket closed.");
 }
@@ -434,6 +439,39 @@ async function moveClosedTicketChannel(app: BotApp, channelId: string) {
 	});
 }
 
+async function removeClosedTicketParticipantAccess(app: BotApp, channelId: string, openerId: string, invitedUserIds: string[]) {
+	if (invitedUserIds.length === 0) {
+		await revokeTicketParticipantAccess(app, channelId, openerId);
+		return;
+	}
+
+	const channel = await app.client.api.channels.get(channelId);
+
+	if (!("permission_overwrites" in channel)) {
+		return;
+	}
+
+	const removedUserIds = new Set([openerId, ...invitedUserIds]);
+	const nextOverwrites: RESTAPIChannelPatchOverwrite[] = (channel.permission_overwrites ?? [])
+		.filter((overwrite) => overwrite.type !== OverwriteType.Member || !removedUserIds.has(overwrite.id))
+		.map((overwrite) => ({
+			id: overwrite.id,
+			type: overwrite.type,
+			allow: overwrite.allow ?? "0",
+			deny: overwrite.deny ?? "0"
+		}));
+
+	await app.client.api.channels.edit(channelId, {
+		permission_overwrites: nextOverwrites
+	});
+}
+
+function runCloseTaskInBackground(app: BotApp, channelId: string, action: string, task: () => Promise<void>) {
+	void task().catch((error) => {
+		app.logger.error(`Failed to ${action} for ticket channel ${channelId}.`, error);
+	});
+}
+
 async function sendCloseDm(
 	app: BotApp,
 	userId: string,
@@ -515,26 +553,48 @@ function createCloseStatusUpdater(
 	interaction: APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction | APIModalSubmitInteraction
 ) {
 	let hasStarted = false;
-	let lastContent = "";
+	let displayedContent = "";
+	let requestedContent = "";
+	let flushPromise: Promise<void> | null = null;
+
+	const flushLatestContent = async (): Promise<void> => {
+		while (hasStarted && requestedContent !== displayedContent) {
+			if (!flushPromise) {
+				const nextContent = requestedContent;
+
+				flushPromise = editReply(app, interaction, {
+					content: nextContent
+				})
+					.catch(() => undefined)
+					.then(() => {
+						displayedContent = nextContent;
+					})
+					.finally(() => {
+						flushPromise = null;
+					});
+			}
+
+			await flushPromise;
+		}
+	};
 
 	return {
 		start: async (content: string) => {
 			hasStarted = true;
-			lastContent = content;
+			displayedContent = content;
+			requestedContent = content;
 			await reply(app, interaction, {
 				content,
 				flags: MessageFlags.Ephemeral
 			});
 		},
 		update: async (content: string) => {
-			if (!hasStarted || content === lastContent) {
+			if (!hasStarted || content === requestedContent) {
 				return;
 			}
 
-			lastContent = content;
-			await editReply(app, interaction, {
-				content
-			}).catch(() => undefined);
+			requestedContent = content;
+			await flushLatestContent();
 		}
 	};
 }
