@@ -30,24 +30,25 @@ import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { getInteractionUser } from "@/features/tickets/utils";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "add",
-		description: "Add someone to the current ticket",
+		description: LL.commands.add.description(),
 		options: [
 			{
 				name: "user",
-				description: "The user to add",
+				description: LL.commands.add.options.user.description(),
 				required: true,
 				type: ApplicationCommandOptionType.User
 			}
 		]
-	},
+	}),
 	async execute({ app }, interaction) {
+		const LL = app.LL;
 		const selectedUser = getUserOption(interaction, "user");
 
 		if (!selectedUser) {
 			await reply(app, interaction, {
-				content: "Choose a user to add to this ticket.",
+				content: LL.commands.add.choose_user(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -67,7 +68,7 @@ export default defineCommand({
 
 		if (selectedUser.userId === openTicket.ticket.createdBy) {
 			await reply(app, interaction, {
-				content: "That user already has access to this ticket.",
+				content: LL.commands.add.already_has_access(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -75,7 +76,7 @@ export default defineCommand({
 
 		if (invitedUserIds.includes(selectedUser.userId)) {
 			await reply(app, interaction, {
-				content: "That user is already invited to this ticket.",
+				content: LL.commands.add.already_invited(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -83,7 +84,7 @@ export default defineCommand({
 
 		if (invitedUserIds.length >= MAX_INVITED_TICKET_USERS) {
 			await reply(app, interaction, {
-				content: `You cannot invite more than ${MAX_INVITED_TICKET_USERS} users to one ticket.`,
+				content: LL.commands.add.invite_limit_reached({ limit: MAX_INVITED_TICKET_USERS }),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -99,7 +100,7 @@ export default defineCommand({
 		});
 
 		await reply(app, interaction, {
-			content: `Added <@${selectedUser.userId}> to this ticket.`,
+			content: LL.commands.add.success({ userId: selectedUser.userId }),
 			flags: MessageFlags.Ephemeral
 		});
 	}

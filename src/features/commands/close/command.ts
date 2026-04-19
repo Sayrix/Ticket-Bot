@@ -17,10 +17,10 @@ import { defineCommand } from "@/core/defineCommand";
 import { executeCloseCommand } from "@/features/tickets/close-workflow";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "close",
-		description: "Close the current ticket"
-	},
+		description: LL.commands.close.description()
+	}),
 	execute: executeCloseCommand
 });
 

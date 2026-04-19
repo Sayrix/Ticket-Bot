@@ -30,25 +30,26 @@ import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { getInteractionUser } from "@/features/tickets/utils";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "mass_add",
-		description: "Add multiple users to the current ticket",
+		description: LL.commands.mass_add.description(),
 		options: [
 			{
 				name: "users",
-				description: "Comma-separated user IDs or mentions",
+				description: LL.commands.mass_add.options.users.description(),
 				required: true,
 				type: ApplicationCommandOptionType.String
 			}
 		]
-	},
+	}),
 	async execute({ app }, interaction) {
+		const LL = app.LL;
 		const rawValue = getStringOption(interaction, "users");
 		const requestedUserIds = parseRequestedUserIds(rawValue ?? "");
 
 		if (requestedUserIds.length === 0) {
 			await reply(app, interaction, {
-				content: "Provide at least one user ID or mention.",
+				content: LL.commands.mass_add.provide_users(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -110,7 +111,7 @@ export default defineCommand({
 		}
 
 		await reply(app, interaction, {
-			content: buildMassAddSummary(addedUserIds, skippedUserIds, invalidUserIds, limitReached),
+			content: buildMassAddSummary(app, addedUserIds, skippedUserIds, invalidUserIds, limitReached),
 			flags: MessageFlags.Ephemeral
 		});
 	}
@@ -136,25 +137,36 @@ function parseRequestedUserIds(rawValue: string) {
 	return [...new Set(requestedUserIds)];
 }
 
-function buildMassAddSummary(addedUserIds: string[], skippedUserIds: string[], invalidUserIds: string[], limitReached: boolean) {
+function buildMassAddSummary(
+	app: Parameters<typeof reply>[0],
+	addedUserIds: string[],
+	skippedUserIds: string[],
+	invalidUserIds: string[],
+	limitReached: boolean
+) {
+	const LL = app.LL;
 	const lines: string[] = [];
 
 	if (addedUserIds.length > 0) {
-		lines.push(`Added ${addedUserIds.map((userId) => `<@${userId}>`).join(", ")}.`);
+		lines.push(
+			LL.commands.mass_add.summary.added({
+				mentions: addedUserIds.map((userId) => `<@${userId}>`).join(", ")
+			})
+		);
 	} else {
-		lines.push("No users were added.");
+		lines.push(LL.commands.mass_add.summary.none_added());
 	}
 
 	if (skippedUserIds.length > 0) {
-		lines.push(`Skipped ${skippedUserIds.length} user(s) that already had access.`);
+		lines.push(LL.commands.mass_add.summary.skipped_existing({ count: skippedUserIds.length }));
 	}
 
 	if (invalidUserIds.length > 0) {
-		lines.push(`Skipped ${invalidUserIds.length} invalid user ID(s).`);
+		lines.push(LL.commands.mass_add.summary.skipped_invalid({ count: invalidUserIds.length }));
 	}
 
 	if (limitReached) {
-		lines.push(`Stopped when the ${MAX_INVITED_TICKET_USERS}-user ticket limit was reached.`);
+		lines.push(LL.commands.mass_add.summary.limit_reached({ limit: MAX_INVITED_TICKET_USERS }));
 	}
 
 	return lines.join("\n");

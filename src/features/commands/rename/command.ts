@@ -25,19 +25,20 @@ import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { getInteractionUser, getMemberRoleIds, sanitizeChannelName } from "@/features/tickets/utils";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "rename",
-		description: "Rename the current ticket",
+		description: LL.commands.rename.description(),
 		options: [
 			{
 				name: "name",
-				description: "The new ticket channel name",
+				description: LL.commands.rename.options.name.description(),
 				required: true,
 				type: ApplicationCommandOptionType.String
 			}
 		]
-	},
+	}),
 	async execute({ app }, interaction) {
+		const LL = app.LL;
 		const openTicket = await getOpenTicketByChannel(app, interaction.channel_id);
 
 		if (!openTicket.ok) {
@@ -50,7 +51,7 @@ export default defineCommand({
 
 		if (!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))) {
 			await reply(app, interaction, {
-				content: "Only staff can rename this ticket.",
+				content: LL.commands.rename.only_staff(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -60,7 +61,7 @@ export default defineCommand({
 
 		if (!requestedName) {
 			await reply(app, interaction, {
-				content: "Provide a new ticket name.",
+				content: LL.commands.rename.provide_name(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -94,7 +95,7 @@ export default defineCommand({
 		}
 
 		await reply(app, interaction, {
-			content: `Ticket renamed to <#${openTicket.ticket.channelId}>.`,
+			content: LL.commands.rename.success({ channelId: openTicket.ticket.channelId }),
 			flags: MessageFlags.Ephemeral
 		});
 	}

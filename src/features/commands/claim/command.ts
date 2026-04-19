@@ -17,10 +17,10 @@ import { defineCommand } from "@/core/defineCommand";
 import { executeClaimCommand } from "@/features/tickets/claim-workflow";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "claim",
-		description: "Claim the current ticket"
-	},
+		description: LL.commands.claim.description()
+	}),
 	execute: executeClaimCommand
 });
 

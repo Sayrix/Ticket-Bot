@@ -19,13 +19,14 @@ import { editReply, reply } from "@/core/respond";
 import { getInteractionUser } from "@/features/tickets/utils";
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "cleardm",
-		description: "Clear the bot's ticket history from your DMs"
-	},
+		description: LL.commands.cleardm.description()
+	}),
 	async execute({ app }, interaction) {
+		const LL = app.LL;
 		await reply(app, interaction, {
-			content: "Clearing your ticket DM history...",
+			content: LL.commands.cleardm.starting(),
 			flags: MessageFlags.Ephemeral
 		});
 
@@ -34,7 +35,7 @@ export default defineCommand({
 
 		if (!dmChannel?.id) {
 			await editReply(app, interaction, {
-				content: "I could not access your DM channel."
+				content: LL.commands.cleardm.dm_unavailable()
 			});
 			return;
 		}
@@ -69,7 +70,7 @@ export default defineCommand({
 		}
 
 		await editReply(app, interaction, {
-			content: deletedCount > 0 ? `Cleared ${deletedCount} ticket DM messages.` : "No ticket DM messages were found."
+			content: deletedCount > 0 ? LL.commands.cleardm.cleared({ count: deletedCount }) : LL.commands.cleardm.none_found()
 		});
 	}
 });

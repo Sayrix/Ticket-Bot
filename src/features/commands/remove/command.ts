@@ -31,19 +31,20 @@ import { getInteractionUser } from "@/features/tickets/utils";
 const REMOVE_USERS_CUSTOM_ID = createCustomId("tickets", "remove-users");
 
 export default defineCommand({
-	data: {
+	data: (LL) => ({
 		name: "remove",
-		description: "Remove invited users from the current ticket",
+		description: LL.commands.remove.description(),
 		options: [
 			{
 				name: "user",
-				description: "The invited user to remove immediately",
+				description: LL.commands.remove.options.user.description(),
 				required: false,
 				type: ApplicationCommandOptionType.User
 			}
 		]
-	},
+	}),
 	async execute({ app }, interaction) {
+		const LL = app.LL;
 		const openTicket = await getOpenTicketByChannel(app, interaction.channel_id);
 
 		if (!openTicket.ok) {
@@ -58,7 +59,7 @@ export default defineCommand({
 
 		if (invitedUserIds.length === 0) {
 			await reply(app, interaction, {
-				content: "There are no invited users to remove from this ticket.",
+				content: LL.commands.remove.no_invited_users(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -84,7 +85,7 @@ export default defineCommand({
 		);
 
 		await reply(app, interaction, {
-			content: "Select the invited users you want to remove from this ticket.",
+			content: LL.commands.remove.select_users(),
 			flags: MessageFlags.Ephemeral,
 			components: [
 				{
@@ -93,7 +94,7 @@ export default defineCommand({
 						{
 							type: ComponentType.StringSelect,
 							custom_id: REMOVE_USERS_CUSTOM_ID,
-							placeholder: "Choose users to remove",
+							placeholder: LL.commands.remove.select_placeholder(),
 							min_values: 1,
 							max_values: options.length,
 							options
@@ -150,7 +151,7 @@ async function removeUsersFromTicket(
 	const removableUserIds = selectedUserIds.filter((userId) => invitedUserIds.includes(userId));
 
 	if (removableUserIds.length === 0) {
-		await respond(app, interaction, "Those users are not invited to this ticket.", options?.responseMode);
+		await respond(app, interaction, app.LL.commands.remove.not_invited(), options?.responseMode);
 		return;
 	}
 
@@ -178,7 +179,9 @@ async function removeUsersFromTicket(
 	await respond(
 		app,
 		interaction,
-		`Removed ${removableUserIds.map((userId) => `<@${userId}>`).join(", ")} from this ticket.`,
+		app.LL.commands.remove.success({
+			mentions: removableUserIds.map((userId) => `<@${userId}>`).join(", ")
+		}),
 		options?.responseMode
 	);
 }

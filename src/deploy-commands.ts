@@ -18,6 +18,7 @@ import { REST } from "@discordjs/rest";
 import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import { config } from "dotenv";
 import { discoverCommands, discoverEvents, discoverFeatures } from "@/core/discovery";
+import { createBotI18n } from "@/core/i18n";
 import { createLogger, type Logger } from "@/core/logger";
 import { createHandlerRegistry } from "@/core/registry";
 import botConfig from "../config/config.ts";
@@ -53,7 +54,8 @@ async function deployCommands() {
 		discoverEvents(logger),
 		discoverFeatures(logger)
 	]);
-	const registry = createHandlerRegistry({ commands, features, events, logger });
+	const i18n = createBotI18n(botConfig.lang, logger);
+	const registry = createHandlerRegistry({ commands, features, events, logger, LL: i18n.LL });
 
 	await deployApplicationCommands({
 		applicationCommands: registry.applicationCommands,
