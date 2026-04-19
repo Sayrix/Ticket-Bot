@@ -421,8 +421,15 @@ function disableTicketActionRow<T extends APIComponentInMessageActionRow>(
 	return {
 		...row,
 		components: row.components.map((component) =>
-			isTicketActionButton(component, disabledButtonIds) ? { ...component, disabled: true } : component
+			isTicketActionButton(component, disabledButtonIds) ? (disableTicketActionButton(component) as T) : component
 		) as T[]
+	};
+}
+
+function disableTicketActionButton(button: APIButtonComponentWithCustomId): APIButtonComponentWithCustomId {
+	return {
+		...button,
+		disabled: true
 	};
 }
 
