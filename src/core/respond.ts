@@ -59,7 +59,7 @@ export async function replyWithAutocomplete(app: BotApp, interaction: APIApplica
 
 export async function replyWithError(app: BotApp, interaction: ReplyableInteraction) {
 	return reply(app, interaction, {
-		content: "An unexpected error occurred while handling this interaction.",
+		content: app.LL.shared.unexpected_interaction_error(),
 		flags: MessageFlags.Ephemeral
 	}).catch(() => undefined);
 }

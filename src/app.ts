@@ -18,6 +18,7 @@ import { REST } from "@discordjs/rest";
 import { WebSocketManager } from "@discordjs/ws";
 import { drizzle } from "drizzle-orm/libsql";
 import { discoverCommands, discoverEvents, discoverFeatures } from "@/core/discovery";
+import { createBotI18n } from "@/core/i18n";
 import { createLogger } from "@/core/logger";
 import { createHandlerRegistry, registerEvents } from "@/core/registry";
 import { InteractionRouter } from "@/core/router";
@@ -41,7 +42,8 @@ export async function createBotApp() {
 		discoverEvents(logger),
 		discoverFeatures(logger)
 	]);
-	const registry = createHandlerRegistry({ commands, features, events, logger });
+	const i18n = createBotI18n(botConfig.lang, logger);
+	const registry = createHandlerRegistry({ commands, features, events, logger, LL: i18n.LL });
 
 	const app = {} as BotApp;
 	app.client = client;
@@ -49,6 +51,8 @@ export async function createBotApp() {
 	app.config = botConfig;
 	app.logger = logger;
 	app.applicationId = botConfig.clientId;
+	app.locale = i18n.locale;
+	app.LL = i18n.LL;
 	app.registry = registry;
 
 	app.router = new InteractionRouter(app);

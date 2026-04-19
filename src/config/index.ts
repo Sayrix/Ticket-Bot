@@ -13,13 +13,15 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
+import type { Locales } from "../../i18n/i18n-types.js";
+
 interface ConfigV0_0_1 {
 	/** The client ID of the bot application */
 	clientId: string;
 	/** The ID of the Discord server the bot is set up in */
 	guildId: string;
 	/** The lang of the bot */
-	lang: "en";
+	lang: Locales;
 	/** Controls the transcript ID style when uploading to ticket.pm */
 	uuidType?: "uuid" | "emoji";
 	/** Reduce telemetry to bot/runtime version only */

@@ -23,6 +23,7 @@ import type {
 } from "@discordjs/core";
 import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { drizzle } from "drizzle-orm/libsql";
+import type { Locales, TranslationFunctions } from "../../i18n/i18n-types.js";
 import type { AnyVersionedConfig } from "@/config/index";
 import type { ParsedCustomId } from "@/core/custom-id";
 import type { Logger } from "@/core/logger";
@@ -33,8 +34,12 @@ export type RoutedInteraction =
 	| APIMessageComponentInteraction
 	| APIModalSubmitInteraction;
 
+export type CommandDataResolver =
+	| RESTPostAPIChatInputApplicationCommandsJSONBody
+	| ((LL: TranslationFunctions) => RESTPostAPIChatInputApplicationCommandsJSONBody);
+
 export interface CommandModule {
-	data: RESTPostAPIChatInputApplicationCommandsJSONBody;
+	data: CommandDataResolver;
 	execute(context: CommandExecutionContext, interaction: APIChatInputApplicationCommandInteraction): Promise<void>;
 	autocomplete?(context: CommandExecutionContext, interaction: APIApplicationCommandAutocompleteInteraction): Promise<void>;
 }
@@ -69,6 +74,8 @@ export interface BotApp {
 	config: AnyVersionedConfig;
 	applicationId: string;
 	logger: Logger;
+	locale: Locales;
+	LL: TranslationFunctions;
 	registry: HandlerRegistry;
 	router: InteractionRouterContract;
 }

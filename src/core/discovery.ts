@@ -28,10 +28,7 @@ function isCommandModule(value: unknown): value is CommandModule {
 		typeof value === "object" &&
 		value !== null &&
 		"data" in value &&
-		typeof value.data === "object" &&
-		value.data !== null &&
-		"name" in value.data &&
-		typeof value.data.name === "string" &&
+		(typeof value.data === "function" || (typeof value.data === "object" && value.data !== null)) &&
 		"execute" in value &&
 		typeof value.execute === "function"
 	);

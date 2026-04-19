@@ -15,17 +15,21 @@ This notice must not be removed, obscured, or replaced.
 
 import type { Logger } from "@/core/logger";
 import type { BotApp, CommandModule, EventModule, FeatureModule, HandlerRegistry } from "@/core/types";
+import type { TranslationFunctions } from "../../i18n/i18n-types.js";
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 
 interface CreateHandlerRegistryInput {
 	commands: CommandModule[];
 	events: EventModule[];
 	features: FeatureModule[];
 	logger: Logger;
+	LL: TranslationFunctions;
 }
 
-export function createHandlerRegistry({ commands, events, features, logger }: CreateHandlerRegistryInput): HandlerRegistry {
+export function createHandlerRegistry({ commands, events, features, logger, LL }: CreateHandlerRegistryInput): HandlerRegistry {
 	const featureMap = new Map<string, FeatureModule>();
 	const commandMap = new Map<string, CommandModule>();
+	const applicationCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
 	for (const feature of features) {
 		if (featureMap.has(feature.key)) {
@@ -36,11 +40,17 @@ export function createHandlerRegistry({ commands, events, features, logger }: Cr
 	}
 
 	for (const command of commands) {
-		if (commandMap.has(command.data.name)) {
-			throw new Error(`Duplicate slash command "${command.data.name}" detected.`);
+		const data = typeof command.data === "function" ? command.data(LL) : command.data;
+
+		if (commandMap.has(data.name)) {
+			throw new Error(`Duplicate slash command "${data.name}" detected.`);
 		}
 
-		commandMap.set(command.data.name, command);
+		commandMap.set(data.name, {
+			...command,
+			data
+		});
+		applicationCommands.push(data);
 	}
 
 	logger.info(`Registered ${featureMap.size} feature modules.`);
@@ -49,7 +59,7 @@ export function createHandlerRegistry({ commands, events, features, logger }: Cr
 		events,
 		features: featureMap,
 		commands: commandMap,
-		applicationCommands: [...commandMap.values()].map((command) => command.data)
+		applicationCommands
 	};
 }
 

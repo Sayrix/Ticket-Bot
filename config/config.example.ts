@@ -20,6 +20,7 @@ export default defineConfig("0.0.1", {
 	clientId: "123456789012345678",
 	// The guild where the bot is installed and where commands should be deployed.
 	guildId: "123456789012345678",
+	// Supported locales: "en", "fr"
 	lang: "en",
 	// Transcript ID style used by ticket.pm uploads.
 	// "uuid" matches the current default. "emoji" keeps the older style.
