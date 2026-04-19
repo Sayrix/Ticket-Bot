@@ -14,29 +14,33 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const generalTicketClosedMessage: LoadedMessageTemplate = {
+const ticketClosedGeneralMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
-			accent_color: 3447003,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## General Support Closed"
+					content: LL.tickets.templates.ticket_closed_general.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "<@{userId}>'s general support ticket is now closed."
+					content: LL.tickets.templates.ticket_closed_general.subtitle({ userId: "{userId}" })
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_general.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_general.closed_by({ closerName: "{closerName}" })
 				},
 				{
 					type: ComponentType.ActionRow,
@@ -44,7 +48,7 @@ const generalTicketClosedMessage: LoadedMessageTemplate = {
 						{
 							type: ComponentType.Button,
 							custom_id: "{deleteButtonCustomId}",
-							label: "Delete Ticket",
+							label: LL.tickets.actions.delete_ticket(),
 							style: 4
 						}
 					]
@@ -52,9 +56,9 @@ const generalTicketClosedMessage: LoadedMessageTemplate = {
 			]
 		}
 	]
-};
+});
 
-export default generalTicketClosedMessage;
+export default ticketClosedGeneralMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

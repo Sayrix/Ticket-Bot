@@ -14,24 +14,35 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const userAddedLogMessage: LoadedMessageTemplate = {
+const userAddedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 3901635,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## User Added" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} added {targetMention} to {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.user_added.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}"
+					content: LL.logs.templates.user_added.action({
+						actorMention: "{actorMention}",
+						targetMention: "{targetMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.user_added.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default userAddedLogMessage;
 

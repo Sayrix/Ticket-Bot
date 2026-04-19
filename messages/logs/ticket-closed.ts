@@ -14,25 +14,38 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketClosedLogMessage: LoadedMessageTemplate = {
+const ticketClosedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 16007990,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## Ticket Closed" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} closed {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.ticket_closed.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content:
-						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Claim Status**: {claimStatus}\n**Open Age**: {ticketAge}\n**Reason**: {reason}\n**Transcript**: {transcriptStatus}"
+					content: LL.logs.templates.ticket_closed.action({
+						actorMention: "{actorMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.ticket_closed.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}",
+						claimStatus: "{claimStatus}",
+						ticketAge: "{ticketAge}",
+						reason: "{reason}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketClosedLogMessage;
 

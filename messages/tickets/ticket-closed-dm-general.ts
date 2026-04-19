@@ -14,32 +14,36 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const generalTicketClosedDmMessage: LoadedMessageTemplate = {
+const ticketClosedDmGeneralMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
-			accent_color: 3447003,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Your general support ticket has been closed"
+					content: LL.tickets.templates.ticket_closed_dm_general.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_dm_general.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_dm_general.closed_by({ closerName: "{closerName}" })
 				}
 			]
 		}
 	]
-};
+});
 
-export default generalTicketClosedDmMessage;
+export default ticketClosedDmGeneralMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

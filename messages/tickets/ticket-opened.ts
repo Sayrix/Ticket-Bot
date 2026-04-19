@@ -15,9 +15,9 @@ This notice must not be removed, obscured, or replaced.
 
 import { ComponentType } from "@discordjs/core";
 import { createMessageSlot, createRuntimeTextSlot } from "@/features/tickets/messages";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketOpenedMessage: LoadedMessageTemplate = {
+const ticketOpenedMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.TextDisplay,
@@ -29,26 +29,26 @@ const ticketOpenedMessage: LoadedMessageTemplate = {
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## {ticketTypeName} Ticket"
+					content: LL.tickets.templates.ticket_opened.title({ ticketTypeName: "{ticketTypeName}" })
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "Thanks for opening a ticket."
+					content: LL.tickets.templates.ticket_opened.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Details**\n{reason}"
+					content: LL.tickets.templates.ticket_opened.details_label({ reason: "{reason}" })
 				},
 				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim Status**: {claimStatus}"
+					content: LL.tickets.templates.ticket_opened.claim_status({ claimStatus: "{claimStatus}" })
 				},
 				createMessageSlot("actions")
 			]
 		}
 	]
-};
+});
 
 export default ticketOpenedMessage;
 

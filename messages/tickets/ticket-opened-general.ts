@@ -15,9 +15,9 @@ This notice must not be removed, obscured, or replaced.
 
 import { ComponentType } from "@discordjs/core";
 import { createMessageSlot, createRuntimeTextSlot } from "@/features/tickets/messages";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const generalTicketOpenedMessage: LoadedMessageTemplate = {
+const ticketOpenedGeneralMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.TextDisplay,
@@ -25,32 +25,32 @@ const generalTicketOpenedMessage: LoadedMessageTemplate = {
 		},
 		{
 			type: ComponentType.Container,
-			accent_color: 3447003,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## General Support Ticket"
+					content: LL.tickets.templates.ticket_opened_general.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "A support team member will review this request soon."
+					content: LL.tickets.templates.ticket_opened_general.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Summary**\n{reason}"
+					content: LL.tickets.templates.ticket_opened_general.details_label({ reason: "{reason}" })
 				},
 				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim Status**: {claimStatus}"
+					content: LL.tickets.templates.ticket_opened_general.claim_status({ claimStatus: "{claimStatus}" })
 				},
 				createMessageSlot("actions")
 			]
 		}
 	]
-};
+});
 
-export default generalTicketOpenedMessage;
+export default ticketOpenedGeneralMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

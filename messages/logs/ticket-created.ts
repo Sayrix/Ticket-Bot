@@ -14,25 +14,36 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketCreatedLogMessage: LoadedMessageTemplate = {
+const ticketCreatedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 3901635,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## Ticket Created" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} opened {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.ticket_created.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content:
-						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Created**: {createdAt}\n**Reason**: {reason}"
+					content: LL.logs.templates.ticket_created.action({
+						actorMention: "{actorMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.ticket_created.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}",
+						createdAt: "{createdAt}",
+						reason: "{reason}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketCreatedLogMessage;
 

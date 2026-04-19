@@ -14,25 +14,36 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketRenamedLogMessage: LoadedMessageTemplate = {
+const ticketRenamedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 3447003,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## Ticket Renamed" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} renamed {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.ticket_renamed.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content:
-						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**From**: `{oldChannelName}`\n**To**: `{newChannelName}`"
+					content: LL.logs.templates.ticket_renamed.action({
+						actorMention: "{actorMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.ticket_renamed.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}",
+						oldChannelName: "{oldChannelName}",
+						newChannelName: "{newChannelName}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketRenamedLogMessage;
 

@@ -14,25 +14,38 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketDeletedLogMessage: LoadedMessageTemplate = {
+const ticketDeletedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 13632027,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## Ticket Deleted" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} deleted {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.ticket_deleted.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content:
-						"**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Claim Status**: {claimStatus}\n**Open Age**: {ticketAge}\n**Close Reason**: {reason}\n**Transcript**: {transcriptStatus}"
+					content: LL.logs.templates.ticket_deleted.action({
+						actorMention: "{actorMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.ticket_deleted.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}",
+						claimStatus: "{claimStatus}",
+						ticketAge: "{ticketAge}",
+						reason: "{reason}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketDeletedLogMessage;
 

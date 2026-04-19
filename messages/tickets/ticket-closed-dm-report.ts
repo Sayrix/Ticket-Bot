@@ -14,36 +14,40 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const reportTicketClosedDmMessage: LoadedMessageTemplate = {
+const ticketClosedDmReportMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
-			accent_color: 15158332,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Your report ticket has been closed"
+					content: LL.tickets.templates.ticket_closed_dm_report.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "Staff reviewed the report and any attached evidence."
+					content: LL.tickets.templates.ticket_closed_dm_report.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Resolution Note**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_dm_report.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_dm_report.closed_by({ closerName: "{closerName}" })
 				}
 			]
 		}
 	]
-};
+});
 
-export default reportTicketClosedDmMessage;
+export default ticketClosedDmReportMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

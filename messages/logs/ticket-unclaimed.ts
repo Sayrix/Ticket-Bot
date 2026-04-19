@@ -14,24 +14,35 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketUnclaimedLogMessage: LoadedMessageTemplate = {
+const ticketUnclaimedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 9807270,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## Ticket Unclaimed" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} unclaimed {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.ticket_unclaimed.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}\n**Open Age**: {ticketAge}"
+					content: LL.logs.templates.ticket_unclaimed.action({
+						actorMention: "{actorMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.ticket_unclaimed.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}",
+						ticketAge: "{ticketAge}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketUnclaimedLogMessage;
 

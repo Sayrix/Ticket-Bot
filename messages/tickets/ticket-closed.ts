@@ -14,9 +14,9 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketClosedMessage: LoadedMessageTemplate = {
+const ticketClosedMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
@@ -24,19 +24,23 @@ const ticketClosedMessage: LoadedMessageTemplate = {
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Ticket Closed"
+					content: LL.tickets.templates.ticket_closed.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "<@{userId}>'s ticket has been closed."
+					content: LL.tickets.templates.ticket_closed.subtitle({ userId: "{userId}" })
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed.closed_by({ closerName: "{closerName}" })
 				},
 				{
 					type: ComponentType.ActionRow,
@@ -44,7 +48,7 @@ const ticketClosedMessage: LoadedMessageTemplate = {
 						{
 							type: ComponentType.Button,
 							custom_id: "{deleteButtonCustomId}",
-							label: "Delete Ticket",
+							label: LL.tickets.actions.delete_ticket(),
 							style: 4
 						}
 					]
@@ -52,7 +56,7 @@ const ticketClosedMessage: LoadedMessageTemplate = {
 			]
 		}
 	]
-};
+});
 
 export default ticketClosedMessage;
 

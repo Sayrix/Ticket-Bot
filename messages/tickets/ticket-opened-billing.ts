@@ -15,9 +15,9 @@ This notice must not be removed, obscured, or replaced.
 
 import { ComponentType } from "@discordjs/core";
 import { createMessageSlot, createRuntimeTextSlot } from "@/features/tickets/messages";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const billingTicketOpenedMessage: LoadedMessageTemplate = {
+const ticketOpenedBillingMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.TextDisplay,
@@ -25,32 +25,32 @@ const billingTicketOpenedMessage: LoadedMessageTemplate = {
 		},
 		{
 			type: ComponentType.Container,
-			accent_color: 15844367,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Billing Ticket"
+					content: LL.tickets.templates.ticket_opened_billing.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "Include invoice numbers, payment method, and any failed transaction details."
+					content: LL.tickets.templates.ticket_opened_billing.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Submitted Details**\n{reason}"
+					content: LL.tickets.templates.ticket_opened_billing.details_label({ reason: "{reason}" })
 				},
 				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim Status**: {claimStatus}"
+					content: LL.tickets.templates.ticket_opened_billing.claim_status({ claimStatus: "{claimStatus}" })
 				},
 				createMessageSlot("actions")
 			]
 		}
 	]
-};
+});
 
-export default billingTicketOpenedMessage;
+export default ticketOpenedBillingMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

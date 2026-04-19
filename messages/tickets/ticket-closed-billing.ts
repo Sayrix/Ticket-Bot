@@ -14,9 +14,9 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const billingTicketClosedMessage: LoadedMessageTemplate = {
+const ticketClosedBillingMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
@@ -24,19 +24,23 @@ const billingTicketClosedMessage: LoadedMessageTemplate = {
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Billing Ticket Closed"
+					content: LL.tickets.templates.ticket_closed_billing.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "<@{userId}>'s billing ticket has been closed."
+					content: LL.tickets.templates.ticket_closed_billing.subtitle({ userId: "{userId}" })
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Close Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_billing.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_billing.closed_by({ closerName: "{closerName}" })
 				},
 				{
 					type: ComponentType.ActionRow,
@@ -44,7 +48,7 @@ const billingTicketClosedMessage: LoadedMessageTemplate = {
 						{
 							type: ComponentType.Button,
 							custom_id: "{deleteButtonCustomId}",
-							label: "Delete Ticket",
+							label: LL.tickets.actions.delete_ticket(),
 							style: 4
 						}
 					]
@@ -52,9 +56,9 @@ const billingTicketClosedMessage: LoadedMessageTemplate = {
 			]
 		}
 	]
-};
+});
 
-export default billingTicketClosedMessage;
+export default ticketClosedBillingMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

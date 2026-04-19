@@ -14,29 +14,33 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const reportTicketClosedMessage: LoadedMessageTemplate = {
+const ticketClosedReportMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
-			accent_color: 15158332,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Report Case Closed"
+					content: LL.tickets.templates.ticket_closed_report.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "The report opened by <@{userId}> has been closed."
+					content: LL.tickets.templates.ticket_closed_report.subtitle({ userId: "{userId}" })
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Resolution Note**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_report.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_report.closed_by({ closerName: "{closerName}" })
 				},
 				{
 					type: ComponentType.ActionRow,
@@ -44,7 +48,7 @@ const reportTicketClosedMessage: LoadedMessageTemplate = {
 						{
 							type: ComponentType.Button,
 							custom_id: "{deleteButtonCustomId}",
-							label: "Delete Ticket",
+							label: LL.tickets.actions.delete_ticket(),
 							style: 4
 						}
 					]
@@ -52,9 +56,9 @@ const reportTicketClosedMessage: LoadedMessageTemplate = {
 			]
 		}
 	]
-};
+});
 
-export default reportTicketClosedMessage;
+export default ticketClosedReportMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

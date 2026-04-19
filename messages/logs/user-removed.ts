@@ -14,24 +14,35 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const userRemovedLogMessage: LoadedMessageTemplate = {
+const userRemovedLogMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
 			accent_color: 16007990,
 			components: [
-				{ type: ComponentType.TextDisplay, content: "## User Removed" },
-				{ type: ComponentType.TextDisplay, content: "{actorMention} removed {targetMention} from {ticketChannelMention}." },
+				{ type: ComponentType.TextDisplay, content: LL.logs.templates.user_removed.title() },
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Ticket**: #{ticketId} • {ticketTypeName}\n**Opened By**: {createdByMention}"
+					content: LL.logs.templates.user_removed.action({
+						actorMention: "{actorMention}",
+						targetMention: "{targetMention}",
+						ticketChannelMention: "{ticketChannelMention}"
+					})
+				},
+				{
+					type: ComponentType.TextDisplay,
+					content: LL.logs.templates.user_removed.details({
+						ticketId: "{ticketId}",
+						ticketTypeName: "{ticketTypeName}",
+						createdByMention: "{createdByMention}"
+					})
 				}
 			]
 		}
 	]
-};
+});
 
 export default userRemovedLogMessage;
 

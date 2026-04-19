@@ -15,9 +15,9 @@ This notice must not be removed, obscured, or replaced.
 
 import { ComponentType } from "@discordjs/core";
 import { createMessageSlot, createRuntimeTextSlot } from "@/features/tickets/messages";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const reportTicketOpenedMessage: LoadedMessageTemplate = {
+const ticketOpenedReportMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.TextDisplay,
@@ -25,32 +25,32 @@ const reportTicketOpenedMessage: LoadedMessageTemplate = {
 		},
 		{
 			type: ComponentType.Container,
-			accent_color: 15158332,
+			accent_color: 16106539,
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Report Ticket"
+					content: LL.tickets.templates.ticket_opened_report.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "Moderation staff will review the report and any evidence attached."
+					content: LL.tickets.templates.ticket_opened_report.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Report Details**\n{reason}"
+					content: LL.tickets.templates.ticket_opened_report.details_label({ reason: "{reason}" })
 				},
 				createRuntimeTextSlot(),
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Claim Status**: {claimStatus}"
+					content: LL.tickets.templates.ticket_opened_report.claim_status({ claimStatus: "{claimStatus}" })
 				},
 				createMessageSlot("actions")
 			]
 		}
 	]
-};
+});
 
-export default reportTicketOpenedMessage;
+export default ticketOpenedReportMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,

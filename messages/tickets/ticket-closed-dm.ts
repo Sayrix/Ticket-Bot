@@ -14,9 +14,9 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const ticketClosedDmMessage: LoadedMessageTemplate = {
+const ticketClosedDmMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
@@ -24,20 +24,24 @@ const ticketClosedDmMessage: LoadedMessageTemplate = {
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Your ticket has been closed"
+					content: LL.tickets.templates.ticket_closed_dm.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_dm.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_dm.closed_by({ closerName: "{closerName}" })
 				}
 			]
 		}
 	]
-};
+});
 
 export default ticketClosedDmMessage;
 

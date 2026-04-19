@@ -14,9 +14,9 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import { ComponentType } from "@discordjs/core";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateContext } from "@/features/tickets/types";
 
-const billingTicketClosedDmMessage: LoadedMessageTemplate = {
+const ticketClosedDmBillingMessage = ({ LL }: MessageTemplateContext): LoadedMessageTemplate => ({
 	components: [
 		{
 			type: ComponentType.Container,
@@ -24,26 +24,30 @@ const billingTicketClosedDmMessage: LoadedMessageTemplate = {
 			components: [
 				{
 					type: ComponentType.TextDisplay,
-					content: "## Your billing ticket has been closed"
+					content: LL.tickets.templates.ticket_closed_dm_billing.title()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "If you still need help, open a new billing ticket and include your order details again."
+					content: LL.tickets.templates.ticket_closed_dm_billing.intro()
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "**Reason**: {reason}\n**Claim**: {claimStatus}\n**Transcript**: {transcriptStatus}"
+					content: LL.tickets.templates.ticket_closed_dm_billing.details({
+						reason: "{reason}",
+						claimStatus: "{claimStatus}",
+						transcriptStatus: "{transcriptStatus}"
+					})
 				},
 				{
 					type: ComponentType.TextDisplay,
-					content: "-# _Closed by {closerName}_"
+					content: LL.tickets.templates.ticket_closed_dm_billing.closed_by({ closerName: "{closerName}" })
 				}
 			]
 		}
 	]
-};
+});
 
-export default billingTicketClosedDmMessage;
+export default ticketClosedDmBillingMessage;
 
 /*
 Ticket-Bot is licensed under the GNU Affero General Public License,
