@@ -1,14 +1,14 @@
 # Main Source
 /src/ @sayrix @zhiyan114
 /config/ @sayrix @zhiyan114
+/messages/ @sayrix @zhiyan114
 
 # Docker files
-dockerfile @zhiyan114
-/docker_run.sh @zhiyan114
-/docker-compose.yml @zhiyan114
-
-# Database schema
-/prisma/* @zhiyan114
+Dockerfile @sayrix
+/docker-compose.yml @sayrix
 
 # Langs
-/locales/ @sayrix
+/i18n/ @sayrix
+
+# All other files
+* @sayrix
