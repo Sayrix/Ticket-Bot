@@ -13,7 +13,7 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
-import { defineConfig } from "@/config/index.ts";
+import { defineConfig } from "@/config/index.js";
 
 export default defineConfig("0.0.1", {
 	// Your Discord application (bot) client ID.

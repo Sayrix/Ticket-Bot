@@ -21,7 +21,7 @@ import { discoverCommands, discoverEvents, discoverFeatures } from "@/core/disco
 import { createBotI18n } from "@/core/i18n";
 import { createLogger, type Logger } from "@/core/logger";
 import { createHandlerRegistry } from "@/core/registry";
-import botConfig from "../config/config.ts";
+import botConfig from "../config/config.js";
 
 config({ path: "./config/.env", quiet: true });
 const logger = createLogger("deploy");
@@ -48,7 +48,7 @@ export async function deployApplicationCommands(options: {
 	options.logger.info(`Deployed ${options.applicationCommands.length} global commands.`);
 }
 
-async function deployCommands() {
+export async function deployCommands() {
 	const [commands, events, features] = await Promise.all([
 		discoverCommands(logger),
 		discoverEvents(logger),
@@ -63,13 +63,6 @@ async function deployCommands() {
 		guildId: botConfig.guildId,
 		logger,
 		token: process.env.DISCORD_TOKEN
-	});
-}
-
-if (import.meta.main) {
-	deployCommands().catch((error) => {
-		logger.error("Failed to deploy commands", error);
-		process.exit(1);
 	});
 }
 

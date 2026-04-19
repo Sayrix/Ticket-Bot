@@ -249,10 +249,12 @@ function shouldShowWSLog(app: BotApp) {
 }
 
 function getRuntimeInfo() {
-	if (typeof process.versions.bun === "string") {
+	const bunVersion = (process.versions as Record<string, string | undefined>).bun;
+
+	if (typeof bunVersion === "string") {
 		return {
 			name: "bun",
-			version: process.versions.bun
+			version: bunVersion
 		} as const;
 	}
 

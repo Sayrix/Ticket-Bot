@@ -224,7 +224,8 @@ async function resolveMessageTemplatePath(reference: string) {
 		throw new Error(`Message template reference "${reference}" resolves outside the messages directory.`);
 	}
 
-	const candidatePaths = extname(resolvedBasePath) === "" ? [`${resolvedBasePath}.ts`] : [resolvedBasePath];
+	const candidatePaths =
+		extname(resolvedBasePath) === "" ? [`${resolvedBasePath}.ts`, `${resolvedBasePath}.js`] : [resolvedBasePath];
 
 	for (const candidatePath of candidatePaths) {
 		try {
@@ -239,14 +240,14 @@ async function resolveMessageTemplatePath(reference: string) {
 async function loadMessageTemplateSource(filePath: string) {
 	const extension = extname(filePath).toLowerCase();
 
-	if (extension === ".ts") {
-		// Templates stay code-only in v4 so they remain typed and can opt into
-		// Components V2 without extra parsing layers.
+	if (extension === ".ts" || extension === ".js") {
+		// Templates stay code-only in v4 so they remain typed in source and still
+		// load correctly from the compiled JavaScript output.
 		const importedModule = await import(pathToFileURL(filePath).href);
 		return (importedModule.default ?? importedModule.message ?? importedModule) as MessageTemplateSource;
 	}
 
-	throw new Error(`Unsupported template file type "${extension}". Only TypeScript templates are supported.`);
+	throw new Error(`Unsupported template file type "${extension}". Only JavaScript and TypeScript templates are supported.`);
 }
 
 function normalizeMessageTemplate(rawPayload: unknown): LoadedMessageTemplate {
