@@ -55,7 +55,7 @@ export async function startTranscriptJob(
 }
 
 async function createTranscript(app: BotApp, channelId: string, onStatus?: TranscriptStatusHandler) {
-	await reportStatus(onStatus, "Collecting ticket messages...");
+	await reportStatus(onStatus, app.LL.tickets.transcript.collecting_messages());
 
 	const [channel, guild, messages] = await Promise.all([
 		app.client.api.channels.get(channelId),
@@ -63,7 +63,7 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 		fetchAllMessages(app, channelId)
 	]);
 
-	await reportStatus(onStatus, "Creating transcript...");
+	await reportStatus(onStatus, app.LL.tickets.transcript.creating());
 
 	const draftTranscript = await buildEnrichedDiscordApiTranscriptData({
 		messages,
@@ -118,7 +118,7 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 		}
 	});
 
-	await reportStatus(onStatus, "Uploading transcript...");
+	await reportStatus(onStatus, app.LL.tickets.transcript.uploading());
 
 	const uploadClient = new TicketPmUploadClient({
 		baseUrl: TRANSCRIPT_BASE_URL,
@@ -126,8 +126,8 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 	});
 	const result = await uploadClient.uploadDraftTranscript(draftTranscript, {
 		uuidStyleIds: app.config.uuidType !== "emoji",
-		avatarProgress: createProgressHandler("Uploading avatars...", onStatus),
-		mediaProgress: createProgressHandler("Uploading attachments...", onStatus)
+		avatarProgress: createProgressHandler(app, app.LL.tickets.transcript.uploading_avatars(), onStatus),
+		mediaProgress: createProgressHandler(app, app.LL.tickets.transcript.uploading_attachments(), onStatus)
 	});
 
 	return `${TRANSCRIPT_VIEW_BASE_URL}${result.id}`;
@@ -163,7 +163,7 @@ async function fetchAllMessages(app: BotApp, channelId: string) {
 	return messages.reverse();
 }
 
-function createProgressHandler(label: string, onStatus?: TranscriptStatusHandler) {
+function createProgressHandler(app: BotApp, label: string, onStatus?: TranscriptStatusHandler) {
 	let lastBucket = -1;
 
 	return (completed: number, total: number) => {
@@ -178,7 +178,13 @@ function createProgressHandler(label: string, onStatus?: TranscriptStatusHandler
 		}
 
 		lastBucket = bucket;
-		void onStatus(`${label} (${completed}/${total})`);
+		void onStatus(
+			app.LL.tickets.transcript.progress({
+				label,
+				completed,
+				total
+			})
+		);
 	};
 }
 

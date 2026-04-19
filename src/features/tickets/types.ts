@@ -14,6 +14,7 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import type { APIAllowedMentions, APIEmbed, APIMessageTopLevelComponent } from "@discordjs/core";
+import type { Locales, TranslationFunctions } from "../../../i18n/i18n-types.js";
 import type { VersionedConfig } from "@/config/index";
 
 export type CurrentConfig = VersionedConfig<"0.0.1">;
@@ -36,6 +37,13 @@ export interface LoadedMessageTemplate {
 	flags?: number;
 	useComponentsV2?: boolean;
 }
+
+export interface MessageTemplateContext {
+	locale: Locales;
+	LL: TranslationFunctions;
+}
+
+export type MessageTemplateSource = LoadedMessageTemplate | ((context: MessageTemplateContext) => LoadedMessageTemplate);
 
 export interface TicketOpenContext {
 	ticketTypeKey: string;

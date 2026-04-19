@@ -31,7 +31,6 @@ import { ticketsTable } from "@/db/schema";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
 import { getTicketType, hasTicketStaffAccess } from "@/features/tickets/config-access";
-import { DEFAULT_NO_REASON } from "@/features/tickets/constants";
 import {
 	appendMessageButton,
 	finalizeMessageTemplate,
@@ -40,6 +39,7 @@ import {
 } from "@/features/tickets/messages";
 import { getInvitedUserIds, revokeTicketParticipantAccess } from "@/features/tickets/participants";
 import { findTicketByChannel, getOpenTicketByChannel } from "@/features/tickets/records";
+import { formatClaimStatus, formatTranscriptStatus, getDefaultNoReason } from "@/features/tickets/text";
 import { startTranscriptJob } from "@/features/tickets/transcripts";
 import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 
@@ -65,7 +65,7 @@ export async function handleDeleteClosedTicketButton(
 
 	if (!channelId) {
 		await reply(context.app, interaction, {
-			content: "This interaction was not used in a ticket channel.",
+			content: context.app.LL.tickets.records.not_ticket_channel(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -82,13 +82,13 @@ export async function handleDeleteClosedTicketButton(
 	}
 
 	await reply(context.app, interaction, {
-		content: "Deleting ticket channel...",
+		content: context.app.LL.tickets.close.delete_channel_start(),
 		flags: MessageFlags.Ephemeral
 	});
 	void sendTicketLog(context.app, {
 		kind: "ticketDelete",
 		actor: getInteractionUser(interaction),
-		reason: manageable.ticket.closedReason ?? DEFAULT_NO_REASON,
+		reason: manageable.ticket.closedReason ?? getDefaultNoReason(context.app),
 		transcriptUrl: manageable.ticket.transcriptUrl,
 		ticket: createTicketLogContext(manageable.ticket, manageable.ticketType.name)
 	});
@@ -123,7 +123,7 @@ async function beginCloseFlow(
 	if (app.config.tickets.close.askForReason) {
 		await showModal(app, interaction, {
 			custom_id: createCustomId("tickets", "submit-close-reason"),
-			title: "Close Ticket",
+			title: app.LL.tickets.close.modal.title(),
 			components: [
 				{
 					type: ComponentType.ActionRow,
@@ -131,11 +131,11 @@ async function beginCloseFlow(
 						{
 							type: ComponentType.TextInput,
 							custom_id: "reason",
-							label: "Reason",
+							label: app.LL.tickets.close.modal.reason_label(),
 							style: TextInputStyle.Paragraph,
 							required: false,
 							max_length: 500,
-							placeholder: "Why is this ticket being closed?"
+							placeholder: app.LL.tickets.close.modal.reason_placeholder()
 						}
 					]
 				}
@@ -156,7 +156,7 @@ async function closeTicket(
 
 	if (!channelId) {
 		await reply(app, interaction, {
-			content: "This interaction was not used in a ticket channel.",
+			content: app.LL.tickets.records.not_ticket_channel(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -174,11 +174,15 @@ async function closeTicket(
 	}
 
 	const status = createCloseStatusUpdater(app, interaction);
-	await status.start(app.config.tickets.close.createTranscript ? "Preparing transcript..." : "Closing ticket...");
+	await status.start(
+		app.config.tickets.close.createTranscript
+			? app.LL.tickets.close.status.preparing_transcript()
+			: app.LL.tickets.close.status.closing_ticket()
+	);
 
 	const { ticket, ticketType } = closable;
 	const closer = getInteractionUser(interaction);
-	const normalizedReason = normalizeCloseReason(reason);
+	const normalizedReason = normalizeCloseReason(app, reason);
 
 	// Mark the ticket as closed immediately so repeated button presses or `/close`
 	// attempts during transcript generation do not start duplicate close flows.
@@ -198,7 +202,7 @@ async function closeTicket(
 			// Preserve the original ticket message while preventing new actions.
 			await disableTicketActionButtons(app, ticket.channelId, ticket.creationMessageId);
 		});
-		await status.update("Updating ticket access...");
+		await status.update(app.LL.tickets.close.status.updating_access());
 		await removeClosedTicketParticipantAccess(app, ticket.channelId, ticket.createdBy, invitedUserIds);
 	}
 
@@ -217,19 +221,19 @@ async function closeTicket(
 	const transcriptUrl = transcriptJob ? await transcriptJob.waitForResult() : null;
 
 	if (app.config.tickets.close.createTranscript && !transcriptUrl) {
-		await status.update("Transcript is still processing. Finishing ticket close...");
+		await status.update(app.LL.tickets.close.status.transcript_still_processing());
 	}
 
 	const closeMessageTokens = {
 		channelId: ticket.channelId,
-		claimStatus: formatClaimStatus(ticket.claimedBy),
+		claimStatus: formatClaimStatus(app, ticket.claimedBy),
 		claimerId: ticket.claimedBy ?? "",
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : "",
 		closerId: closer.id,
 		closerMention: `<@${closer.id}>`,
 		closerName: closer.username,
 		reason: normalizedReason,
-		transcriptStatus: formatTranscriptStatus(transcriptUrl),
+		transcriptStatus: formatTranscriptStatus(app, transcriptUrl),
 		transcriptUrl: transcriptUrl ?? "",
 		userId: ticket.createdBy
 	};
@@ -242,7 +246,7 @@ async function closeTicket(
 	});
 
 	if (app.config.tickets.close.deleteChannelOnClose && app.config.tickets.close.dmUserOnClose) {
-		await status.update("Sending close confirmation...");
+		await status.update(app.LL.tickets.close.status.sending_close_confirmation());
 		await sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens);
 	}
 
@@ -255,9 +259,7 @@ async function closeTicket(
 			ticket: createTicketLogContext(ticket, ticketType.name)
 		});
 		await editReply(app, interaction, {
-			content: transcriptUrl
-				? "Ticket closed. The transcript is ready and the channel will now be deleted."
-				: "Ticket closed. The channel will now be deleted."
+			content: transcriptUrl ? app.LL.tickets.close.deleted_with_transcript() : app.LL.tickets.close.deleted_without_transcript()
 		});
 		await app.client.api.channels.delete(ticket.channelId);
 		return;
@@ -270,10 +272,14 @@ async function closeTicket(
 		closeTasks.push(sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens));
 	}
 
-	await status.update(app.config.tickets.close.dmUserOnClose ? "Sending close updates..." : "Posting close summary...");
+	await status.update(
+		app.config.tickets.close.dmUserOnClose
+			? app.LL.tickets.close.status.sending_close_updates()
+			: app.LL.tickets.close.status.posting_close_summary()
+	);
 	await Promise.all(closeTasks);
 
-	await status.update("Ticket closed.");
+	await status.update(app.LL.tickets.close.status.closed());
 }
 
 async function getClosableTicket(
@@ -294,7 +300,7 @@ async function getClosableTicket(
 	if (enforcePermission && app.config.tickets.close.staffOnly && !hasTicketStaffAccess(app, ticketType, roleIds)) {
 		return {
 			ok: false as const,
-			message: "Only staff can close this ticket."
+			message: app.LL.tickets.close.only_staff()
 		};
 	}
 
@@ -302,14 +308,14 @@ async function getClosableTicket(
 		if (!ticket.claimedBy) {
 			return {
 				ok: false as const,
-				message: "This ticket must be claimed before it can be closed."
+				message: app.LL.tickets.close.must_be_claimed()
 			};
 		}
 
 		if (ticket.claimedBy !== actorId) {
 			return {
 				ok: false as const,
-				message: "Only the current claimer can close this ticket."
+				message: app.LL.tickets.close.only_current_claimer()
 			};
 		}
 	}
@@ -325,7 +331,7 @@ async function getDeletableTicket(app: BotApp, channelId: string | undefined, ro
 	if (!channelId) {
 		return {
 			ok: false as const,
-			message: "This interaction was not used in a ticket channel."
+			message: app.LL.tickets.records.not_ticket_channel()
 		};
 	}
 
@@ -334,14 +340,14 @@ async function getDeletableTicket(app: BotApp, channelId: string | undefined, ro
 	if (!ticket) {
 		return {
 			ok: false as const,
-			message: "This channel is not a ticket."
+			message: app.LL.tickets.close.not_ticket()
 		};
 	}
 
 	if (!ticket.closedAt) {
 		return {
 			ok: false as const,
-			message: "Only closed tickets can be deleted from this button."
+			message: app.LL.tickets.close.only_closed_delete()
 		};
 	}
 
@@ -350,7 +356,7 @@ async function getDeletableTicket(app: BotApp, channelId: string | undefined, ro
 	if (!hasTicketStaffAccess(app, ticketType, roleIds)) {
 		return {
 			ok: false as const,
-			message: "Only staff can delete this ticket."
+			message: app.LL.tickets.close.only_staff_delete()
 		};
 	}
 
@@ -493,7 +499,7 @@ async function sendCloseDm(
 		return;
 	}
 
-	const messageTemplate = await loadMessageTemplate(resolveCloseDmMessageReference(app, ticketType), tokens);
+	const messageTemplate = await loadMessageTemplate(app, resolveCloseDmMessageReference(app, ticketType), tokens);
 
 	await app.client.api.channels
 		.createMessage(dmChannel.id, {
@@ -520,7 +526,7 @@ async function buildCloseChannelMessage(
 	}
 ) {
 	const deleteButtonCustomId = createCustomId("tickets", "delete-closed");
-	const messageTemplate = await loadMessageTemplate(resolveCloseChannelMessageReference(app, ticketType), {
+	const messageTemplate = await loadMessageTemplate(app, resolveCloseChannelMessageReference(app, ticketType), {
 		...tokens,
 		deleteButtonCustomId
 	});
@@ -532,7 +538,7 @@ async function buildCloseChannelMessage(
 				? ({
 						type: ComponentType.Button,
 						custom_id: deleteButtonCustomId,
-						label: "Delete Ticket",
+						label: app.LL.tickets.actions.delete_ticket(),
 						style: ButtonStyle.Danger
 					} satisfies APIButtonComponentWithCustomId)
 				: undefined
@@ -599,14 +605,6 @@ function createCloseStatusUpdater(
 	};
 }
 
-function formatTranscriptStatus(transcriptUrl: string | null) {
-	return transcriptUrl ? `[Open Transcript](${transcriptUrl})` : "Unavailable or still processing.";
-}
-
-function formatClaimStatus(claimedBy: string | null) {
-	return claimedBy ? `Claimed by <@${claimedBy}>` : "Unclaimed";
-}
-
 function readCloseReason(interaction: APIModalSubmitInteraction) {
 	for (const component of interaction.data.components) {
 		if (!("components" in component)) {
@@ -623,8 +621,8 @@ function readCloseReason(interaction: APIModalSubmitInteraction) {
 	return null;
 }
 
-function normalizeCloseReason(reason: string | null) {
-	return reason?.trim() || "No reason provided.";
+function normalizeCloseReason(app: BotApp, reason: string | null) {
+	return reason?.trim() || getDefaultNoReason(app);
 }
 
 /*

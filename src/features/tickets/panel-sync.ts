@@ -65,7 +65,7 @@ export async function handleOpenPanelSelector(context: ComponentExecutionContext
 
 	if (options.length === 0) {
 		await reply(context.app, interaction, {
-			content: "You do not have access to any ticket types on this panel.",
+			content: context.app.LL.tickets.panel.no_visible_types(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -73,7 +73,7 @@ export async function handleOpenPanelSelector(context: ComponentExecutionContext
 
 	await reply(context.app, interaction, {
 		flags: MessageFlags.Ephemeral,
-		components: [createSelectRow(panelKey, panel.opener, options)]
+		components: [createSelectRow(context.app, panelKey, panel.opener, options)]
 	});
 }
 
@@ -100,7 +100,7 @@ export async function handlePanelSelect(context: ComponentExecutionContext, inte
 
 	if (!ticketTypeKey) {
 		await reply(context.app, interaction, {
-			content: "Please select a ticket type.",
+			content: context.app.LL.tickets.panel.select_type(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -110,7 +110,7 @@ export async function handlePanelSelect(context: ComponentExecutionContext, inte
 
 	if (!allowedTicketTypes.has(ticketTypeKey)) {
 		await reply(context.app, interaction, {
-			content: "That ticket type is not available from this panel.",
+			content: context.app.LL.tickets.panel.unavailable_type(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -161,7 +161,7 @@ async function recreatePanelMessage(
 }
 
 async function buildPanelMessage(app: BotApp, panelKey: string, panel: PanelConfig) {
-	const messageTemplate = await loadMessageTemplate(panel.message);
+	const messageTemplate = await loadMessageTemplate(app, panel.message);
 	const withConfiguredText = appendMessageText(messageTemplate, panel.content);
 	const body = placePanelOpener(withConfiguredText, buildPanelComponents(app, panelKey, panel));
 
@@ -235,7 +235,7 @@ function isPanelOpenerSlot(value: unknown): value is {
 function buildPanelComponents(app: BotApp, panelKey: string, panel: PanelConfig): APIMessageTopLevelComponent[] {
 	switch (panel.opener.type) {
 		case "inline-select":
-			return [createSelectRow(panelKey, panel.opener, buildSelectOptions(app, panel.opener.ticketTypes))];
+			return [createSelectRow(app, panelKey, panel.opener, buildSelectOptions(app, panel.opener.ticketTypes))];
 		case "button-select":
 			return [createButtonRow(panelKey, panel.opener)];
 		case "buttons":
@@ -244,6 +244,7 @@ function buildPanelComponents(app: BotApp, panelKey: string, panel: PanelConfig)
 }
 
 function createSelectRow(
+	app: BotApp,
 	panelKey: string,
 	opener: Extract<PanelOpenerConfig, { type: "inline-select" | "button-select" }>,
 	options: APIStringSelectComponent["options"]
@@ -254,7 +255,7 @@ function createSelectRow(
 			{
 				type: ComponentType.StringSelect,
 				custom_id: createCustomId("tickets", "panel-select", panelKey),
-				placeholder: opener.placeholder ?? "Select a ticket type",
+				placeholder: opener.placeholder ?? app.LL.tickets.panel.select_placeholder(),
 				min_values: 1,
 				max_values: 1,
 				options

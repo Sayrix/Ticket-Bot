@@ -44,13 +44,14 @@ import {
 	getTicketType,
 	userCanAccessTicketType
 } from "@/features/tickets/config-access";
-import { DEFAULT_NO_REASON, TICKET_ACCESS_ALLOW } from "@/features/tickets/constants";
+import { TICKET_ACCESS_ALLOW } from "@/features/tickets/constants";
 import {
 	appendMessageText,
 	finalizeMessageTemplate,
 	hasMessageComponentCustomId,
 	loadMessageTemplate
 } from "@/features/tickets/messages";
+import { formatClaimStatus, getDefaultNoReason } from "@/features/tickets/text";
 import type {
 	LoadedMessageTemplate,
 	TicketOpenContext,
@@ -75,7 +76,8 @@ export async function handleOpenFormSubmit(context: ComponentExecutionContext, i
 	const ticketType = getTicketType(context.app, ticketTypeKey);
 	const questions = ticketType.openForm?.questions ?? [];
 	const answers = extractSubmittedValues(interaction);
-	const reason = questions.length > 0 ? createTicketOpenReason(questions, answers) : createDefaultTicketOpenReason();
+	const reason =
+		questions.length > 0 ? createTicketOpenReason(context.app, questions, answers) : createDefaultTicketOpenReason(context.app);
 
 	await createTicket(context.app, interaction, ticketTypeKey, ticketType, reason);
 }
@@ -87,7 +89,7 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 
 	if (!userCanAccessTicketType(app, ticketType, roleIds)) {
 		await reply(app, interaction, {
-			content: "You are not allowed to create that ticket type.",
+			content: app.LL.tickets.open.not_allowed_type(),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -98,7 +100,7 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 
 		if (!allowedTypes.has(context.ticketTypeKey)) {
 			await reply(app, interaction, {
-				content: "That ticket type is not available from this panel.",
+				content: app.LL.tickets.open.unavailable_type(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -109,7 +111,7 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 
 	if (app.config.tickets.maxOpenPerUser > 0 && currentOpenCount >= app.config.tickets.maxOpenPerUser) {
 		await reply(app, interaction, {
-			content: `You already have the maximum number of open tickets (${app.config.tickets.maxOpenPerUser}).`,
+			content: app.LL.tickets.open.max_open_reached({ limit: app.config.tickets.maxOpenPerUser }),
 			flags: MessageFlags.Ephemeral
 		});
 		return;
@@ -130,13 +132,13 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 	if (interaction.data.component_type === ComponentType.StringSelect) {
 		// Update the open panel message so that it resets the selection of the user, letting them open another ticket later.
 		await updateMessage(app, interaction, {});
-		await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(), {
+		await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(app), {
 			responseMode: "follow-up"
 		});
 		return;
 	}
 
-	await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason());
+	await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(app));
 }
 
 async function createTicket(
@@ -173,6 +175,7 @@ async function createTicket(
 		permission_overwrites: buildTicketPermissionOverwrites(app, user.id, ticketType)
 	});
 	const tokens = createTicketRenderTokens({
+		app,
 		channelId: channel.id,
 		createdByMention: `<@${user.id}>`,
 		openReason: reason,
@@ -213,7 +216,7 @@ async function createTicket(
 	});
 
 	const successMessage = {
-		content: `Your ticket has been created: <#${channel.id}>`,
+		content: app.LL.tickets.open.created({ channelId: channel.id }),
 		flags: MessageFlags.Ephemeral
 	};
 
@@ -261,7 +264,7 @@ export async function buildTicketWelcomeMessage(
 		closeButtonCustomId,
 		staffMentions: roleMentions.length ? ` ${roleMentions.join(" ")}` : ""
 	};
-	const messageTemplate = messageReference ? await loadMessageTemplate(messageReference, renderedTokens) : {};
+	const messageTemplate = messageReference ? await loadMessageTemplate(app, messageReference, renderedTokens) : {};
 	const configuredContent = ticketType.welcomeContent ?? app.config.tickets.defaultWelcomeContent;
 	const runtimeText = configuredContent ? renderTemplate(configuredContent, renderedTokens) : undefined;
 	const withRuntimeText = appendMessageText(messageTemplate, runtimeText, { slot: "runtime-text" });
@@ -287,12 +290,13 @@ export async function buildTicketWelcomeMessage(
 export async function syncTicketWelcomeMessage(app: BotApp, ticket: TicketRecord, ticketType = getTicketType(app, ticket.type)) {
 	const creator = await app.client.api.users.get(ticket.createdBy).catch(() => null);
 	const tokens = createTicketRenderTokens({
+		app,
 		channelId: ticket.channelId,
-		claimStatus: formatClaimStatus(ticket.claimedBy),
+		claimStatus: formatClaimStatus(app, ticket.claimedBy),
 		claimerId: ticket.claimedBy ?? undefined,
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : undefined,
 		createdByMention: `<@${ticket.createdBy}>`,
-		openReason: parseStoredTicketOpenReason(ticket.reason),
+		openReason: parseStoredTicketOpenReason(app, ticket.reason),
 		ticketNumber: ticket.id.toString(),
 		ticketTypeKey: ticket.type,
 		ticketTypeName: ticketType.name,
@@ -343,7 +347,7 @@ function buildTicketActionButtons(
 		buttons.push({
 			type: ComponentType.Button,
 			custom_id: options.closeButtonCustomId,
-			label: "Close Ticket",
+			label: app.LL.tickets.actions.close_ticket(),
 			style: ButtonStyle.Danger,
 			disabled: options.disableActions
 		});
@@ -354,14 +358,14 @@ function buildTicketActionButtons(
 			? ({
 					type: ComponentType.Button,
 					custom_id: options.unclaimButtonCustomId,
-					label: "Unclaim Ticket",
+					label: app.LL.tickets.actions.unclaim_ticket(),
 					style: ButtonStyle.Secondary,
 					disabled: options.disableActions
 				} satisfies APIButtonComponentWithCustomId)
 			: ({
 					type: ComponentType.Button,
 					custom_id: options.claimButtonCustomId,
-					label: "Claim Ticket",
+					label: app.LL.tickets.actions.claim_ticket(),
 					style: ButtonStyle.Primary,
 					disabled: options.disableActions
 				} satisfies APIButtonComponentWithCustomId);
@@ -504,23 +508,28 @@ function extractSubmittedValues(interaction: APIModalSubmitInteraction) {
 	return values;
 }
 
-function createDefaultTicketOpenReason(): TicketOpenReasonData {
+function createDefaultTicketOpenReason(app: BotApp): TicketOpenReasonData {
 	return {
 		answers: [],
-		combined: DEFAULT_NO_REASON
+		combined: getDefaultNoReason(app)
 	};
 }
 
-function createTicketOpenReason(questions: TicketQuestionConfig[], answers: Map<string, string>): TicketOpenReasonData {
-	const normalizedAnswers = questions.map((question) => normalizeAnswer(answers.get(question.key)));
+function createTicketOpenReason(
+	app: BotApp,
+	questions: TicketQuestionConfig[],
+	answers: Map<string, string>
+): TicketOpenReasonData {
+	const normalizedAnswers = questions.map((question) => normalizeAnswer(app, answers.get(question.key)));
 
 	return {
 		answers: normalizedAnswers,
-		combined: formatQuestionAnswers(questions, normalizedAnswers)
+		combined: formatQuestionAnswers(app, questions, normalizedAnswers)
 	};
 }
 
 function createTicketRenderTokens(input: {
+	app: BotApp;
 	channelId?: string;
 	claimStatus?: string;
 	claimerId?: string;
@@ -535,7 +544,7 @@ function createTicketRenderTokens(input: {
 }) {
 	const tokens: TicketRenderTokens = {
 		channelId: input.channelId,
-		claimStatus: input.claimStatus ?? formatClaimStatus(input.claimerId ?? null),
+		claimStatus: input.claimStatus ?? formatClaimStatus(input.app, input.claimerId ?? null),
 		claimerId: input.claimerId,
 		claimerMention: input.claimerMention,
 		createdByMention: input.createdByMention,
@@ -556,17 +565,20 @@ function createTicketRenderTokens(input: {
 	return tokens;
 }
 
-function formatQuestionAnswers(questions: TicketQuestionConfig[], answers: string[]) {
-	const lines = questions.map((question, index) => `${question.label}: ${answers[index] ?? DEFAULT_NO_REASON}`);
+function formatQuestionAnswers(app: BotApp, questions: TicketQuestionConfig[], answers: string[]): string {
+	const lines = questions.map((question, index) => {
+		const answer = answers[index] ?? getDefaultNoReason(app);
+
+		return app.LL.tickets.open.question_answer({
+			label: question.label,
+			answer
+		});
+	});
 	return lines.join("\n");
 }
 
-function formatClaimStatus(claimedBy: string | null) {
-	return claimedBy ? `Claimed by <@${claimedBy}>` : "Unclaimed";
-}
-
-function normalizeAnswer(answer: string | undefined) {
-	return answer?.trim() || DEFAULT_NO_REASON;
+function normalizeAnswer(app: BotApp, answer: string | undefined) {
+	return answer?.trim() || getDefaultNoReason(app);
 }
 
 function serializeTicketOpenReason(reason: TicketOpenReasonData) {
@@ -581,9 +593,9 @@ function serializeTicketOpenReason(reason: TicketOpenReasonData) {
 	});
 }
 
-function parseStoredTicketOpenReason(reason: string | null | undefined): TicketOpenReasonData {
+function parseStoredTicketOpenReason(app: BotApp, reason: string | null | undefined): TicketOpenReasonData {
 	if (!reason) {
-		return createDefaultTicketOpenReason();
+		return createDefaultTicketOpenReason(app);
 	}
 
 	try {
@@ -597,7 +609,7 @@ function parseStoredTicketOpenReason(reason: string | null | undefined): TicketO
 		}
 
 		return {
-			answers: parsed.answers.map((answer) => normalizeAnswer(typeof answer === "string" ? answer : undefined)),
+			answers: parsed.answers.map((answer) => normalizeAnswer(app, typeof answer === "string" ? answer : undefined)),
 			combined: parsed.combined
 		};
 	} catch {

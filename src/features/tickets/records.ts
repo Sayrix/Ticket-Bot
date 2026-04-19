@@ -31,7 +31,7 @@ export async function getOpenTicketByChannel(app: BotApp, channelId: string | un
 	if (!channelId) {
 		return {
 			ok: false as const,
-			message: "This interaction was not used in a ticket channel."
+			message: app.LL.tickets.records.not_ticket_channel()
 		};
 	}
 
@@ -40,14 +40,14 @@ export async function getOpenTicketByChannel(app: BotApp, channelId: string | un
 	if (!ticket) {
 		return {
 			ok: false as const,
-			message: "This channel is not an open ticket."
+			message: app.LL.tickets.records.not_open_ticket()
 		};
 	}
 
 	if (ticket.closedAt) {
 		return {
 			ok: false as const,
-			message: "This ticket is already closed."
+			message: app.LL.tickets.records.already_closed()
 		};
 	}
 

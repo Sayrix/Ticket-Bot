@@ -19,8 +19,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { APIButtonComponentWithCustomId, APIMessageTopLevelComponent } from "@discordjs/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MESSAGE_TEMPLATES_DIRECTORY } from "@/features/tickets/constants";
-import type { LoadedMessageTemplate } from "@/features/tickets/types";
+import type { LoadedMessageTemplate, MessageTemplateSource } from "@/features/tickets/types";
 import { renderTemplate } from "@/features/tickets/utils";
+import type { BotApp } from "@/core/types";
 
 const TEMPLATE_SLOT_TYPE = "template-slot";
 const TEMPLATE_SLOT_KIND_MANY = "many";
@@ -51,12 +52,20 @@ export function createRuntimeTextSlot() {
 }
 
 export async function loadMessageTemplate(
+	app: BotApp,
 	reference: string,
 	tokens?: Record<string, string | undefined>
 ): Promise<LoadedMessageTemplate> {
 	const resolvedPath = await resolveMessageTemplatePath(reference);
 	const rawPayload = await loadMessageTemplateSource(resolvedPath);
-	const normalizedPayload = normalizeMessageTemplate(rawPayload);
+	const templatePayload =
+		typeof rawPayload === "function"
+			? rawPayload({
+					locale: app.locale,
+					LL: app.LL
+				})
+			: rawPayload;
+	const normalizedPayload = normalizeMessageTemplate(templatePayload);
 	const renderedPayload = tokens
 		? (renderDeep(normalizedPayload, tokens) as LoadedMessageTemplate)
 		: (structuredClone(normalizedPayload) as LoadedMessageTemplate);
@@ -234,7 +243,7 @@ async function loadMessageTemplateSource(filePath: string) {
 		// Templates stay code-only in v4 so they remain typed and can opt into
 		// Components V2 without extra parsing layers.
 		const importedModule = await import(pathToFileURL(filePath).href);
-		return importedModule.default ?? importedModule.message ?? importedModule;
+		return (importedModule.default ?? importedModule.message ?? importedModule) as MessageTemplateSource;
 	}
 
 	throw new Error(`Unsupported template file type "${extension}". Only TypeScript templates are supported.`);

@@ -53,7 +53,7 @@ export async function handleUnclaimButton(context: ComponentExecutionContext, in
 
 async function claimTicket(app: BotApp, interaction: ClaimInteraction) {
 	if (!app.config.tickets.claims.enabled) {
-		await replyWithContent(app, interaction, "Ticket claiming is disabled.");
+		await replyWithContent(app, interaction, app.LL.commands.claim.disabled());
 		return;
 	}
 
@@ -68,12 +68,12 @@ async function claimTicket(app: BotApp, interaction: ClaimInteraction) {
 	const { ticket, ticketType } = claimable;
 
 	if (ticket.claimedBy === actor.id) {
-		await replyWithContent(app, interaction, "You already claimed this ticket.");
+		await replyWithContent(app, interaction, app.LL.commands.claim.already_claimed());
 		return;
 	}
 
 	if (ticket.claimedBy && !canTakeOverClaim(app, getMemberRoleIds(interaction))) {
-		await replyWithContent(app, interaction, "This ticket is already claimed and cannot be taken over.");
+		await replyWithContent(app, interaction, app.LL.commands.claim.cannot_take_over());
 		return;
 	}
 
@@ -104,18 +104,18 @@ async function claimTicket(app: BotApp, interaction: ClaimInteraction) {
 	await replyWithContent(
 		app,
 		interaction,
-		ticket.claimedBy ? `Ticket reassigned to <@${actor.id}>.` : `You claimed this ticket.`
+		ticket.claimedBy ? app.LL.commands.claim.reassigned({ userId: actor.id }) : app.LL.commands.claim.success()
 	);
 }
 
 async function unclaimTicket(app: BotApp, interaction: ClaimInteraction) {
 	if (!app.config.tickets.claims.enabled) {
-		await replyWithContent(app, interaction, "Ticket claiming is disabled.");
+		await replyWithContent(app, interaction, app.LL.commands.claim.disabled());
 		return;
 	}
 
 	if (!app.config.tickets.claims.allowUnclaim) {
-		await replyWithContent(app, interaction, "Unclaiming is disabled for this server.");
+		await replyWithContent(app, interaction, app.LL.commands.unclaim.disabled());
 		return;
 	}
 
@@ -130,12 +130,12 @@ async function unclaimTicket(app: BotApp, interaction: ClaimInteraction) {
 	const { ticket, ticketType } = claimable;
 
 	if (!ticket.claimedBy) {
-		await replyWithContent(app, interaction, "This ticket is not claimed.");
+		await replyWithContent(app, interaction, app.LL.commands.unclaim.not_claimed());
 		return;
 	}
 
 	if (ticket.claimedBy !== actor.id) {
-		await replyWithContent(app, interaction, "Only the current claimer can unclaim this ticket.");
+		await replyWithContent(app, interaction, app.LL.commands.unclaim.only_current_claimer());
 		return;
 	}
 
@@ -168,7 +168,7 @@ async function unclaimTicket(app: BotApp, interaction: ClaimInteraction) {
 		)
 	});
 
-	await replyWithContent(app, interaction, "You unclaimed this ticket.");
+	await replyWithContent(app, interaction, app.LL.commands.unclaim.success());
 }
 
 async function getClaimableTicket(app: BotApp, channelId: string | undefined, roleIds: string[]) {
@@ -183,7 +183,7 @@ async function getClaimableTicket(app: BotApp, channelId: string | undefined, ro
 	if (!hasTicketStaffAccess(app, ticketType, roleIds)) {
 		return {
 			ok: false as const,
-			message: "Only staff can claim this ticket."
+			message: app.LL.tickets.claim.only_staff()
 		};
 	}
 

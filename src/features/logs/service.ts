@@ -15,8 +15,8 @@ This notice must not be removed, obscured, or replaced.
 
 import type { BotApp } from "@/core/types";
 import type { TicketLogEvent } from "@/features/logs/types";
-import { DEFAULT_NO_REASON } from "@/features/tickets/constants";
 import { finalizeMessageTemplate, loadMessageTemplate } from "@/features/tickets/messages";
+import { formatClaimStatus, formatTranscriptStatus, getDefaultNoReason } from "@/features/tickets/text";
 import type { LogEventToggleKey } from "@/features/tickets/types";
 
 const LOG_EVENT_TOGGLE_KEYS: Record<TicketLogEvent["kind"], LogEventToggleKey> = {
@@ -52,7 +52,7 @@ export async function sendTicketLog(app: BotApp, event: TicketLogEvent) {
 	const channelId = app.config.logs.channelId.trim();
 
 	try {
-		const messageTemplate = await loadMessageTemplate(LOG_TEMPLATE_REFERENCES[event.kind], createLogTokens(event));
+		const messageTemplate = await loadMessageTemplate(app, LOG_TEMPLATE_REFERENCES[event.kind], createLogTokens(app, event));
 		const payload = finalizeMessageTemplate({
 			...messageTemplate,
 			allowed_mentions: messageTemplate.allowed_mentions ?? {
@@ -79,29 +79,29 @@ export function shouldSendTicketLog(app: BotApp, kind: TicketLogEvent["kind"]) {
 	return app.config.logs.events?.[toggleKey] ?? true;
 }
 
-function createLogTokens(event: TicketLogEvent) {
+function createLogTokens(app: BotApp, event: TicketLogEvent) {
 	const openedAtSeconds = Math.floor(event.ticket.createdAt / 1000);
 	const claimedById = resolveClaimedById(event);
 	const tokens: Record<string, string | undefined> = {
 		actorId: event.actor.id,
 		actorMention: `<@${event.actor.id}>`,
 		actorName: event.actor.username,
-		claimStatus: claimedById ? `Claimed by <@${claimedById}>` : "Unclaimed",
+		claimStatus: formatClaimStatus(app, claimedById),
 		claimerId: claimedById ?? undefined,
 		claimerMention: claimedById ? `<@${claimedById}>` : undefined,
 		createdAt: `<t:${openedAtSeconds}:F>`,
 		createdById: event.ticket.createdById,
 		createdByMention: `<@${event.ticket.createdById}>`,
-		reason: DEFAULT_NO_REASON,
+		reason: getDefaultNoReason(app),
 		targetId: undefined,
 		targetMention: undefined,
-		ticketAge: formatDuration(Date.now() - event.ticket.createdAt),
+		ticketAge: formatDuration(app, Date.now() - event.ticket.createdAt),
 		ticketChannelId: event.ticket.ticketChannelId,
 		ticketChannelMention: `<#${event.ticket.ticketChannelId}>`,
 		ticketId: event.ticket.ticketId,
 		ticketTypeKey: event.ticket.ticketTypeKey,
 		ticketTypeName: event.ticket.ticketTypeName,
-		transcriptStatus: "Unavailable or still processing.",
+		transcriptStatus: formatTranscriptStatus(app, null),
 		transcriptUrl: undefined
 	};
 
@@ -113,9 +113,7 @@ function createLogTokens(event: TicketLogEvent) {
 		case "ticketDelete":
 			tokens.reason = event.reason;
 			tokens.transcriptUrl = event.transcriptUrl ?? undefined;
-			tokens.transcriptStatus = event.transcriptUrl
-				? `[Open Transcript](${event.transcriptUrl})`
-				: "Unavailable or still processing.";
+			tokens.transcriptStatus = formatTranscriptStatus(app, event.transcriptUrl);
 			break;
 		case "userAdded":
 		case "userRemoved":
@@ -141,18 +139,18 @@ function resolveClaimedById(event: TicketLogEvent) {
 	}
 }
 
-function formatDuration(durationMs: number) {
+function formatDuration(app: BotApp, durationMs: number) {
 	const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
 
 	if (totalSeconds < 60) {
-		return `${totalSeconds}s`;
+		return `${totalSeconds}${app.LL.logs.duration.second_short()}`;
 	}
 
 	const units: Array<[label: string, seconds: number]> = [
-		["d", 86_400],
-		["h", 3_600],
-		["m", 60],
-		["s", 1]
+		[app.LL.logs.duration.day_short(), 86_400],
+		[app.LL.logs.duration.hour_short(), 3_600],
+		[app.LL.logs.duration.minute_short(), 60],
+		[app.LL.logs.duration.second_short(), 1]
 	];
 	const parts: string[] = [];
 	let remainingSeconds = totalSeconds;
