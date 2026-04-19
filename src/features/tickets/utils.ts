@@ -27,11 +27,11 @@ export function renderChannelName(template: string, tokens: Record<string, strin
 
 export function sanitizeChannelName(value: string) {
 	const cleaned = value
+		.trim()
 		.toLowerCase()
 		.replaceAll(/\s+/g, "-")
-		.replaceAll(/[^a-z0-9-_]/g, "-")
-		.replaceAll(/-+/g, "-")
-		.replaceAll(/^-|-$/g, "");
+		// Deduplicate dashes
+		.replaceAll(/-+/g, "-");
 
 	return cleaned.slice(0, 100) || "ticket";
 }
