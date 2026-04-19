@@ -1,0 +1,15 @@
+name: ticket-bot
+
+services:
+  bot:
+    container_name: ticket-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./config/.env
+    volumes:
+      - ./config:/app/config:ro
+      - ./messages:/app/messages:ro
+      - ./.data:/app/.data
