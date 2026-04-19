@@ -58,6 +58,7 @@ const readyEvent = defineEvent<[ToEventProps<GatewayReadyDispatchData>]>({
 	once: true,
 	async execute(app, event) {
 		await validateStartupEnvironment(app, event.data.user.id);
+		await ensureApplicationAttribution(app);
 		app.logger.info(`Connected as ${event.data.user.username}.`);
 
 		await deployApplicationCommands({
@@ -183,6 +184,33 @@ async function fetchSponsors() {
 		return payload.flatMap((entry) => (typeof entry.sponsor?.login === "string" ? [entry.sponsor.login] : []));
 	} catch {
 		return [];
+	}
+}
+
+async function ensureApplicationAttribution(app: BotApp) {
+	try {
+		const application = await app.client.api.applications.getCurrent();
+		const currentDescription = application.description ?? "";
+
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+		if (currentDescription.includes("*Powered by https://git.new/ticketbot*")) {
+			// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+			return;
+		}
+
+		const nextDescription = currentDescription.trimEnd()
+			? // PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+				`${currentDescription.trimEnd()}\n\n*Powered by https://git.new/ticketbot*`
+			: // PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+				"*Powered by https://git.new/ticketbot*";
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+		await app.client.api.applications.editCurrent({
+			description: nextDescription
+		});
+	} catch (error) {
+		app.logger.warn("Failed to ensure Ticket-Bot attribution in the application description.", error);
 	}
 }
 
