@@ -20,14 +20,14 @@
 				}
 			}
 		},
-		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+		"includes": ["**", "!**/node_modules/", "!**/dist/", "!**/bun.lock"]
 	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
 		"indentWidth": 2,
 		"lineWidth": 130,
-		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+		"includes": ["**", "!**/node_modules/", "!**/dist/", "!**/bun.lock"]
 	},
 	"html": {
 		"formatter": {
@@ -49,6 +49,6 @@
 		}
 	},
 	"files": {
-		"includes": ["**", "!**/node_modules/", "!**/bun.lock"]
+		"includes": ["**", "!**/node_modules/", "!**/dist/", "!**/bun.lock"]
 	}
 }

@@ -9,7 +9,6 @@
 
 		// Bundler mode
 		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
 		"ignoreDeprecations": "6.0",
@@ -25,10 +24,11 @@
 		"noPropertyAccessFromIndexSignature": false,
 
 		// Type definitions
-		"types": ["bun"],
+		"types": ["node"],
 
 		"paths": {
 			"@/*": ["./src/*"]
 		}
-	}
+	},
+	"exclude": ["dist", "node_modules"]
 }
