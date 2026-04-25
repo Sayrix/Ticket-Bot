@@ -1,7 +1,7 @@
 node_modules/
 dist/
 
-config/.env
-config/config.ts
+config/.env*
+config/config.ts*
 
 .data/*.db
