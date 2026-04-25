@@ -15,13 +15,16 @@ This notice must not be removed, obscured, or replaced.
 
 import type {
 	APIActionRowComponent,
+	APIAutoPopulatedSelectMenuComponent,
 	APIButtonComponentWithCustomId,
-	APIMessageTopLevelComponent,
+	APIComponentInMessageActionRow,
 	APIMessageComponentInteraction,
+	APIMessageTopLevelComponent,
 	APIModalSubmitInteraction,
-	APIModalSubmitTextInputComponent
+	APIModalSubmitTextInputComponent,
+	APISelectMenuComponent,
+	APIStringSelectComponent
 } from "@discordjs/core";
-import type { APIComponentInContainer, APIContainerComponent } from "discord-api-types/v10";
 import {
 	ButtonStyle,
 	ChannelType,
@@ -31,6 +34,7 @@ import {
 	PermissionFlagsBits,
 	TextInputStyle
 } from "@discordjs/core";
+import type { APIComponentInContainer, APIContainerComponent } from "discord-api-types/v10";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
 import { deferReply, editReply, followUp, reply, showModal, updateMessage } from "@/core/respond";
@@ -66,6 +70,9 @@ interface TicketOpenReasonData {
 	combined: string;
 }
 
+type TicketOpenResponseMode = "initial" | "follow-up";
+type MessageActionRow = APIActionRowComponent<APIComponentInMessageActionRow>;
+
 export async function handleOpenFormSubmit(context: ComponentExecutionContext, interaction: APIModalSubmitInteraction) {
 	const ticketTypeKey = context.route.state[0];
 
@@ -86,12 +93,16 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 	const ticketType = getTicketType(app, context.ticketTypeKey);
 	const panel = context.panelKey ? getPanel(app, context.panelKey) : null;
 	const roleIds = getMemberRoleIds(interaction);
+	const openForm = ticketType.openForm;
+	const hasOpenForm = Boolean(openForm?.questions.length);
+	const isStringSelect = interaction.data.component_type === ComponentType.StringSelect;
 
 	if (!userCanAccessTicketType(app, ticketType, roleIds)) {
-		await reply(app, interaction, {
-			content: app.LL.tickets.open.not_allowed_type(),
-			flags: MessageFlags.Ephemeral
-		});
+		if (isStringSelect) {
+			await updateMessage(app, interaction, {});
+		}
+
+		await respondToTicketOpen(app, interaction, app.LL.tickets.open.not_allowed_type(), isStringSelect ? "follow-up" : "initial");
 		return;
 	}
 
@@ -99,46 +110,151 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 		const allowedTypes = new Set(getPanelTicketTypeKeys(panel));
 
 		if (!allowedTypes.has(context.ticketTypeKey)) {
-			await reply(app, interaction, {
-				content: app.LL.tickets.open.unavailable_type(),
-				flags: MessageFlags.Ephemeral
-			});
+			if (isStringSelect) {
+				await updateMessage(app, interaction, {});
+			}
+
+			await respondToTicketOpen(
+				app,
+				interaction,
+				app.LL.tickets.open.unavailable_type(),
+				isStringSelect ? "follow-up" : "initial"
+			);
 			return;
 		}
+	}
+
+	const resetBeforeTicketWork = isStringSelect && !hasOpenForm;
+
+	if (resetBeforeTicketWork) {
+		await updateMessage(app, interaction, {});
 	}
 
 	const currentOpenCount = await getUserOpenTicketCount(app, getInteractionUser(interaction).id);
 
 	if (app.config.tickets.maxOpenPerUser > 0 && currentOpenCount >= app.config.tickets.maxOpenPerUser) {
-		await reply(app, interaction, {
-			content: app.LL.tickets.open.max_open_reached({ limit: app.config.tickets.maxOpenPerUser }),
-			flags: MessageFlags.Ephemeral
-		});
+		if (isStringSelect && hasOpenForm) {
+			await updateMessage(app, interaction, {});
+			await respondToTicketOpen(
+				app,
+				interaction,
+				app.LL.tickets.open.max_open_reached({ limit: app.config.tickets.maxOpenPerUser }),
+				"follow-up"
+			);
+			return;
+		}
+
+		await respondToTicketOpen(
+			app,
+			interaction,
+			app.LL.tickets.open.max_open_reached({ limit: app.config.tickets.maxOpenPerUser }),
+			resetBeforeTicketWork ? "follow-up" : "initial"
+		);
 		return;
 	}
 
-	if (ticketType.openForm?.questions.length) {
+	if (openForm?.questions.length) {
 		await showModal(app, interaction, {
 			custom_id: createCustomId("tickets", "submit-open-form", context.ticketTypeKey),
-			title: ticketType.openForm.title,
-			components: ticketType.openForm.questions.map((question) => ({
+			title: openForm.title,
+			components: openForm.questions.map((question) => ({
 				type: ComponentType.ActionRow,
 				components: [createQuestionInput(question)]
 			}))
 		});
+
+		if (isStringSelect) {
+			await refreshSourceMessageComponents(app, interaction);
+		}
+
 		return;
 	}
 
-	if (interaction.data.component_type === ComponentType.StringSelect) {
-		// Update the open panel message so that it resets the selection of the user, letting them open another ticket later.
-		await updateMessage(app, interaction, {});
-		await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(app), {
-			responseMode: "follow-up"
+	await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(app), {
+		responseMode: resetBeforeTicketWork ? "follow-up" : "deferred-reply"
+	});
+}
+
+async function respondToTicketOpen(
+	app: BotApp,
+	interaction: APIMessageComponentInteraction,
+	content: string,
+	responseMode: TicketOpenResponseMode
+) {
+	const body = {
+		content,
+		flags: MessageFlags.Ephemeral
+	};
+
+	if (responseMode === "follow-up") {
+		await followUp(app, interaction, body);
+		return;
+	}
+
+	await reply(app, interaction, body);
+}
+
+async function refreshSourceMessageComponents(app: BotApp, interaction: APIMessageComponentInteraction) {
+	if (!interaction.channel.id || !interaction.message.components?.length) {
+		return;
+	}
+
+	try {
+		await app.client.api.channels.editMessage(interaction.channel.id, interaction.message.id, {
+			components: clearSelectDefaults(interaction.message.components)
 		});
-		return;
+	} catch (error) {
+		app.logger.warn("Failed to refresh ticket panel select menu after opening modal.", error);
 	}
+}
 
-	await createTicket(app, interaction, context.ticketTypeKey, ticketType, createDefaultTicketOpenReason(app));
+function clearSelectDefaults(components: APIMessageTopLevelComponent[]): APIMessageTopLevelComponent[] {
+	return components.map((component) => {
+		if (component.type === ComponentType.ActionRow) {
+			return clearActionRowDefaults(component);
+		}
+
+		if (component.type === ComponentType.Container) {
+			return {
+				...component,
+				components: component.components.map((child) =>
+					child.type === ComponentType.ActionRow ? clearActionRowDefaults(child) : child
+				)
+			};
+		}
+
+		return component;
+	});
+}
+
+function clearActionRowDefaults(row: MessageActionRow): MessageActionRow {
+	return {
+		...row,
+		components: row.components.map((component) => {
+			if (!isSelectMenuComponent(component)) {
+				return component;
+			}
+
+			if (component.type === ComponentType.StringSelect) {
+				return {
+					...component,
+					options: component.options.map((option) => ({
+						...option,
+						default: false
+					}))
+				} satisfies APIStringSelectComponent;
+			}
+
+			return {
+				...component,
+				default_values: []
+			} satisfies APIAutoPopulatedSelectMenuComponent;
+		})
+	};
+}
+
+function isSelectMenuComponent(component: APIComponentInMessageActionRow): component is APISelectMenuComponent {
+	return component.type !== ComponentType.Button;
 }
 
 async function createTicket(
