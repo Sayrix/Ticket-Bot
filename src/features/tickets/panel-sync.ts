@@ -23,7 +23,7 @@ import type {
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { eq } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
-import { reply } from "@/core/respond";
+import { followUp, reply, updateMessage } from "@/core/respond";
 import type { BotApp, ComponentExecutionContext } from "@/core/types";
 import { panelMessagesTable } from "@/db/schema";
 import {
@@ -99,7 +99,8 @@ export async function handlePanelSelect(context: ComponentExecutionContext, inte
 	const ticketTypeKey = values[0];
 
 	if (!ticketTypeKey) {
-		await reply(context.app, interaction, {
+		await updateMessage(context.app, interaction, {});
+		await followUp(context.app, interaction, {
 			content: context.app.LL.tickets.panel.select_type(),
 			flags: MessageFlags.Ephemeral
 		});
@@ -109,7 +110,8 @@ export async function handlePanelSelect(context: ComponentExecutionContext, inte
 	const allowedTicketTypes = new Set(getPanelTicketTypeKeys(panel));
 
 	if (!allowedTicketTypes.has(ticketTypeKey)) {
-		await reply(context.app, interaction, {
+		await updateMessage(context.app, interaction, {});
+		await followUp(context.app, interaction, {
 			content: context.app.LL.tickets.panel.unavailable_type(),
 			flags: MessageFlags.Ephemeral
 		});
