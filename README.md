@@ -6,7 +6,7 @@ Ticket Bot is a open-source Discord bot that allows you to easily manage support
 
 ## 📄 Documentation
 
-The documentation is available [here](https://doc.ticket.pm/)
+The documentation is available [here](https://github.com/Sayrix/Ticket-Bot/wiki)
 
 ## 💬 Discord
 
