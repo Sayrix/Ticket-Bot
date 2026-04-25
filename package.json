@@ -18,6 +18,9 @@
 		"drizzle:push": "drizzle-kit push",
 		"build": "bun scripts/build.mjs || node scripts/build.mjs",
 		"deploy:commands": "bun scripts/run-entry.mjs src/deploy-commands-cli.js || node scripts/run-entry.mjs src/deploy-commands-cli.js",
+		"migrate:v3": "bun scripts/run-entry.mjs src/migrate-v3-db.js",
+		"migrate:v3:config": "bun scripts/run-entry.mjs src/migrate-v3-config.js",
+		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs",
 		"start": "bun scripts/run-entry.mjs src/index.js || node scripts/run-entry.mjs src/index.js"
 	},
 	"dependencies": {
@@ -29,8 +32,9 @@
 		"@ticketpm/discord-api": "^0.0.7",
 		"discord-api-types": "^0.38.47",
 		"dotenv": "^17.4.2",
-		"drizzle-orm": "^0.45.2",
 		"drizzle-kit": "^0.31.10",
+		"drizzle-orm": "^0.45.2",
+		"jsonc-parser": "^3.3.1",
 		"typesafe-i18n": "^5.27.1"
 	},
 	"devDependencies": {
