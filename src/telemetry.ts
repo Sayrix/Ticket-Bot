@@ -23,7 +23,7 @@ const TELEMETRY_SOCKET_URL = "wss://telemetry.ticket.pm";
 // const TELEMETRY_SOCKET_URL = "ws://localhost:45263";
 const TELEMETRY_PROTOCOL_VERSION = "v1";
 const TELEMETRY_SOCKET_PROTOCOL = `ticket.pm.telemetry.${TELEMETRY_PROTOCOL_VERSION}`;
-const TELEMETRY_SEND_INTERVAL_MS = 300_000; // 5 minutes
+const TELEMETRY_SEND_INTERVAL_MS = 90_000; // 1 minute and 30 seconds.
 const TELEMETRY_RECONNECT_MAX_DELAY_MS = 10_000;
 const TELEMETRY_NOTICE_KEY = "telemetryPrivacyNoticeShown";
 
