@@ -16,12 +16,12 @@
 		"format": "biome format .",
 		"format:fix": "biome format --write",
 		"drizzle:push": "drizzle-kit push",
-		"build": "bun scripts/build.mjs || node scripts/build.mjs",
-		"deploy:commands": "bun scripts/run-entry.mjs src/deploy-commands-cli.js || node scripts/run-entry.mjs src/deploy-commands-cli.js",
-		"migrate:v3": "bun scripts/run-entry.mjs src/migrate-v3-db.js",
-		"migrate:v3:config": "bun scripts/run-entry.mjs src/migrate-v3-config.js",
-		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs",
-		"start": "bun scripts/run-entry.mjs src/index.js || node scripts/run-entry.mjs src/index.js"
+		"build": "tsc -p tsconfig.build.json && resolve-tspaths -p tsconfig.build.json",
+		"start": "bun src/index.ts",
+		"node:start": "node dist/src/index.js",
+		"migrate:v3": "bun src/migrate-v3-db.ts",
+		"migrate:v3:config": "bun src/migrate-v3-config.ts",
+		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs"
 	},
 	"dependencies": {
 		"@discordjs/core": "2.4.0",
@@ -40,7 +40,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
 		"@types/node": "^24.9.1",
-		"typescript": "^6.0.2",
-		"tsx": "^4.21.0"
+		"resolve-tspaths": "^0.8.23",
+		"typescript": "^6.0.2"
 	}
 }
