@@ -17,7 +17,14 @@ import type {
 	APIApplicationCommandAutocompleteInteraction,
 	APIChatInputApplicationCommandInteraction,
 	APIMessageComponentInteraction,
-	APIModalSubmitInteraction
+	APIModalSubmitInteraction,
+	CreateAutocompleteResponseOptions,
+	CreateInteractionDeferResponseOptions,
+	CreateInteractionFollowUpResponseOptions,
+	CreateInteractionResponseOptions,
+	CreateInteractionUpdateMessageResponseOptions,
+	CreateModalResponseOptions,
+	EditInteractionResponseOptions
 } from "@discordjs/core";
 import { MessageFlags } from "@discordjs/core";
 import type { BotApp } from "@/core/types";
@@ -29,31 +36,39 @@ type ReplyableInteraction =
 
 type ModalCapableInteraction = APIChatInputApplicationCommandInteraction | APIMessageComponentInteraction;
 
-export async function reply(app: BotApp, interaction: ReplyableInteraction, body: any) {
+export async function reply(app: BotApp, interaction: ReplyableInteraction, body: CreateInteractionResponseOptions) {
 	return app.client.api.interactions.reply(interaction.id, interaction.token, body);
 }
 
-export async function deferReply(app: BotApp, interaction: ReplyableInteraction, body?: any) {
+export async function deferReply(app: BotApp, interaction: ReplyableInteraction, body?: CreateInteractionDeferResponseOptions) {
 	return app.client.api.interactions.defer(interaction.id, interaction.token, body);
 }
 
-export async function editReply(app: BotApp, interaction: ReplyableInteraction, body: any) {
+export async function editReply(app: BotApp, interaction: ReplyableInteraction, body: EditInteractionResponseOptions) {
 	return app.client.api.interactions.editReply(app.applicationId, interaction.token, body);
 }
 
-export async function followUp(app: BotApp, interaction: ReplyableInteraction, body: any) {
+export async function followUp(app: BotApp, interaction: ReplyableInteraction, body: CreateInteractionFollowUpResponseOptions) {
 	return app.client.api.interactions.followUp(app.applicationId, interaction.token, body);
 }
 
-export async function updateMessage(app: BotApp, interaction: APIMessageComponentInteraction, body: any) {
+export async function updateMessage(
+	app: BotApp,
+	interaction: APIMessageComponentInteraction,
+	body: CreateInteractionUpdateMessageResponseOptions
+) {
 	return app.client.api.interactions.updateMessage(interaction.id, interaction.token, body);
 }
 
-export async function showModal(app: BotApp, interaction: ModalCapableInteraction, body: any) {
+export async function showModal(app: BotApp, interaction: ModalCapableInteraction, body: CreateModalResponseOptions) {
 	return app.client.api.interactions.createModal(interaction.id, interaction.token, body);
 }
 
-export async function replyWithAutocomplete(app: BotApp, interaction: APIApplicationCommandAutocompleteInteraction, body: any) {
+export async function replyWithAutocomplete(
+	app: BotApp,
+	interaction: APIApplicationCommandAutocompleteInteraction,
+	body: CreateAutocompleteResponseOptions
+) {
 	return app.client.api.interactions.createAutocompleteResponse(interaction.id, interaction.token, body);
 }
 
