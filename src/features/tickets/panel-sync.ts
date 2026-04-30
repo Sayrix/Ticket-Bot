@@ -33,7 +33,7 @@ import {
 	userCanAccessTicketType,
 	validatePanelConfig
 } from "@/features/tickets/config-access";
-import { appendMessageText, finalizeMessageTemplate, loadMessageTemplate } from "@/features/tickets/messages";
+import { appendMessageText, appendPanelOpener, finalizeMessageTemplate, loadMessageTemplate } from "@/features/tickets/messages";
 import { continueTicketOpen } from "@/features/tickets/ticket-workflow";
 import type { ButtonPanelEntryConfig, PanelConfig, PanelOpenerConfig } from "@/features/tickets/types";
 import { chunk, getMemberRoleIds, mapButtonStyle, toPartialEmoji } from "@/features/tickets/utils";
@@ -165,7 +165,7 @@ async function recreatePanelMessage(
 async function buildPanelMessage(app: BotApp, panelKey: string, panel: PanelConfig) {
 	const messageTemplate = await loadMessageTemplate(app, panel.message);
 	const withConfiguredText = appendMessageText(messageTemplate, panel.content);
-	const body = placePanelOpener(withConfiguredText, buildPanelComponents(app, panelKey, panel));
+	const body = appendPanelOpener(withConfiguredText, buildPanelComponents(app, panelKey, panel));
 
 	return finalizeMessageTemplate({
 		...body,
@@ -174,64 +174,6 @@ async function buildPanelMessage(app: BotApp, panelKey: string, panel: PanelConf
 			parse: []
 		}
 	});
-}
-
-function placePanelOpener(
-	payload: Awaited<ReturnType<typeof loadMessageTemplate>>,
-	openerComponents: APIMessageTopLevelComponent[]
-) {
-	if (!openerComponents.length) {
-		return payload;
-	}
-
-	let replacedSlot = false;
-	let appendedToContainer = false;
-
-	const visit = (value: unknown): unknown => {
-		if (Array.isArray(value)) {
-			return value.flatMap((entry) => {
-				if (isPanelOpenerSlot(entry)) {
-					replacedSlot = true;
-					return structuredClone(openerComponents);
-				}
-
-				const nextEntry = visit(entry);
-				return Array.isArray(nextEntry) ? nextEntry : [nextEntry];
-			});
-		}
-
-		if (!value || typeof value !== "object") {
-			return value;
-		}
-
-		if (
-			!replacedSlot &&
-			!appendedToContainer &&
-			"type" in value &&
-			value.type === ComponentType.Container &&
-			"components" in value &&
-			Array.isArray(value.components)
-		) {
-			appendedToContainer = true;
-			return {
-				...value,
-				components: [...value.components, ...structuredClone(openerComponents)]
-			};
-		}
-
-		return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, visit(entry)]));
-	};
-
-	return {
-		...payload,
-		components: visit(payload.components ?? []) as APIMessageTopLevelComponent[]
-	};
-}
-
-function isPanelOpenerSlot(value: unknown): value is {
-	slot: string;
-} {
-	return Boolean(value && typeof value === "object" && "slot" in value && value.slot === "panel-opener");
 }
 
 function buildPanelComponents(app: BotApp, panelKey: string, panel: PanelConfig): APIMessageTopLevelComponent[] {
