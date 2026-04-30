@@ -19,7 +19,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { APIButtonComponentWithCustomId, APIMessageTopLevelComponent } from "@discordjs/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MESSAGE_TEMPLATES_DIRECTORY } from "@/features/tickets/constants";
-import type { LoadedMessageTemplate, MessageTemplateSource } from "@/features/tickets/types";
+import type {
+	DiscordMessageTemplate,
+	LoadedMessageTemplate,
+	MessageTemplateComponent,
+	MessageTemplateSlotComponent,
+	MessageTemplateSource
+} from "@/features/tickets/types";
 import { renderTemplate } from "@/features/tickets/utils";
 import type { BotApp } from "@/core/types";
 
@@ -35,7 +41,7 @@ const COMPONENTS_V2_TYPES = new Set([
 	ComponentType.Container
 ]);
 
-export function createMessageSlot(slot: string): any {
+export function createMessageSlot(slot: string): MessageTemplateSlotComponent {
 	return {
 		type: TEMPLATE_SLOT_TYPE,
 		slot,
@@ -73,7 +79,7 @@ export async function loadMessageTemplate(
 	return applyComponentsV2Defaults(renderedPayload);
 }
 
-export function finalizeMessageTemplate(payload: LoadedMessageTemplate) {
+export function finalizeMessageTemplate(payload: LoadedMessageTemplate): DiscordMessageTemplate {
 	return sanitizeMessageTemplate(applyComponentsV2Defaults(payload));
 }
 
@@ -297,9 +303,9 @@ function applyComponentsV2Defaults(payload: LoadedMessageTemplate): LoadedMessag
 	};
 }
 
-function sanitizeMessageTemplate(payload: LoadedMessageTemplate): LoadedMessageTemplate {
+function sanitizeMessageTemplate(payload: LoadedMessageTemplate): DiscordMessageTemplate {
 	const usesV2 = usesComponentsV2(payload);
-	const nextPayload: LoadedMessageTemplate = {};
+	const nextPayload: DiscordMessageTemplate = {};
 
 	if (payload.allowed_mentions) {
 		nextPayload.allowed_mentions = payload.allowed_mentions;
@@ -326,17 +332,17 @@ function sanitizeMessageTemplate(payload: LoadedMessageTemplate): LoadedMessageT
 	return nextPayload;
 }
 
-function hasComponentsV2Components(components: APIMessageTopLevelComponent[] | undefined) {
-	return components?.some((component) => COMPONENTS_V2_TYPES.has(component.type)) ?? false;
+function hasComponentsV2Components(components: MessageTemplateComponent[] | undefined) {
+	return components?.some((component) => typeof component.type === "number" && COMPONENTS_V2_TYPES.has(component.type)) ?? false;
 }
 
 function injectManyIntoSlots(
-	components: APIMessageTopLevelComponent[],
+	components: MessageTemplateComponent[],
 	injectedComponents: APIMessageTopLevelComponent[],
 	slot: string
 ): {
 	replaced: boolean;
-	value: APIMessageTopLevelComponent[];
+	value: MessageTemplateComponent[];
 } {
 	let replaced = false;
 
@@ -366,16 +372,16 @@ function injectManyIntoSlots(
 
 	return {
 		replaced,
-		value: visit(components) as APIMessageTopLevelComponent[]
+		value: visit(components) as MessageTemplateComponent[]
 	};
 }
 
 function appendComponentsToFirstContainer(
-	components: APIMessageTopLevelComponent[],
+	components: MessageTemplateComponent[],
 	appendedComponents: APIMessageTopLevelComponent[]
 ): {
 	replaced: boolean;
-	value: APIMessageTopLevelComponent[];
+	value: MessageTemplateComponent[];
 } {
 	let replaced = false;
 
@@ -407,13 +413,13 @@ function appendComponentsToFirstContainer(
 
 	return {
 		replaced,
-		value: visit(components) as APIMessageTopLevelComponent[]
+		value: visit(components) as MessageTemplateComponent[]
 	};
 }
 
-function stripTemplateSlots(components: APIMessageTopLevelComponent[] | undefined) {
+function stripTemplateSlots(components: MessageTemplateComponent[] | undefined): APIMessageTopLevelComponent[] | undefined {
 	if (!components?.length) {
-		return components;
+		return undefined;
 	}
 
 	const visit = (value: unknown): unknown => {
@@ -444,10 +450,7 @@ function stripTemplateSlots(components: APIMessageTopLevelComponent[] | undefine
 	return visit(components) as APIMessageTopLevelComponent[];
 }
 
-function isTemplateSlot(value: unknown): value is {
-	slot: string;
-	slot_kind?: string;
-} {
+function isTemplateSlot(value: unknown): value is MessageTemplateSlotComponent {
 	return Boolean(
 		value &&
 			typeof value === "object" &&

@@ -23,7 +23,8 @@ import type {
 	APIModalSubmitInteraction,
 	APIModalSubmitTextInputComponent,
 	APISelectMenuComponent,
-	APIStringSelectComponent
+	APIStringSelectComponent,
+	APITextInputComponent
 } from "@discordjs/core";
 import {
 	ButtonStyle,
@@ -577,7 +578,7 @@ type WelcomeTemplateContainer = Omit<APIContainerComponent, "components"> & {
 };
 type TicketActionRows = APIActionRowComponent<APIButtonComponentWithCustomId>[];
 
-function createQuestionInput(question: TicketQuestionConfig) {
+function createQuestionInput(question: TicketQuestionConfig): APITextInputComponent {
 	return {
 		type: ComponentType.TextInput,
 		custom_id: question.key,

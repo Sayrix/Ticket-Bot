@@ -14,6 +14,7 @@ This notice must not be removed, obscured, or replaced.
 */
 
 import type { APIAllowedMentions, APIEmbed, APIMessageTopLevelComponent } from "@discordjs/core";
+import type { APIComponentInContainer, APIContainerComponent } from "discord-api-types/v10";
 import type { Locales, TranslationFunctions } from "../../../i18n/i18n-types.js";
 import type { VersionedConfig } from "@/config/index";
 
@@ -29,14 +30,33 @@ export type TicketClaimMode = TicketClaimsConfig["mode"];
 export type LogsConfig = CurrentConfig["logs"];
 export type LogEventToggleKey = keyof NonNullable<LogsConfig["events"]>;
 
+export interface MessageTemplateSlotComponent {
+	type: "template-slot";
+	slot: string;
+	slot_kind?: "many";
+}
+
+export type MessageTemplateContainerChild = APIComponentInContainer | MessageTemplateSlotComponent;
+export type MessageTemplateContainerComponent = Omit<APIContainerComponent, "components"> & {
+	components: MessageTemplateContainerChild[];
+};
+export type MessageTemplateComponent =
+	| Exclude<APIMessageTopLevelComponent, APIContainerComponent>
+	| MessageTemplateContainerComponent
+	| MessageTemplateSlotComponent;
+
 export interface LoadedMessageTemplate {
 	allowed_mentions?: APIAllowedMentions;
 	content?: string;
 	embeds?: APIEmbed[];
-	components?: APIMessageTopLevelComponent[];
+	components?: MessageTemplateComponent[];
 	flags?: number;
 	useComponentsV2?: boolean;
 }
+
+export type DiscordMessageTemplate = Omit<LoadedMessageTemplate, "components" | "useComponentsV2"> & {
+	components?: APIMessageTopLevelComponent[];
+};
 
 export interface MessageTemplateContext {
 	locale: Locales;
