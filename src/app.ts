@@ -44,18 +44,22 @@ export async function createBotApp() {
 	]);
 	const i18n = createBotI18n(botConfig.lang, logger);
 	const registry = createHandlerRegistry({ commands, features, events, logger, LL: i18n.LL });
+	let router: InteractionRouter;
+	const app: BotApp = {
+		client,
+		db,
+		config: botConfig,
+		logger,
+		applicationId: botConfig.clientId,
+		locale: i18n.locale,
+		LL: i18n.LL,
+		registry,
+		get router() {
+			return router;
+		}
+	};
 
-	const app = {} as BotApp;
-	app.client = client;
-	app.db = db;
-	app.config = botConfig;
-	app.logger = logger;
-	app.applicationId = botConfig.clientId;
-	app.locale = i18n.locale;
-	app.LL = i18n.LL;
-	app.registry = registry;
-
-	app.router = new InteractionRouter(app);
+	router = new InteractionRouter(app);
 
 	registerEvents(app);
 
