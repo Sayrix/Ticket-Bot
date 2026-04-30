@@ -17,6 +17,7 @@ import { MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
 import { defineCommand } from "@/core/defineCommand";
 import { reply } from "@/core/respond";
+import type { BotApp } from "@/core/types";
 import { getStringOption } from "@/features/commands/shared/options";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
@@ -138,7 +139,7 @@ function parseRequestedUserIds(rawValue: string) {
 }
 
 function buildMassAddSummary(
-	app: Parameters<typeof reply>[0],
+	app: BotApp,
 	addedUserIds: string[],
 	skippedUserIds: string[],
 	invalidUserIds: string[],
