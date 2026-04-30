@@ -169,7 +169,7 @@ async function announceStartup(app: BotApp, tag: string, userId: string) {
 
 async function fetchSponsors() {
 	try {
-		const response = (await fetch(SPONSORS_URL)) as any;
+		const response = await fetch(SPONSORS_URL);
 
 		if (!response.ok) {
 			return [];

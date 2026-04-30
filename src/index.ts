@@ -55,11 +55,11 @@ main().catch(async (error) => {
 
 async function checkForUpdates() {
 	try {
-		const response = (await fetch(REPOSITORY_TAGS_URL, {
+		const response = await fetch(REPOSITORY_TAGS_URL, {
 			headers: {
 				accept: "application/vnd.github+json"
 			}
-		})) as any;
+		});
 
 		if (!response.ok) {
 			logger.warn(`Failed to pull latest version from server (${response.status}).`);
