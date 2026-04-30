@@ -41,7 +41,7 @@ import { getInvitedUserIds, revokeTicketParticipantAccess } from "@/features/tic
 import { findTicketByChannel, getOpenTicketByChannel } from "@/features/tickets/records";
 import { formatClaimStatus, formatTranscriptStatus, getDefaultNoReason } from "@/features/tickets/text";
 import { startTranscriptJob } from "@/features/tickets/transcripts";
-import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
+import { getInteractionUser, getMemberRoleIds, getModalTextInputValues } from "@/features/tickets/utils";
 
 const DEFAULT_CLOSE_DM_MESSAGE = "tickets/ticket-closed-dm";
 const DEFAULT_CLOSE_CHANNEL_MESSAGE = "tickets/ticket-closed";
@@ -613,19 +613,7 @@ function createCloseStatusUpdater(
 }
 
 function readCloseReason(interaction: APIModalSubmitInteraction) {
-	for (const component of interaction.data.components) {
-		if (!("components" in component)) {
-			continue;
-		}
-
-		for (const child of component.components) {
-			if (child.type === ComponentType.TextInput && child.custom_id === "reason" && "value" in child) {
-				return child.value.trim() || null;
-			}
-		}
-	}
-
-	return null;
+	return getModalTextInputValues(interaction).get("reason")?.trim() || null;
 }
 
 function normalizeCloseReason(app: BotApp, reason: string | null) {

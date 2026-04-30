@@ -13,8 +13,8 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
-import type { APIUser } from "@discordjs/core";
-import { ButtonStyle } from "@discordjs/core";
+import type { APIModalSubmitInteraction, APIModalSubmitTextInputComponent, APIUser } from "@discordjs/core";
+import { ButtonStyle, ComponentType } from "@discordjs/core";
 import type { ButtonStyleName } from "@/features/tickets/types";
 
 export function renderTemplate(template: string, tokens: Record<string, string | undefined>) {
@@ -99,6 +99,26 @@ export function getInteractionUser(interaction: { member?: { user?: APIUser } | 
 
 export function getMemberRoleIds(interaction: { member?: { roles?: string[] } | null }) {
 	return Array.isArray(interaction.member?.roles) ? interaction.member.roles : [];
+}
+
+export function getModalTextInputValues(interaction: APIModalSubmitInteraction) {
+	const values = new Map<string, string>();
+
+	for (const component of interaction.data.components) {
+		if (!("components" in component)) {
+			continue;
+		}
+
+		for (const child of component.components) {
+			if (child.type !== ComponentType.TextInput) {
+				continue;
+			}
+
+			values.set(child.custom_id, (child as APIModalSubmitTextInputComponent).value);
+		}
+	}
+
+	return values;
 }
 
 /*

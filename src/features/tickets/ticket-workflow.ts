@@ -21,7 +21,6 @@ import type {
 	APIMessageComponentInteraction,
 	APIMessageTopLevelComponent,
 	APIModalSubmitInteraction,
-	APIModalSubmitTextInputComponent,
 	APISelectMenuComponent,
 	APIStringSelectComponent,
 	APITextInputComponent
@@ -64,7 +63,13 @@ import type {
 	TicketRenderTokens,
 	TicketTypeConfig
 } from "@/features/tickets/types";
-import { getInteractionUser, getMemberRoleIds, renderChannelName, renderTemplate } from "@/features/tickets/utils";
+import {
+	getInteractionUser,
+	getMemberRoleIds,
+	getModalTextInputValues,
+	renderChannelName,
+	renderTemplate
+} from "@/features/tickets/utils";
 
 interface TicketOpenReasonData {
 	answers: string[];
@@ -83,7 +88,7 @@ export async function handleOpenFormSubmit(context: ComponentExecutionContext, i
 
 	const ticketType = getTicketType(context.app, ticketTypeKey);
 	const questions = ticketType.openForm?.questions ?? [];
-	const answers = extractSubmittedValues(interaction);
+	const answers = getModalTextInputValues(interaction);
 	const reason =
 		questions.length > 0 ? createTicketOpenReason(context.app, questions, answers) : createDefaultTicketOpenReason(context.app);
 
@@ -603,26 +608,6 @@ async function getUserOpenTicketCount(app: BotApp, userId: string) {
 async function getNextTicketNumber(app: BotApp) {
 	const rows = await app.db.select({ count: count() }).from(ticketsTable);
 	return Number(rows[0]?.count ?? 0) + 1;
-}
-
-function extractSubmittedValues(interaction: APIModalSubmitInteraction) {
-	const values = new Map<string, string>();
-
-	for (const component of interaction.data.components) {
-		if (!("components" in component)) {
-			continue;
-		}
-
-		for (const child of component.components) {
-			if (child.type !== ComponentType.TextInput) {
-				continue;
-			}
-
-			values.set(child.custom_id, (child as APIModalSubmitTextInputComponent).value);
-		}
-	}
-
-	return values;
 }
 
 function createDefaultTicketOpenReason(app: BotApp): TicketOpenReasonData {
