@@ -27,9 +27,9 @@
 		"@discordjs/core": "2.4.0",
 		"@discordjs/rest": "^2.6.1",
 		"@discordjs/ws": "^2.0.4",
-		"@libsql/client": "^0.17.2",
-		"@ticketpm/core": "^0.0.7",
-		"@ticketpm/discord-api": "^0.0.7",
+		"@libsql/client": "^0.17.3",
+		"@ticketpm/core": "^0.0.11",
+		"@ticketpm/discord-api": "^0.0.11",
 		"discord-api-types": "^0.38.47",
 		"dotenv": "^17.4.2",
 		"drizzle-kit": "^0.31.10",
@@ -38,9 +38,9 @@
 		"typesafe-i18n": "^5.27.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.12",
-		"@types/node": "^24.9.1",
+		"@biomejs/biome": "^2.4.13",
+		"@types/node": "^25.6.0",
 		"resolve-tspaths": "^0.8.23",
-		"typescript": "^6.0.2"
+		"typescript": "^6.0.3"
 	}
 }
