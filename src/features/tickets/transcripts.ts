@@ -26,6 +26,11 @@ const TRANSCRIPT_TIMEOUT_MS = 15 * 60 * 1000;
 type TranscriptStatusHandler = (content: string) => Promise<void> | void;
 type TranscriptSourceMessage = Parameters<typeof buildEnrichedDiscordApiTranscriptData>[0]["messages"][number];
 
+const uploadClient = new TicketPmUploadClient({
+	baseUrl: TRANSCRIPT_BASE_URL,
+	token: process.env.TICKETPM_PASSKEY
+});
+
 export async function startTranscriptJob(
 	app: BotApp,
 	ticketChannelId: string,
@@ -120,10 +125,6 @@ async function createTranscript(app: BotApp, channelId: string, onStatus?: Trans
 
 	await reportStatus(onStatus, app.LL.tickets.transcript.uploading());
 
-	const uploadClient = new TicketPmUploadClient({
-		baseUrl: TRANSCRIPT_BASE_URL,
-		token: process.env.TICKETPM_PASSKEY
-	});
 	const result = await uploadClient.uploadDraftTranscript(draftTranscript, {
 		uuidStyleIds: app.config.uuidType !== "emoji",
 		avatarProgress: createProgressHandler(app, app.LL.tickets.transcript.uploading_avatars(), onStatus),
