@@ -1,6 +1,8 @@
 node_modules/
 dist/
 
+.vscode/
+
 config/.env*
 config/config.ts*
 
