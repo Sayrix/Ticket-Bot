@@ -399,7 +399,7 @@ async function preparePanelMigration(source: Client, requestedPanelKey: string |
 
 	if (!openTicketMessageId) {
 		return {
-			skippedReason: 'v3 config.openTicketMessageId was not found.'
+			skippedReason: "v3 config.openTicketMessageId was not found."
 		};
 	}
 
@@ -626,7 +626,8 @@ function printSummary(summary: MigrationSummary) {
 }
 
 function printHelp() {
-	console.log(`
+	console.log(
+		`
 Usage:
   bun run migrate:v3 -- --source file:./tixbot.db
   bun run migrate:v3 -- --source file:./tixbot.db --target file:.data/sqlite.db
@@ -638,7 +639,8 @@ Options:
   --type-map old=new      Map a v3 ticket type codeName to a v4 ticketTypes key. Can be repeated.
   --overwrite             Clear v4 tickets and panel_messages before importing.
   --help                  Show this help.
-`.trim());
+`.trim()
+	);
 }
 
 /*

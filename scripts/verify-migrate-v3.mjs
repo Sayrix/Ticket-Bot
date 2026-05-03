@@ -32,13 +32,7 @@ async function verifyBasicMigration() {
 	const targetUrl = await resetFixture("migrate-v3-basic-target.db");
 
 	await createV3Database(sourceUrl, validTypeKey, { includePanelMessage: Boolean(firstPanelKey) });
-	await runMigration([
-		"--source",
-		sourceUrl,
-		"--target",
-		targetUrl,
-		...(firstPanelKey ? ["--panel-key", firstPanelKey] : [])
-	]);
+	await runMigration(["--source", sourceUrl, "--target", targetUrl, ...(firstPanelKey ? ["--panel-key", firstPanelKey] : [])]);
 
 	await withClient(targetUrl, async (target) => {
 		const tickets = await target.execute("SELECT * FROM tickets ORDER BY id ASC");
@@ -49,7 +43,10 @@ async function verifyBasicMigration() {
 		assert(tickets.rows[1].claimedBy === "222222222222222222", "basic migration should copy claimedBy.");
 		assert(tickets.rows[1].closedReason === "Done", "basic migration should copy close reasons.");
 		assert(tickets.rows[1].transcriptUrl === "https://ticket.pm/transcript/abc", "basic migration should copy transcript URLs.");
-		assert(tickets.rows[0].invitedUserIds === JSON.stringify(["333333333333333333"]), "basic migration should copy invited users.");
+		assert(
+			tickets.rows[0].invitedUserIds === JSON.stringify(["333333333333333333"]),
+			"basic migration should copy invited users."
+		);
 
 		if (firstPanelKey) {
 			const panels = await target.execute("SELECT * FROM panel_messages");

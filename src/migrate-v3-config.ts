@@ -317,7 +317,9 @@ function migrateClaims(claimOption: V3Config["claimOption"]) {
 		mode: "soft",
 		showButtons: claimButton,
 		allowUnclaim: true,
-		nameWhenClaimed: migrateClaimTemplate(readOptionalString(claimOption?.nameWhenClaimed) || "{ticketNumber}-claimed-{claimerUsername}"),
+		nameWhenClaimed: migrateClaimTemplate(
+			readOptionalString(claimOption?.nameWhenClaimed) || "{ticketNumber}-claimed-{claimerUsername}"
+		),
 		categoryWhenClaimed: categoryWhenClaimed || undefined,
 		takeoverMode: "staff",
 		takeoverRoleIds: []
@@ -506,7 +508,8 @@ function printSummary(summary: MigrationSummary) {
 }
 
 function printHelp() {
-	console.log(`
+	console.log(
+		`
 Usage:
   bun run migrate:v3:config -- --source config.jsonc --output config/config.ts
   bun run migrate:v3:config -- --source config.jsonc --output .data/config.v4.ts
@@ -517,7 +520,8 @@ Options:
   --panel-key <key>    v4 panel key created from openTicketChannelId. Defaults to support.
   --overwrite          Replace the output file if it already exists.
   --help               Show this help.
-`.trim());
+`.trim()
+	);
 }
 
 function licenseHeader() {
