@@ -13,17 +13,28 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
+import { mkdirSync } from "node:fs";
+import { dirname, isAbsolute, resolve } from "node:path";
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
 config({ path: "./config/.env" });
+
+const databaseUrl = process.env.DB_FILE_NAME;
+
+if (databaseUrl?.startsWith("file:")) {
+	const databasePath = databaseUrl.slice("file:".length);
+	const databaseDirectory = dirname(isAbsolute(databasePath) ? databasePath : resolve(databasePath));
+
+	mkdirSync(databaseDirectory, { recursive: true });
+}
 
 export default defineConfig({
 	out: "./drizzle",
 	schema: "./src/db/schema.ts",
 	dialect: "sqlite",
 	dbCredentials: {
-		url: process.env.DB_FILE_NAME
+		url: databaseUrl
 	}
 });
 
