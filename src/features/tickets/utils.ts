@@ -25,6 +25,10 @@ export function renderChannelName(template: string, tokens: Record<string, strin
 	return sanitizeChannelName(renderTemplate(template, tokens));
 }
 
+export function escapeDiscordMarkdown(value: string) {
+	return value.replaceAll(/([\\_*`~|>])/g, "\\$1");
+}
+
 export function sanitizeChannelName(value: string) {
 	const cleaned = value
 		.trim()

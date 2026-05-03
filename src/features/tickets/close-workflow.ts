@@ -41,7 +41,7 @@ import { getInvitedUserIds, revokeTicketParticipantAccess } from "@/features/tic
 import { findTicketByChannel, getOpenTicketByChannel } from "@/features/tickets/records";
 import { formatClaimStatus, formatTranscriptStatus, getDefaultNoReason } from "@/features/tickets/text";
 import { startTranscriptJob } from "@/features/tickets/transcripts";
-import { getInteractionUser, getMemberRoleIds, getModalTextInputValues } from "@/features/tickets/utils";
+import { escapeDiscordMarkdown, getInteractionUser, getMemberRoleIds, getModalTextInputValues } from "@/features/tickets/utils";
 
 const DEFAULT_CLOSE_DM_MESSAGE = "tickets/ticket-closed-dm";
 const DEFAULT_CLOSE_CHANNEL_MESSAGE = "tickets/ticket-closed";
@@ -231,7 +231,7 @@ async function closeTicket(
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : "",
 		closerId: closer.id,
 		closerMention: `<@${closer.id}>`,
-		closerName: closer.username,
+		closerName: escapeDiscordMarkdown(closer.username),
 		reason: normalizedReason,
 		transcriptStatus: formatTranscriptStatus(app, transcriptUrl),
 		transcriptUrl: transcriptUrl ?? "",
