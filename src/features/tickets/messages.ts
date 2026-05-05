@@ -16,8 +16,9 @@ This notice must not be removed, obscured, or replaced.
 import { access } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import type { APIButtonComponentWithCustomId, APIMessageTopLevelComponent } from "@discordjs/core";
-import { ComponentType, MessageFlags } from "@discordjs/core";
+import type { APIButtonComponentWithCustomId, APIMessageTopLevelComponent } from "discord-api-types/v10";
+import { ComponentType, MessageFlags } from "discord-api-types/v10";
+import type { BotApp } from "@/core/types";
 import { MESSAGE_TEMPLATES_DIRECTORY } from "@/features/tickets/constants";
 import type {
 	DiscordMessageTemplate,
@@ -27,7 +28,6 @@ import type {
 	MessageTemplateSource
 } from "@/features/tickets/types";
 import { renderTemplate } from "@/features/tickets/utils";
-import type { BotApp } from "@/core/types";
 
 const TEMPLATE_SLOT_TYPE = "template-slot";
 const TEMPLATE_SLOT_KIND_MANY = "many";
@@ -180,15 +180,13 @@ export function appendPanelOpener(
 		};
 	}
 
-	if (usesComponentsV2(payload)) {
-		const containerInjection = appendComponentsToFirstContainer(currentComponents, components);
+	const containerInjection = appendComponentsToFirstContainer(currentComponents, components);
 
-		if (containerInjection.replaced) {
-			return {
-				...payload,
-				components: containerInjection.value
-			};
-		}
+	if (containerInjection.replaced) {
+		return {
+			...payload,
+			components: containerInjection.value
+		};
 	}
 
 	return appendMessageComponents(payload, components);
@@ -370,9 +368,11 @@ function injectManyIntoSlots(
 		return value;
 	};
 
+	const value = visit(components) as MessageTemplateComponent[];
+
 	return {
 		replaced,
-		value: visit(components) as MessageTemplateComponent[]
+		value
 	};
 }
 
@@ -411,9 +411,11 @@ function appendComponentsToFirstContainer(
 		return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, visit(entry)]));
 	};
 
+	const value = visit(components) as MessageTemplateComponent[];
+
 	return {
 		replaced,
-		value: visit(components) as MessageTemplateComponent[]
+		value
 	};
 }
 
