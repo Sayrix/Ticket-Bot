@@ -22,7 +22,13 @@ import type {
 	APIModalSubmitInteraction
 } from "@discordjs/core";
 import { ButtonStyle, ComponentType, MessageFlags, OverwriteType, TextInputStyle } from "@discordjs/core";
-import type { APIComponentInMessageActionRow, APIContainerComponent, RESTAPIChannelPatchOverwrite } from "discord-api-types/v10";
+import { DiscordAPIError } from "@discordjs/rest";
+import {
+	type APIComponentInMessageActionRow,
+	type APIContainerComponent,
+	type RESTAPIChannelPatchOverwrite,
+	RESTJSONErrorCodes
+} from "discord-api-types/v10";
 import { eq } from "drizzle-orm";
 import { createCustomId } from "@/core/custom-id";
 import { editReply, reply, showModal } from "@/core/respond";
@@ -454,7 +460,16 @@ async function moveClosedTicketChannel(app: BotApp, channelId: string) {
 
 async function removeClosedTicketParticipantAccess(app: BotApp, channelId: string, openerId: string, invitedUserIds: string[]) {
 	if (invitedUserIds.length === 0) {
-		await revokeTicketParticipantAccess(app, channelId, openerId);
+		try {
+			await revokeTicketParticipantAccess(app, channelId, openerId);
+		} catch (error) {
+			// Discord may return Unknown Overwrite if the opener left and the member overwrite is already gone.
+			if (error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownPermissionOverwrite) {
+				return;
+			}
+
+			throw error;
+		}
 		return;
 	}
 

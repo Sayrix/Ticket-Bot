@@ -14,6 +14,10 @@ This notice must not be removed, obscured, or replaced.
 */
 
 declare module "@discordjs/rest" {
+	export class DiscordAPIError extends Error {
+		public code: number | string;
+	}
+
 	export class REST {
 		public constructor(options?: { version?: string });
 		public setToken(token: string | undefined): REST;
