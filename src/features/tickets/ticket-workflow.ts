@@ -283,6 +283,9 @@ async function createTicket(
 	const ticketNumber = (await getNextTicketNumber(app)).toString();
 	const createdAt = Date.now();
 	const channelName = renderChannelName(ticketType.channelNameTemplate ?? app.config.tickets.channelNameTemplate, {
+		createdById: user.id,
+		createdByUsername: user.username,
+		ticketId: ticketNumber,
 		ticketNumber,
 		ticketTypeKey,
 		ticketTypeName: ticketType.name,
@@ -411,12 +414,14 @@ export async function buildTicketWelcomeMessage(
 
 export async function syncTicketWelcomeMessage(app: BotApp, ticket: TicketRecord, ticketType = getTicketType(app, ticket.type)) {
 	const creator = await app.client.api.users.get(ticket.createdBy).catch(() => null);
+	const claimer = ticket.claimedBy ? await app.client.api.users.get(ticket.claimedBy).catch(() => null) : null;
 	const tokens = createTicketRenderTokens({
 		app,
 		channelId: ticket.channelId,
 		claimStatus: formatClaimStatus(app, ticket.claimedBy),
 		claimerId: ticket.claimedBy ?? undefined,
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : undefined,
+		claimerUsername: ticket.claimedBy ? (claimer?.username ?? ticket.claimedBy) : undefined,
 		createdByMention: `<@${ticket.createdBy}>`,
 		openReason: parseStoredTicketOpenReason(app, ticket.reason),
 		ticketNumber: ticket.id.toString(),
@@ -636,6 +641,7 @@ function createTicketRenderTokens(input: {
 	claimStatus?: string;
 	claimerId?: string;
 	claimerMention?: string;
+	claimerUsername?: string;
 	createdByMention?: string;
 	openReason: TicketOpenReasonData;
 	ticketNumber: string;
@@ -649,8 +655,12 @@ function createTicketRenderTokens(input: {
 		claimStatus: input.claimStatus ?? formatClaimStatus(input.app, input.claimerId ?? null),
 		claimerId: input.claimerId,
 		claimerMention: input.claimerMention,
+		claimerUsername: input.claimerUsername,
+		createdById: input.userId,
 		createdByMention: input.createdByMention,
+		createdByUsername: input.username,
 		reason: input.openReason.combined,
+		ticketId: input.ticketNumber,
 		ticketNumber: input.ticketNumber,
 		ticketTypeKey: input.ticketTypeKey,
 		ticketTypeName: input.ticketTypeName,

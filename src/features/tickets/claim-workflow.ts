@@ -232,12 +232,17 @@ async function renameClaimedTicketChannel(
 	const creator = await app.client.api.users.get(ticket.createdBy).catch(() => null);
 	const nextName = renderChannelName(template, {
 		claimerId: ticket.claimedBy,
+		claimerMention: `<@${ticket.claimedBy}>`,
 		claimerUsername,
 		createdById: ticket.createdBy,
+		createdByMention: `<@${ticket.createdBy}>`,
 		createdByUsername: creator?.username ?? ticket.createdBy,
+		ticketId: ticket.id.toString(),
 		ticketNumber: ticket.id.toString(),
 		ticketTypeKey: ticket.type,
-		ticketTypeName
+		ticketTypeName,
+		userId: ticket.createdBy,
+		username: creator?.username ?? ticket.createdBy
 	});
 
 	await app.client.api.channels.edit(ticket.channelId, {

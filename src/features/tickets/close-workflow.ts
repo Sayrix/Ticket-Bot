@@ -52,6 +52,30 @@ import { escapeDiscordMarkdown, getInteractionUser, getMemberRoleIds, getModalTe
 const DEFAULT_CLOSE_DM_MESSAGE = "tickets/ticket-closed-dm";
 const DEFAULT_CLOSE_CHANNEL_MESSAGE = "tickets/ticket-closed";
 
+interface CloseMessageTokens {
+	[key: string]: string;
+	channelId: string;
+	claimStatus: string;
+	claimerId: string;
+	claimerMention: string;
+	claimerUsername: string;
+	closerId: string;
+	closerMention: string;
+	closerName: string;
+	createdById: string;
+	createdByMention: string;
+	createdByUsername: string;
+	reason: string;
+	ticketId: string;
+	ticketNumber: string;
+	ticketTypeKey: string;
+	ticketTypeName: string;
+	transcriptStatus: string;
+	transcriptUrl: string;
+	userId: string;
+	username: string;
+}
+
 export async function executeCloseCommand(
 	context: CommandExecutionContext,
 	interaction: APIChatInputApplicationCommandInteraction
@@ -230,19 +254,33 @@ async function closeTicket(
 		await status.update(app.LL.tickets.close.status.transcript_still_processing());
 	}
 
+	const [opener, claimer] = await Promise.all([
+		app.client.api.users.get(ticket.createdBy).catch(() => null),
+		ticket.claimedBy ? app.client.api.users.get(ticket.claimedBy).catch(() => null) : Promise.resolve(null)
+	]);
+	const openerUsername = opener?.username ?? ticket.createdBy;
 	const closeMessageTokens = {
 		channelId: ticket.channelId,
 		claimStatus: formatClaimStatus(app, ticket.claimedBy),
 		claimerId: ticket.claimedBy ?? "",
 		claimerMention: ticket.claimedBy ? `<@${ticket.claimedBy}>` : "",
+		claimerUsername: ticket.claimedBy ? (claimer?.username ?? ticket.claimedBy) : "",
 		closerId: closer.id,
 		closerMention: `<@${closer.id}>`,
 		closerName: escapeDiscordMarkdown(closer.username),
+		createdById: ticket.createdBy,
+		createdByMention: `<@${ticket.createdBy}>`,
+		createdByUsername: openerUsername,
 		reason: normalizedReason,
+		ticketId: ticket.id.toString(),
+		ticketNumber: ticket.id.toString(),
+		ticketTypeKey: ticket.type,
+		ticketTypeName: ticketType.name,
 		transcriptStatus: formatTranscriptStatus(app, transcriptUrl),
 		transcriptUrl: transcriptUrl ?? "",
-		userId: ticket.createdBy
-	};
+		userId: ticket.createdBy,
+		username: openerUsername
+	} satisfies CloseMessageTokens;
 	void sendTicketLog(app, {
 		kind: "ticketClose",
 		actor: closer,
@@ -504,16 +542,7 @@ async function sendCloseDm(
 	app: BotApp,
 	userId: string,
 	ticketType: ReturnType<typeof getTicketType>,
-	tokens: {
-		channelId: string;
-		closerId: string;
-		closerMention: string;
-		closerName: string;
-		reason: string;
-		transcriptStatus: string;
-		transcriptUrl: string;
-		userId: string;
-	}
+	tokens: CloseMessageTokens
 ) {
 	const dmChannel = await app.client.api.users.createDM(userId).catch(() => null);
 
@@ -530,23 +559,7 @@ async function sendCloseDm(
 		.catch(() => undefined);
 }
 
-async function buildCloseChannelMessage(
-	app: BotApp,
-	ticketType: ReturnType<typeof getTicketType>,
-	tokens: {
-		channelId: string;
-		closerId: string;
-		closerMention: string;
-		closerName: string;
-		claimStatus: string;
-		claimerId: string;
-		claimerMention: string;
-		reason: string;
-		transcriptStatus: string;
-		transcriptUrl: string;
-		userId: string;
-	}
-) {
+async function buildCloseChannelMessage(app: BotApp, ticketType: ReturnType<typeof getTicketType>, tokens: CloseMessageTokens) {
 	const deleteButtonCustomId = createCustomId("tickets", "delete-closed");
 	const messageTemplate = await loadMessageTemplate(app, resolveCloseChannelMessageReference(app, ticketType), {
 		...tokens,

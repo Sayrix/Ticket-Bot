@@ -15,8 +15,8 @@ This notice must not be removed, obscured, or replaced.
 
 import type { APIAllowedMentions, APIEmbed, APIMessageTopLevelComponent } from "@discordjs/core";
 import type { APIComponentInContainer, APIContainerComponent } from "discord-api-types/v10";
-import type { Locales, TranslationFunctions } from "../../../i18n/i18n-types.js";
 import type { VersionedConfig } from "@/config/index";
+import type { Locales, TranslationFunctions } from "../../../i18n/i18n-types.js";
 
 export type CurrentConfig = VersionedConfig<"0.0.1">;
 export type TicketTypeConfig = CurrentConfig["ticketTypes"][string];
@@ -76,8 +76,12 @@ export interface TicketRenderTokens {
 	claimStatus?: string;
 	claimerId?: string;
 	claimerMention?: string;
+	claimerUsername?: string;
+	createdById: string;
 	createdByMention?: string;
+	createdByUsername: string;
 	reason: string;
+	ticketId: string;
 	ticketNumber: string;
 	ticketTypeKey: string;
 	ticketTypeName: string;
