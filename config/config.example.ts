@@ -62,7 +62,8 @@ export default defineConfig("0.0.1", {
 	tickets: {
 		// Fallback channel name used when a ticket type does not override it.
 		// Available parameters here:
-		// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
+		// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName}
+		// {createdById} {createdByUsername} {userId} {username}
 		channelNameTemplate: "{ticketNumber}-ticket-{username}",
 		// How many open tickets a single user may have at once. Use 0 for unlimited.
 		maxOpenPerUser: 1,
@@ -79,9 +80,10 @@ export default defineConfig("0.0.1", {
 		defaultWelcomeMessage: "tickets/ticket-opened",
 		// Optional plain text appended to the welcome message template.
 		// Available parameters here:
-		// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+		// {channelId} {claimStatus} {claimerId} {claimerMention} {claimerUsername}
+		// {createdById} {createdByMention} {createdByUsername}
 		// {reason} {reason1} {reason2} ... {reasonN}
-		// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
+		// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 		defaultWelcomeContent: "A staff member will be with you shortly. Please explain your issue clearly.",
 
 		claims: {
@@ -96,8 +98,9 @@ export default defineConfig("0.0.1", {
 			allowUnclaim: true,
 			// Optional rename applied after a successful claim.
 			// Available parameters here:
-			// {claimerId} {claimerUsername} {createdById} {createdByUsername}
-			// {ticketNumber} {ticketTypeKey} {ticketTypeName}
+			// {claimerId} {claimerMention} {claimerUsername}
+			// {createdById} {createdByMention} {createdByUsername}
+			// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			nameWhenClaimed: "{ticketNumber}-claimed-{claimerUsername}",
 			// Optional category move applied after a successful claim.
 			// Leave blank to keep the ticket in its original category.
@@ -142,7 +145,8 @@ export default defineConfig("0.0.1", {
 			categoryId: "777777777777777777",
 			// Optional per-type channel name override.
 			// Available parameters here:
-			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
+			// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName}
+			// {createdById} {createdByUsername} {userId} {username}
 			channelNameTemplate: "{ticketNumber}-general-{username}",
 			// Optional per-type open-ticket template override.
 			// Copy messages/tickets/ticket-opened.ts to a new file if this type
@@ -150,9 +154,10 @@ export default defineConfig("0.0.1", {
 			message: "tickets/ticket-opened",
 			// Optional plain text appended after the message template.
 			// Available parameters here:
-			// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+			// {channelId} {claimStatus} {claimerId} {claimerMention} {claimerUsername}
+			// {createdById} {createdByMention} {createdByUsername}
 			// {reason} {reason1} {reason2} ... {reasonN}
-			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
+			// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			welcomeContent: "Tell us what you need help with and include screenshots if they matter.",
 			// Optional per-type block list.
 			blockedRoleIds: ["888888888888888888"],
@@ -168,9 +173,10 @@ export default defineConfig("0.0.1", {
 			// If you want a custom open layout, create another file in messages/
 			// and set `message` here the same way as the close overrides below.
 			// Available parameters here:
-			// {channelId} {claimStatus} {claimerId} {claimerMention} {createdByMention}
+			// {channelId} {claimStatus} {claimerId} {claimerMention} {claimerUsername}
+			// {createdById} {createdByMention} {createdByUsername}
 			// {reason} {reason1} {reason2} ... {reasonN}
-			// {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
+			// {ticketId} {ticketNumber} {ticketTypeKey} {ticketTypeName} {userId} {username}
 			welcomeContent: "Please include invoice numbers, order IDs, or the last payment date if you have them.",
 			// Optional per-type close templates.
 			// These override tickets.close.dmMessage and tickets.close.channelMessage.
