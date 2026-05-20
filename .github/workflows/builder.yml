@@ -1,47 +1,117 @@
-name: Source Check
+name: Quality Checks
 
 on:
   push:
     branches:
       - "main"
   pull_request:
-    types: [review_requested, ready_for_review]
+    types: [opened, synchronize, reopened, review_requested, ready_for_review, draft]
 
 permissions:
   contents: read
 
 jobs:
-  checks:
+  quality:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v5
         with:
-          bun-version: latest
+          path: node_modules
+          key: ${{ runner.os }}-bun-node-modules-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-node-modules-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Typecheck
-        run: bun run typecheck
+      - name: Prepare config
+        run: bun run prepare:config
 
-      - name: i18n
+      - name: Generate i18n files
         run: bun run i18n
 
-      - name: Lint
-        run: bun run lint
+      - name: Run typecheck, biome, drizzle, and build checks
+        shell: bash
+        run: |
+          set +e
 
-      - name: Format
-        run: bun run format
+          run_check() {
+            local name="$1"
+            shift
 
-      - name: Drizzle
-        run: bunx drizzle-kit check
+            "$@" > "quality-${name}.txt" 2>&1
+            return $?
+          }
 
-      - name: Build
-        run: bun run build
+          run_check typecheck bun run typecheck &
+          typecheck_pid=$!
+
+          run_check biome ./node_modules/.bin/biome check . --colors=off &
+          biome_pid=$!
+
+          run_check drizzle bunx drizzle-kit check &
+          drizzle_pid=$!
+
+          run_check build bun run build &
+          build_pid=$!
+
+          wait "$typecheck_pid"
+          typecheck_status=$?
+
+          wait "$biome_pid"
+          biome_status=$?
+
+          wait "$drizzle_pid"
+          drizzle_status=$?
+
+          wait "$build_pid"
+          build_status=$?
+
+          report_success() {
+            local name="$1"
+
+            echo "::notice title=${name} passed::${name} completed successfully."
+          }
+
+          report_failure() {
+            local name="$1"
+
+            echo "::error title=${name} failed::${name} failed. Expand the '${name} output' log group below or download the quality-reports artifact."
+            echo "::group::${name} output"
+            cat "quality-${name}.txt"
+            echo "::endgroup::"
+
+            {
+              echo "## ${name} failed"
+              echo
+              echo '```text'
+              cat "quality-${name}.txt"
+              echo '```'
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          }
+
+          [ "$typecheck_status" -eq 0 ] && report_success typecheck || report_failure typecheck
+          [ "$biome_status" -eq 0 ] && report_success biome || report_failure biome
+          [ "$drizzle_status" -eq 0 ] && report_success drizzle || report_failure drizzle
+          [ "$build_status" -eq 0 ] && report_success build || report_failure build
+
+          if [ "$typecheck_status" -ne 0 ] || [ "$biome_status" -ne 0 ] || [ "$drizzle_status" -ne 0 ] || [ "$build_status" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Upload quality reports
+        if: ${{ failure() && !env.ACT }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-reports
+          path: quality-*.txt
