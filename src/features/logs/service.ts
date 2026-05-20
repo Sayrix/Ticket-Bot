@@ -52,7 +52,11 @@ export async function sendTicketLog(app: BotApp, event: TicketLogEvent) {
 	const channelId = app.config.logs.channelId.trim();
 
 	try {
-		const messageTemplate = await loadMessageTemplate(app, LOG_TEMPLATE_REFERENCES[event.kind], createLogTokens(app, event));
+		const messageTemplate = await loadMessageTemplate(
+			app,
+			LOG_TEMPLATE_REFERENCES[event.kind],
+			await createLogTokens(app, event)
+		);
 		const payload = finalizeMessageTemplate({
 			...messageTemplate,
 			allowed_mentions: messageTemplate.allowed_mentions ?? {
@@ -79,9 +83,15 @@ export function shouldSendTicketLog(app: BotApp, kind: TicketLogEvent["kind"]) {
 	return app.config.logs.events?.[toggleKey] ?? true;
 }
 
-function createLogTokens(app: BotApp, event: TicketLogEvent) {
+async function createLogTokens(app: BotApp, event: TicketLogEvent) {
 	const openedAtSeconds = Math.floor(event.ticket.createdAt / 1000);
 	const claimedById = resolveClaimedById(event);
+	const [creator, claimer, target] = await Promise.all([
+		app.client.api.users.get(event.ticket.createdById).catch(() => null),
+		claimedById ? app.client.api.users.get(claimedById).catch(() => null) : Promise.resolve(null),
+		"targetId" in event ? app.client.api.users.get(event.targetId).catch(() => null) : Promise.resolve(null)
+	]);
+	const creatorUsername = creator?.username ?? event.ticket.createdById;
 	const tokens: Record<string, string | undefined> = {
 		actorId: event.actor.id,
 		actorMention: `<@${event.actor.id}>`,
@@ -89,20 +99,26 @@ function createLogTokens(app: BotApp, event: TicketLogEvent) {
 		claimStatus: formatClaimStatus(app, claimedById),
 		claimerId: claimedById ?? undefined,
 		claimerMention: claimedById ? `<@${claimedById}>` : undefined,
+		claimerUsername: claimedById ? (claimer?.username ?? claimedById) : undefined,
 		createdAt: `<t:${openedAtSeconds}:F>`,
 		createdById: event.ticket.createdById,
 		createdByMention: `<@${event.ticket.createdById}>`,
+		createdByUsername: creatorUsername,
 		reason: getDefaultNoReason(app),
 		targetId: undefined,
 		targetMention: undefined,
+		targetName: undefined,
 		ticketAge: formatDuration(app, Date.now() - event.ticket.createdAt),
 		ticketChannelId: event.ticket.ticketChannelId,
 		ticketChannelMention: `<#${event.ticket.ticketChannelId}>`,
 		ticketId: event.ticket.ticketId,
+		ticketNumber: event.ticket.ticketId,
 		ticketTypeKey: event.ticket.ticketTypeKey,
 		ticketTypeName: event.ticket.ticketTypeName,
 		transcriptStatus: formatTranscriptStatus(app, null),
-		transcriptUrl: undefined
+		transcriptUrl: undefined,
+		userId: event.ticket.createdById,
+		username: creatorUsername
 	};
 
 	switch (event.kind) {
@@ -119,6 +135,7 @@ function createLogTokens(app: BotApp, event: TicketLogEvent) {
 		case "userRemoved":
 			tokens.targetId = event.targetId;
 			tokens.targetMention = `<@${event.targetId}>`;
+			tokens.targetName = target?.username ?? event.targetId;
 			break;
 		case "ticketRename":
 			tokens.oldChannelName = event.oldChannelName;
