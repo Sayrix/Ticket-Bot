@@ -1,79 +1,129 @@
 /*
-Copyright 2023 Sayrix (github.com/Sayrix)
+Ticket-Bot is licensed under the GNU Affero General Public License,
+version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
 
-Licensed under the Creative Commons Attribution 4.0 International
-please check https://creativecommons.org/licenses/by/4.0 for more informations.
+Additional Term under GNU AGPL v3, Section 7(b):
+
+You are required to preserve and display, in a location clearly visible
+to end users interacting with the bot (such as bot embeds, the bot's
+"Bio" Discord profile, status, or equivalent), a notice that the
+software is powered by Ticket-Bot, including a link to the original
+project repository or to its website.
+
+This notice must not be removed, obscured, or replaced.
 */
 
-import fs from "fs-extra";
-import path from "node:path";
-import { GatewayIntentBits } from "discord.js";
-import { jsonc } from "jsonc";
-import { config as envconf } from "dotenv";
-import {ConfigType, ExtendedClient} from "./structure";
+import { config } from "dotenv";
+import { createBotApp } from "@/app";
+import { createLogger } from "@/core/logger";
+import { BOT_VERSION } from "@/version";
 
-// Initalize .env file as environment
-try {envconf();}
-catch {console.log(".env failed to load");}
+const REPOSITORY_TAGS_URL = "https://api.github.com/repos/Sayrix/Ticket-Bot/tags";
+const VERSION_PATTERN = /^v?(\d+)\.(\d+)\.(\d+)$/;
+const logger = createLogger("boot");
 
-// Although invalid type, it should be good enough for now until more stuff needs to be handled here
-process.on("unhandledRejection", (reason: string, promise: string, a: string) => {
-	console.error(reason, promise, a);
-});
-
-process.on("uncaughtException", (err: string) => {
-	console.error(err);
-});
-
-process.stdout.write(`
+console.log(`
 \x1b[38;2;143;110;250m████████╗██╗ ██████╗██╗  ██╗███████╗████████╗    ██████╗  ██████╗ ████████╗
 \x1b[38;2;157;101;254m╚══██╔══╝██║██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝    ██╔══██╗██╔═══██╗╚══██╔══╝
 \x1b[38;2;172;90;255m   ██║   ██║██║     █████╔╝ █████╗     ██║       ██████╔╝██║   ██║   ██║   
 \x1b[38;2;188;76;255m   ██║   ██║██║     ██╔═██╗ ██╔══╝     ██║       ██╔══██╗██║   ██║   ██║   
 \x1b[38;2;205;54;255m   ██║   ██║╚██████╗██║  ██╗███████╗   ██║       ██████╔╝╚██████╔╝   ██║   
 \x1b[38;2;222;0;255m   ╚═╝   ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝       ╚═════╝  ╚═════╝    ╚═╝\x1b[0m
-                 https://github.com/Sayrix/ticket-bot
-
-Connecting to Discord...
 `);
 
-// Update Detector
-fetch("https://api.github.com/repos/Sayrix/Ticket-Bot/tags").then((res) => {
-	if (Math.floor(res.status / 100) !== 2) return console.warn("🔄  Failed to pull latest version from server");
-	res.json().then((json) => {
-		// Assumign the format stays consistent (i.e. x.x.x)
-		const latest = json[0].name.split(".").map((k: string) => parseInt(k));
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const current = require("../package.json").version.split(".")
-			.map((k: string) => parseInt(k));
-		if (
-			latest[0] > current[0] ||
-			(latest[0] === current[0] && latest[1] > current[1]) ||
-			(latest[0] === current[0] && latest[1] === current[1] && latest[2] > current[2])
-		)
-			console.warn(`🔄  New version available: ${json[0].name}; Current Version: ${current.join(".")}`);
-		else console.log("🔄  The ticket-bot is up to date");
+config({ path: "./config/.env", quiet: true });
+void checkForUpdates();
+
+async function main() {
+	const { start, stop } = await createBotApp();
+
+	process.on("SIGINT", () => {
+		void stop().finally(() => process.exit(0));
 	});
+
+	process.on("SIGTERM", () => {
+		void stop().finally(() => process.exit(0));
+	});
+
+	await start();
+}
+
+main().catch(async (error) => {
+	logger.error("Failed to start bot", error);
+	process.exit(1);
 });
 
-const config: ConfigType = jsonc.parse(fs.readFileSync(path.join(__dirname, "/../config/config.jsonc"), "utf8"));
+async function checkForUpdates() {
+	try {
+		const response = await fetch(REPOSITORY_TAGS_URL, {
+			headers: {
+				accept: "application/vnd.github+json"
+			}
+		});
 
-const client = new ExtendedClient({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
-	presence: {
-		status: config.status?.status ?? "online"
+		if (!response.ok) {
+			logger.warn(`Failed to pull latest version from server (${response.status}).`);
+			return;
+		}
+
+		const tags = (await response.json()) as Array<{ name?: string }>;
+		const latestTag = tags.find((tag) => parseVersion(tag.name));
+		const latestVersion = latestTag ? parseVersion(latestTag.name) : null;
+		const currentVersion = parseVersion(BOT_VERSION);
+
+		if (!latestTag?.name || !latestVersion || !currentVersion) {
+			logger.warn("Failed to parse repository tags for update checking.");
+			return;
+		}
+
+		if (compareVersions(latestVersion, currentVersion) > 0) {
+			logger.warn(`🔄️ New version available: ${latestTag.name}; current version: ${BOT_VERSION}.`);
+			return;
+		}
+
+		logger.info(`Ticket-Bot is up to date (${BOT_VERSION}). Latest tag: ${latestTag.name}.`);
+	} catch (error) {
+		logger.warn("Failed to check for updates.", error);
 	}
-}, config);
+}
 
-// Login the bot
-const token = process.env["TOKEN"];
-if(!token || token.trim() === "")
-	throw new Error("TOKEN Environment Not Found");
-client.login(process.env["TOKEN"]).then(null);
+function parseVersion(value: string | undefined) {
+	if (!value) {
+		return null;
+	}
+
+	const match = VERSION_PATTERN.exec(value.trim());
+
+	if (!match) {
+		return null;
+	}
+
+	return match.slice(1).map((segment) => Number.parseInt(segment, 10));
+}
+
+function compareVersions(left: number[], right: number[]) {
+	for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+		const delta = (left[index] ?? 0) - (right[index] ?? 0);
+
+		if (delta !== 0) {
+			return delta;
+		}
+	}
+
+	return 0;
+}
 
 /*
-Copyright 2023 Sayrix (github.com/Sayrix)
+Ticket-Bot is licensed under the GNU Affero General Public License,
+version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
 
-Licensed under the Creative Commons Attribution 4.0 International
-please check https://creativecommons.org/licenses/by/4.0 for more informations.
+Additional Term under GNU AGPL v3, Section 7(b):
+
+You are required to preserve and display, in a location clearly visible
+to end users interacting with the bot (such as bot embeds, the bot's
+"Bio" Discord profile, status, or equivalent), a notice that the
+software is powered by Ticket-Bot, including a link to the original
+project repository or to its website.
+
+This notice must not be removed, obscured, or replaced.
 */

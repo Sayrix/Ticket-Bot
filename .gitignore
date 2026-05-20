@@ -1,13 +1,9 @@
-node_modules
-config.jsonc
-token.json
-dist
-.env
-*.db
+node_modules/
+dist/
 
+.vscode/
 
-test.sql
-__pycache__/
-*.py[cod]
-local_settings.py
-.venv
+config/.env*
+config/config.ts*
+
+.data/

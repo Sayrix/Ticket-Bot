@@ -1,20 +1,34 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist",
-        "rootDir": "./src/",
-        "allowJs": true,
-        "module": "CommonJS",
-        "target": "ESNext",
-        "strict": true,
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "skipLibCheck": false,
-        "sourceMap": true,
-        "inlineSources": true,
-        "sourceRoot": "/"
-    },
-    "include": [
-        "./src/**/*",
-    ]
+	"compilerOptions": {
+		// Enable latest features
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleDetection": "force",
+		"allowJs": true,
+
+		// Bundler mode
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"ignoreDeprecations": "6.0",
+
+		// Best practices
+		"strict": true,
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+
+		// Some stricter flags (disabled by default)
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"noPropertyAccessFromIndexSignature": false,
+
+		// Type definitions
+		"types": ["node"],
+
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"exclude": ["dist", "node_modules"]
 }

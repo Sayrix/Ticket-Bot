@@ -1,22 +1,16 @@
-# Ticket Bot
+# Ticket-Bot
 
-Ticket Bot is a open source project of an ticket discord bot using [discord.js](https://discord.js.org) v14
+Ticket Bot is a open-source Discord bot that allows you to easily manage support tickets on your server. It is built with `@discordjs/core` for a lower memory footprint than `discord.js`.
 
-![Discord.js ticket bot](https://i.imgur.com/564YXvR.png)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSayrix%2FTicket-Bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSayrix%2FTicket-Bot?ref=badge_shield)
+![discord ticket bot typescript](https://i.imgur.com/qEzUBOL.png)
 
 ## 📄 Documentation
 
-The documentation is available [here](https://doc.ticket.pm/)
-
-## ⚠️ Incompatibility
-This new source code you're seeing are completely refactored and will be incompatible with the older version.
-I recommend you finish up all of your remaining support ticket and start migrating to the newer version.
-If you prefer to stay in the older version, here is the doc for the old version: https://doc.ticket.pm/docs/oldDoc/intro
+The documentation is available [here](https://github.com/Sayrix/Ticket-Bot/wiki)
 
 ## 💬 Discord
 
-You can come on the discord: https://discord.gg/VasYV6MEJy
+Ask questions and get support on our [Discord server](https://discord.gg/VasYV6MEJy).
 
 ## ✨ Contributing
 
@@ -37,10 +31,20 @@ You can see all perks here: https://github.com/sponsors/Sayrix
 </p>
 
 ## 🎥 Videos  
-[Tutorial in french + english subtitle](https://youtu.be/24zAFj8w9gE?si=OvikXeNIJglz4FJV)
+- Have you made a video about Ticket-Bot? Please share it with us on our [Discord server](https://discord.gg/VasYV6MEJy) to get it listed here!
 
 ## Please leave a ⭐ to help the project!
 
-
 ## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSayrix%2FTicket-Bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSayrix%2FTicket-Bot?ref=badge_large)
+Ticket-Bot is licensed under the GNU Affero General Public License,
+version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
+
+Additional Term under GNU AGPL v3, Section 7(b):
+
+You are required to preserve and display, in a location clearly visible
+to end users interacting with the bot (such as bot embeds, the bot's
+"Bio" Discord profile, status, or equivalent), a notice that the
+software is powered by Ticket-Bot, including a link to the original
+project repository or to its website.
+
+This notice must not be removed, obscured, or replaced.

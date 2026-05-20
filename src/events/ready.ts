@@ -1,307 +1,260 @@
-import readline from "readline";
-import axios from "axios";
-import {client as WebSocketClient, connection} from "websocket";
-import {ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ColorResolvable, EmbedBuilder, Message} from "discord.js";
-import os from "os";
-import {BaseEvent, ExtendedClient, SponsorType} from "../structure";
-
 /*
-Copyright 2023 Sayrix (github.com/Sayrix)
+Ticket-Bot is licensed under the GNU Affero General Public License,
+version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
 
-Licensed under the Creative Commons Attribution 4.0 International
-please check https://creativecommons.org/licenses/by/4.0 for more informations.
+Additional Term under GNU AGPL v3, Section 7(b):
+
+You are required to preserve and display, in a location clearly visible
+to end users interacting with the bot (such as bot embeds, the bot's
+"Bio" Discord profile, status, or equivalent), a notice that the
+software is powered by Ticket-Bot, including a link to the original
+project repository or to its website.
+
+This notice must not be removed, obscured, or replaced.
 */
 
-export default class ReadyEvent extends BaseEvent {
-	private connected = false;
-	constructor(client: ExtendedClient) {
-		super(client);
-	}
+import { GatewayDispatchEvents, type GatewayReadyDispatchData, type ToEventProps } from "@discordjs/core";
+import {
+	ActivityType,
+	ChannelType,
+	type GatewayPresenceUpdateData,
+	PermissionFlagsBits,
+	PresenceUpdateStatus
+} from "discord-api-types/v10";
+import { defineEvent } from "@/core/defineEvent";
+import type { BotApp } from "@/core/types";
+import { deployApplicationCommands } from "@/deploy-commands";
+import { syncTicketPanels } from "@/features/tickets/service";
+import { announceTelemetryPrivacy, startTelemetry } from "@/telemetry";
 
-	public async execute()  {
-		if (!this.client.config.guildId) {
-			console.log("⚠️⚠️⚠️ Please add the guild id in the config.jsonc file. ⚠️⚠️⚠️");
-			process.exit(0);
-		}
+const PRESENCE_REFRESH_INTERVAL_MS = 900_000;
+const SPONSORS_URL = "https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json";
+const PANEL_CHANNEL_TYPES = new Set([
+	ChannelType.GuildAnnouncement,
+	ChannelType.GuildStageVoice,
+	ChannelType.GuildText,
+	ChannelType.GuildVoice,
+	ChannelType.AnnouncementThread,
+	ChannelType.PrivateThread,
+	ChannelType.PublicThread
+]);
+const ACTIVITY_TYPES = {
+	COMPETING: ActivityType.Competing,
+	CUSTOM: ActivityType.Custom,
+	LISTENING: ActivityType.Listening,
+	PLAYING: ActivityType.Playing,
+	STREAMING: ActivityType.Streaming,
+	WATCHING: ActivityType.Watching
+} as const;
+const PRESENCE_STATUSES = {
+	dnd: PresenceUpdateStatus.DoNotDisturb,
+	idle: PresenceUpdateStatus.Idle,
+	invisible: PresenceUpdateStatus.Invisible,
+	online: PresenceUpdateStatus.Online
+} as const;
 
-		await this.client.guilds.fetch(this.client.config.guildId);
-		await this.client.guilds.cache.get(this.client.config.guildId)?.members.fetch();
-		if (!this.client.guilds.cache.get(this.client.config.guildId)?.members.me?.permissions.has("Administrator")) {
-			console.log("\n⚠️⚠️⚠️ I don't have the Administrator permission, to prevent any issues please add the Administrator permission to me. ⚠️⚠️⚠️");
-			process.exit(0);
-		}
+const readyEvent = defineEvent<[ToEventProps<GatewayReadyDispatchData>]>({
+	name: GatewayDispatchEvents.Ready,
+	once: true,
+	async execute(app, event) {
+		await validateStartupEnvironment(app, event.data.user.id);
+		await ensureApplicationAttribution(app);
+		app.logger.info(`Connected as ${event.data.user.username}.`);
 
-		const embedMessageId = (await this.client.prisma.config.findUnique({
-			where: {
-				key: "openTicketMessageId",
-			}
-		}))?.value;
-		await this.client.channels.fetch(this.client.config.openTicketChannelId).catch(() => {
-			console.error("The channel to open tickets is not found!");
-			process.exit(0);
+		await deployApplicationCommands({
+			applicationCommands: app.registry.applicationCommands,
+			clientId: app.config.clientId,
+			guildId: app.config.guildId,
+			logger: app.logger,
+			token: process.env.DISCORD_TOKEN
 		});
-		const openTicketChannel = await this.client.channels.cache.get(this.client.config.openTicketChannelId);
-		if (!openTicketChannel) {
-			console.error("The channel to open tickets is not found!");
-			process.exit(0);
-		}
+		await syncTicketPanels(app);
+		await applyConfiguredPresence(app);
+		setInterval(() => {
+			void applyConfiguredPresence(app);
+		}, PRESENCE_REFRESH_INTERVAL_MS);
+		await announceStartup(app, `${event.data.user.username}#${event.data.user.discriminator}`, event.data.user.id);
+		await announceTelemetryPrivacy(app);
+		startTelemetry(app, event.data.guilds.length);
+	}
+});
 
-		if (!openTicketChannel.isTextBased()) {
-			console.error("The channel to open tickets is not a channel!");
-			process.exit(0);
-		}
-		const locale = this.client.locales;
-		let footer = locale.getSubValue("embeds", "openTicket", "footer", "text").replace("ticket.pm", "");
-		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-		footer = `ticket.pm ${footer.trim() !== "" ? `- ${footer}` : ""}`; // Please respect the LICENSE :D
-		// Please respect the project by keeping the credits, (if it is too disturbing you can credit me in the "about me" of the bot discord)
-		const embed = new EmbedBuilder({
-			...locale.getSubRawValue("embeds.openTicket") as object,
-			color: 0,
-		})
-			.setColor(
-				locale.getNoErrorSubValue("embeds", "openTicket", "color") as ColorResolvable | undefined ??
-				this.client.config.mainColor
-			)
-			.setFooter({
-				text: footer,
-				iconURL: locale.getNoErrorSubValue("embeds.openTicket.footer.iconURL")
-			});
+export default readyEvent;
 
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder().setCustomId("openTicket").setLabel(this.client.locales.getSubValue("other", "openTicketButtonMSG")).setStyle(ButtonStyle.Primary)
-		);
+async function validateStartupEnvironment(app: BotApp, currentUserId: string) {
+	const guildId = app.config.guildId.trim();
 
-		try {
-			// Fetch Message object and return undefined if not found
-			const msg = embedMessageId ? await (()=> new Promise<Message | undefined>((res)=> {
-				openTicketChannel?.messages?.fetch(embedMessageId)
-					.then(msg=>res(msg))
-					.catch(()=>res(undefined));
-			}))() : undefined;
-			
-			if (msg && msg.id) {
-				msg.edit({
-					embeds: [embed],
-					components: [row]
-				});
-			} else {
-				const channel = this.client.channels.cache.get(this.client.config.openTicketChannelId);
-				if(channel?.type !== ChannelType.GuildText) 
-					return console.error("Invalid openTicketChannelId");
-				channel.send({
-					embeds: [embed],
-					components: [row]
-				}).then((rMsg) => {
-					this.client.prisma.config.upsert({
-						create: {
-							key: "openTicketMessageId",
-							value: rMsg.id
-						},
-						update: {
-							value: rMsg.id
-						},
-						where: {
-							key: "openTicketMessageId"
-						}
-					}).then(); // I need .then() for it to execute?!?!??
-				});
-			}
-		} catch (e) {
-			console.error(e);
-		}
-
-
-		this.setStatus();
-		setInterval(()=>this.setStatus(), 9e5); // 15 minutes
-
-		readline.cursorTo(process.stdout, 0);
-		process.stdout.write(
-			`\x1b[0m🚀  The bot is ready! Logged in as \x1b[37;46;1m${this.client.user?.tag}\x1b[0m (\x1b[37;46;1m${this.client.user?.id}\x1b[0m)
-		\x1b[0m🌟  You can leave a star on GitHub: \x1b[37;46;1mhttps://github.com/Sayrix/ticket-bot \x1b[0m
-		\x1b[0m⛅  Host your ticket-bot by being a sponsor from 1$/month: \x1b[37;46;1mhttps://github.com/sponsors/Sayrix \x1b[0m\n`.replace(/\t/g, "")
-		);
-
-		const a = await axios.get("https://raw.githubusercontent.com/Sayrix/sponsors/main/sponsors.json").catch(() => {return;});
-		if (a) {
-			const sponsors: SponsorType[] = a.data;
-			const sponsorsList = sponsors
-				.map((s) => `\x1b]8;;https://github.com/${s.sponsor.login}\x1b\\\x1b[1m${s.sponsor.login}\x1b]8;;\x1b\\\x1b[0m`)
-				.join(", ");
-			process.stdout.write(`\x1b[0m💖  Thanks to our sponsors: ${sponsorsList}\n`);
-		}
-
-
-		if ((await this.client.prisma.config.findUnique({
-			where: {
-				key: "firstStart",
-			}
-		})) === null) {
-			await this.client.prisma.config.create({
-				data: {
-					key: "firstStart",
-					value: "true",
-				}
-			});
-
-			if(!this.client.config.minimalTracking) console.warn(`
-				PRIVACY NOTICES
-				-------------------------------
-				Telemetry is current set to full and the following information are sent to the server anonymously:
-				* Discord Bot's number of guilds & users
-				* Current Source Version
-				* NodeJS Version
-				* OS Version
-				* CPU version, name, core count, architecture, and model
-				* Current Process up-time
-				* System total ram and freed ram
-				* Client name and id
-				* Guild ID
-				-------------------------------
-				If you wish to minimize the information that are being sent, please set "minimalTracking" to true in the config
-		`.replace(/\t/g, ""));
-			else console.warn(`
-				PRIVACY NOTICES
-				-------------------------------
-				Minimal tracking has been enabled; the following information are sent anonymously:
-				* Current Source Version
-				* NodeJS Version
-				-------------------------------
-		`.replace(/\t/g, ""));
-		}
-
-		this.connect(this.client.config.showWSLog);
-
-		this.client.deployCommands();
+	if (!guildId) {
+		await failStartup(app, 'Please set "guildId" in config/config.ts before starting the bot.');
 	}
 
-	private setStatus(): void {
-		if (this.client.config.status) {
-			if (!this.client.config.status.enabled) return;
+	await app.client.api.guilds
+		.get(guildId)
+		.catch((error) => failStartup(app, `Configured guild "${guildId}" was not found or is not accessible.`, error));
 
-			let type = 0;
-			switch(this.client.config.status.type) {
-			case "PLAYING":
-				type = 0;
-				break;
-			case "STREAMING":
-				type = 1;
-				break;
-			case "LISTENING":
-				type = 2;
-				break;
-			case "WATCHING":
-				type = 3;
-				break;
-			case "CUSTOM":
-				type = 4;
-				break;
-			case "COMPETING":
-				type = 5;
-				break;
-			}
+	const member = await app.client.api.guilds
+		.getMember(guildId, currentUserId)
+		.catch((error) => failStartup(app, `Bot user "${currentUserId}" is not a member of guild "${guildId}".`, error));
 
-			if (this.client.config.status.type && this.client.config.status.text) {
-				// If the user just want to set the status but not the activity
-				const url = this.client.config.status.url;
-				this.client.user?.setPresence({
-					activities: [{ name: this.client.config.status.text, type: type, url: (url && url.trim() !== "") ? url : undefined }],
-					status: this.client.config.status.status,
-				});
-			}
-			this.client.user?.setStatus(this.client.config.status.status);
+	const roles = await app.client.api.guilds
+		.getRoles(guildId)
+		.catch((error) => failStartup(app, `Failed to fetch roles for guild "${guildId}".`, error));
+	const memberRoleIds = new Set([guildId, ...member.roles]);
+	const permissions = roles.reduce((bits, role) => {
+		if (!memberRoleIds.has(role.id)) {
+			return bits;
 		}
+
+		return bits | BigInt(role.permissions);
+	}, 0n);
+
+	if ((permissions & PermissionFlagsBits.Administrator) !== PermissionFlagsBits.Administrator) {
+		warnStartup(app, "The bot does not have the Administrator permission. Some actions may fail because of missing permissions.");
 	}
 
-	private connect(enableLog?: boolean): void {
-		if (this.connected) return;
-		const ws = new WebSocketClient();
-		ws.on("connectFailed", (e) => {
-			this.connected = false;
-			setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
-			if(enableLog)
-				console.log(`❌  WebSocket Error: ${e.toString()}`);
+	for (const [panelKey, panel] of Object.entries(app.config.panels)) {
+		const channelId = panel.channelId.trim();
+
+		if (!channelId) {
+			await failStartup(app, `Panel "${panelKey}" is missing its channelId.`);
+		}
+
+		const channel = await app.client.api.channels
+			.get(channelId)
+			.catch((error) => failStartup(app, `Panel "${panelKey}" channel "${channelId}" was not found.`, error));
+
+		if (!PANEL_CHANNEL_TYPES.has(channel.type)) {
+			await failStartup(app, `Panel "${panelKey}" channel "${channelId}" is not a text-based channel.`);
+		}
+	}
+}
+
+async function failStartup(app: BotApp, message: string, error?: unknown): Promise<never> {
+	if (error) {
+		app.logger.error(message, error);
+	} else {
+		app.logger.error(message);
+	}
+
+	process.exit(1);
+}
+
+function warnStartup(app: BotApp, message: string, error?: unknown) {
+	if (error) {
+		app.logger.warn(message, error);
+		return;
+	}
+
+	app.logger.warn(message);
+}
+
+async function announceStartup(app: BotApp, tag: string, userId: string) {
+	app.logger.info(`🚀 The bot is ready! Logged in as ${tag} (${userId}).`);
+	app.logger.info("⭐ Help the project by leaving a star on GitHub: \x1b[36;1mhttps://github.com/Sayrix/Ticket-Bot\x1b[0m");
+	app.logger.info(
+		"⛅ Need to host your Ticket-Bot? Support the project and get access to hosting for $1/month: \x1b[36;1mhttps://github.com/sponsors/Sayrix\x1b[0m"
+	);
+
+	const sponsorLogins = await fetchSponsors();
+
+	if (sponsorLogins.length === 0) {
+		return;
+	}
+
+	const sponsorNames = sponsorLogins.map(
+		(login) => `\x1b]8;;https://github.com/${login}\x1b\\\x1b[1m${login}\x1b]8;;\x1b\\\x1b[0m`
+	);
+	app.logger.info(`💖 Thanks to our sponsors: ${sponsorNames.join(", ")} who make this project possible!`);
+}
+
+async function fetchSponsors() {
+	try {
+		const response = await fetch(SPONSORS_URL);
+
+		if (!response.ok) {
+			return [];
+		}
+
+		const payload = (await response.json()) as Array<{
+			sponsor?: {
+				login?: string;
+			};
+		}>;
+
+		return payload.flatMap((entry) => (typeof entry.sponsor?.login === "string" ? [entry.sponsor.login] : []));
+	} catch {
+		return [];
+	}
+}
+
+async function ensureApplicationAttribution(app: BotApp) {
+	try {
+		const application = await app.client.api.applications.getCurrent();
+		const currentDescription = application.description ?? "";
+
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+		if (currentDescription.includes("*Powered by https://git.new/ticketbot*")) {
+			// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+			return;
+		}
+
+		const nextDescription = currentDescription.trimEnd()
+			? // PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+				`${currentDescription.trimEnd()}\n\n*Powered by https://git.new/ticketbot*`
+			: // PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+				"*Powered by https://git.new/ticketbot*";
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+
+		// PLEASE RESPECT THE LICENSE: EITHER CREDIT THE PROJECT IN THE BOT'S DESCRIPTION OR STATUS OR EMBEDS, OR DON'T USE THE SOFTWARE AT ALL. THANK YOU.
+		await app.client.api.applications.editCurrent({
+			description: nextDescription
 		});
+	} catch (error) {
+		app.logger.warn("Failed to ensure Ticket-Bot attribution in the application description.", error);
+	}
+}
 
-		ws.on("connect", (connection) => {
-			connection.on("error", (e) => {
-				this.connected = false;
-				setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
-				if(enableLog)
-					console.log(`❌  WebSocket Error: ${e.toString()}`);
-			});
+async function applyConfiguredPresence(app: BotApp) {
+	const configuredStatus = app.config.status;
 
-			connection.on("close", (e) => {
-				this.connected = false;
-				setTimeout(()=>this.connect(enableLog), Math.random() * 1e4);
-				if(enableLog)
-					console.log(`❌  WebSocket Error: ${e.toString()}`);
-			});
-
-			this.connected = true;
-			if(enableLog)
-				console.log("✅  Connected to WebSocket server.");
-			this.telemetry(connection);
-
-			setInterval(() => {
-				this.telemetry(connection);
-			}, 120_000);
-		});
-
-		ws.connect("wss://ws.ticket.pm", "echo-protocol");
-
+	if (!configuredStatus?.enabled) {
+		return;
 	}
 
-	private telemetry(connection: connection) {
-		let fullInfo: {[key:string]: string | number | {[key:string]: string | number}} = {
-			os: os.platform(),
-			osVersion1: os.release(),
-			osVersion2: os.version(),
-			uptime: process.uptime(),
-			ram: {
-				total: os.totalmem(),
-				free: os.freemem()
-			},
-			cpu: {
-				model: os.cpus()[0].model,
-				cores: os.cpus().length,
-				arch: os.arch()
-			}
-		};
-		let moreInfo: {[key:string]: string | undefined} = {
-			clientName: this.client?.user?.tag,
-			clientId: this.client?.user?.id,
-			guildId: this.client?.config?.guildId
-		};
-		// Minimal tracking enabled, remove those info from being sent
-		if(this.client.config.minimalTracking) {
-			fullInfo = {};
-			moreInfo = {};
-		}
-		connection.sendUTF(
-			JSON.stringify({
-				type: "telemetry",
-				data: {
-					stats: {
-						guilds: this.client?.guilds?.cache?.size,
-						users: this.client?.users?.cache?.size
-					},
-					infos: {
-						// eslint-disable-next-line @typescript-eslint/no-var-requires
-						ticketbotVersion: require("../../package.json").version,
-						nodeVersion: process.version,
-						...fullInfo
-					},
-					...moreInfo
-				}
-			})
-		);
+	const activities =
+		configuredStatus.type && configuredStatus.text
+			? [
+					{
+						name: configuredStatus.text,
+						type: ACTIVITY_TYPES[configuredStatus.type],
+						url: configuredStatus.type === "STREAMING" && configuredStatus.url?.trim() ? configuredStatus.url : undefined
+					}
+				]
+			: [];
+	const presence: GatewayPresenceUpdateData = {
+		activities,
+		afk: false,
+		since: null,
+		status: PRESENCE_STATUSES[configuredStatus.status]
+	};
+	const shardCount = await app.client.gateway.getShardCount();
+
+	for (let shardId = 0; shardId < shardCount; shardId += 1) {
+		await app.client.updatePresence(shardId, presence);
 	}
 }
 
 /*
-Copyright 2023 Sayrix (github.com/Sayrix)
+Ticket-Bot is licensed under the GNU Affero General Public License,
+version 3 only ("AGPL-3.0-only"). See LICENSE.md for the full license text.
 
-Licensed under the Creative Commons Attribution 4.0 International
-please check https://creativecommons.org/licenses/by/4.0 for more informations.
+Additional Term under GNU AGPL v3, Section 7(b):
+
+You are required to preserve and display, in a location clearly visible
+to end users interacting with the bot (such as bot embeds, the bot's
+"Bio" Discord profile, status, or equivalent), a notice that the
+software is powered by Ticket-Bot, including a link to the original
+project repository or to its website.
+
+This notice must not be removed, obscured, or replaced.
 */

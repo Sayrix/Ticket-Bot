@@ -1,28 +1,15 @@
-version: '3'
+name: ticket-bot
 
 services:
   bot:
-    build: .
     container_name: ticket-bot
-    environment:
-      - TOKEN
-    networks:
-      - net
-    depends_on:
-      - pgsql
-    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./config/.env
     volumes:
-      - /opt/ticket-bot/config:/app/config
-  pgsql:
-    image: postgres:15.3-alpine
-    environment:
-      - POSTGRES_PASSWORD=postgres
-    networks:
-      - net
-    volumes:
-      - /opt/ticket-bot/pgsql:/var/lib/postgresql/data
-    restart: on-failure
-
-networks:
-  net:
-    driver: bridge
+      - ./config:/app/config:ro
+      - ./messages:/app/messages:ro
+      - ./.data:/app/.data
