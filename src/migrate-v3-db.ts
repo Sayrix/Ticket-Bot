@@ -17,7 +17,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs as parseNodeArgs } from "node:util";
-import { createClient, type Client, type InStatement, type InValue, type Row, type Value } from "@libsql/client/sqlite3";
+import { type Client, createClient, type InStatement, type InValue, type Row, type Value } from "@libsql/client/sqlite3";
 import { config as loadEnv } from "dotenv";
 import botConfig from "../config/config.js";
 

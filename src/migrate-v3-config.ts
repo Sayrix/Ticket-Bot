@@ -16,7 +16,7 @@ This notice must not be removed, obscured, or replaced.
 import { access, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs as parseNodeArgs } from "node:util";
-import { parse as parseJsonc, type ParseError, printParseErrorCode } from "jsonc-parser";
+import { type ParseError, parse as parseJsonc, printParseErrorCode } from "jsonc-parser";
 
 interface CliOptions {
 	source: string;

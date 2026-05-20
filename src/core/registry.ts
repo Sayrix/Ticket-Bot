@@ -13,10 +13,10 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { Logger } from "@/core/logger";
 import type { BotApp, CommandModule, EventModule, FeatureModule, HandlerRegistry } from "@/core/types";
 import type { TranslationFunctions } from "../../i18n/i18n-types.js";
-import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 
 interface CreateHandlerRegistryInput {
 	commands: CommandModule[];
