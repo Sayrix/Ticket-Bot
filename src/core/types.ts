@@ -23,10 +23,10 @@ import type {
 } from "@discordjs/core";
 import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { drizzle } from "drizzle-orm/libsql";
-import type { Locales, TranslationFunctions } from "../../i18n/i18n-types.js";
 import type { AnyVersionedConfig } from "@/config/index";
 import type { ParsedCustomId } from "@/core/custom-id";
 import type { Logger } from "@/core/logger";
+import type { Locales, TranslationFunctions } from "../../i18n/i18n-types.js";
 
 export type RoutedInteraction =
 	| APIApplicationCommandAutocompleteInteraction
