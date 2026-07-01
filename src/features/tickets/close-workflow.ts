@@ -213,6 +213,11 @@ async function closeTicket(
 	const { ticket, ticketType } = closable;
 	const closer = getInteractionUser(interaction);
 	const normalizedReason = normalizeCloseReason(app, reason);
+	const claimedBy = ticket.claimedBy;
+	const closeUsersPromise = Promise.all([
+		app.client.api.users.get(ticket.createdBy).catch(() => null),
+		claimedBy ? app.client.api.users.get(claimedBy).catch(() => null) : Promise.resolve(null)
+	]);
 
 	// Mark the ticket as closed immediately so repeated button presses or `/close`
 	// attempts during transcript generation do not start duplicate close flows.
@@ -232,13 +237,16 @@ async function closeTicket(
 			// Preserve the original ticket message while preventing new actions.
 			await disableTicketActionButtons(app, ticket.channelId, ticket.creationMessageId);
 		});
-		await status.update(app.LL.tickets.close.status.updating_access());
+		void status.update(app.LL.tickets.close.status.updating_access());
 		await removeClosedTicketParticipantAccess(app, ticket.channelId, ticket.createdBy, invitedUserIds);
 	}
 
 	const transcriptJob = app.config.tickets.close.createTranscript
 		? await startTranscriptJob(app, ticket.channelId, {
-				onStatus: (content) => status.update(content)
+				// Progress is informational; Discord interaction edits must not gate transcript work.
+				onStatus: (content) => {
+					void status.update(content);
+				}
 			})
 		: null;
 
@@ -254,10 +262,7 @@ async function closeTicket(
 		await status.update(app.LL.tickets.close.status.transcript_still_processing());
 	}
 
-	const [opener, claimer] = await Promise.all([
-		app.client.api.users.get(ticket.createdBy).catch(() => null),
-		ticket.claimedBy ? app.client.api.users.get(ticket.claimedBy).catch(() => null) : Promise.resolve(null)
-	]);
+	const [opener, claimer] = await closeUsersPromise;
 	const openerUsername = opener?.username ?? ticket.createdBy;
 	const closeMessageTokens = {
 		channelId: ticket.channelId,
@@ -290,7 +295,7 @@ async function closeTicket(
 	});
 
 	if (app.config.tickets.close.deleteChannelOnClose && app.config.tickets.close.dmUserOnClose) {
-		await status.update(app.LL.tickets.close.status.sending_close_confirmation());
+		void status.update(app.LL.tickets.close.status.sending_close_confirmation());
 		await sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens);
 	}
 
@@ -316,7 +321,7 @@ async function closeTicket(
 		closeTasks.push(sendCloseDm(app, ticket.createdBy, ticketType, closeMessageTokens));
 	}
 
-	await status.update(
+	void status.update(
 		app.config.tickets.close.dmUserOnClose
 			? app.LL.tickets.close.status.sending_close_updates()
 			: app.LL.tickets.close.status.posting_close_summary()
