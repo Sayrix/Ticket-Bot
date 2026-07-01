@@ -1,10 +1,10 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"style": {
 				"useConst": "error",
 				"noNonNullAssertion": "off"
