@@ -8,7 +8,7 @@ const rootDirectory = fileURLToPath(new URL("..", import.meta.url));
 const fixtureDirectory = path.join(rootDirectory, ".data");
 
 await mkdir(fixtureDirectory, { recursive: true });
-await run(process.execPath, [path.join(rootDirectory, "scripts", "build.mjs")]);
+await run(process.execPath, ["run", "build"]);
 
 const configModule = await import(pathToFileURL(path.join(rootDirectory, "dist", "config", "config.js")).href);
 const config = configModule.default;
