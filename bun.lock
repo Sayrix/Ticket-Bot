@@ -9,7 +9,7 @@
         "@discordjs/ws": "^2.0.4",
         "@libsql/client": "^0.17.4",
         "@ticketpm/core": "^0.0.13",
-        "@ticketpm/discord-api": "^0.0.11",
+        "@ticketpm/discord-api": "^0.0.13",
         "discord-api-types": "^0.38.49",
         "dotenv": "^17.4.2",
         "drizzle-kit": "^0.31.10",
@@ -152,7 +152,7 @@
 
     "@ticketpm/core": ["@ticketpm/core@0.0.13", "", {}, "sha512-TCGkj6GBajOELF+7AwiFpNklJS0vyI7e7rtKYUQWPgJ+ZEiQ0Cvk+Q5hHkK9q6p/riBel1EDfJzxoC8qoz9Mvg=="],
 
-    "@ticketpm/discord-api": ["@ticketpm/discord-api@0.0.11", "", { "dependencies": { "@ticketpm/core": "0.0.11", "discord-api-types": "^0.37.119" } }, "sha512-BTz5UHhYV+u4ZAPQnjyTHghwOXYxUkImhSKFlVlgu4/84eqAmQDgDvRKIZm+Mrx+a/rz0850dVBXAt0Ziz2Njw=="],
+    "@ticketpm/discord-api": ["@ticketpm/discord-api@0.0.13", "", { "dependencies": { "@ticketpm/core": "0.0.13", "discord-api-types": "^0.37.119" } }, "sha512-9plLqvFR1HOvmnR+BRqggej3D6I0fukAzvp5ZioTZHGd2CZ7NEmDtimqlw+1qqn5CR6KnGfPIvsrvc5+o5eVaQ=="],
 
     "@types/node": ["@types/node@25.9.1", "", { "dependencies": { "undici-types": ">=7.24.0 <7.24.7" } }, "sha512-xfrlY7UD5rMJk3ZVJP8BNzS28J36YJg+xp+LPXV1TdWxr8uMH5A860QNxYDGQe/ylDSgjxE52Q9VnO7p75tJxg=="],
 
@@ -255,8 +255,6 @@
     "@discordjs/ws/discord-api-types": ["discord-api-types@0.38.44", "", {}, "sha512-q91MgBzP/gRaCLIbQTaOrOhbD8uVIaPKxpgX2sfFB2nZ9nSiTYM9P3NFQ7cbO6NCxctI6ODttc67MI+YhIfILg=="],
 
     "@esbuild-kit/core-utils/esbuild": ["esbuild@0.18.20", "", { "optionalDependencies": { "@esbuild/android-arm": "0.18.20", "@esbuild/android-arm64": "0.18.20", "@esbuild/android-x64": "0.18.20", "@esbuild/darwin-arm64": "0.18.20", "@esbuild/darwin-x64": "0.18.20", "@esbuild/freebsd-arm64": "0.18.20", "@esbuild/freebsd-x64": "0.18.20", "@esbuild/linux-arm": "0.18.20", "@esbuild/linux-arm64": "0.18.20", "@esbuild/linux-ia32": "0.18.20", "@esbuild/linux-loong64": "0.18.20", "@esbuild/linux-mips64el": "0.18.20", "@esbuild/linux-ppc64": "0.18.20", "@esbuild/linux-riscv64": "0.18.20", "@esbuild/linux-s390x": "0.18.20", "@esbuild/linux-x64": "0.18.20", "@esbuild/netbsd-x64": "0.18.20", "@esbuild/openbsd-x64": "0.18.20", "@esbuild/sunos-x64": "0.18.20", "@esbuild/win32-arm64": "0.18.20", "@esbuild/win32-ia32": "0.18.20", "@esbuild/win32-x64": "0.18.20" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA=="],
-
-    "@ticketpm/discord-api/@ticketpm/core": ["@ticketpm/core@0.0.11", "", {}, "sha512-VFOkwgzEEYtnMzAAR7z9hTb2ZaRfyUjb96i1JCd9EdrxuQaMZpU5MtktmeEg9wx2hs/9smS8zcw5W96xnqR9Xw=="],
 
     "@ticketpm/discord-api/discord-api-types": ["discord-api-types@0.37.120", "", {}, "sha512-7xpNK0EiWjjDFp2nAhHXezE4OUWm7s1zhc/UXXN6hnFFU8dfoPHgV0Hx0RPiCa3ILRpdeh152icc68DGCyXYIw=="],
 
