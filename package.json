@@ -34,7 +34,7 @@
 		"@discordjs/rest": "^2.6.1",
 		"@discordjs/ws": "^2.0.4",
 		"@libsql/client": "^0.17.4",
-		"@ticketpm/core": "^0.0.13",
+		"@ticketpm/core": "^0.0.14",
 		"@ticketpm/discord-api": "^0.0.13",
 		"discord-api-types": "^0.38.49",
 		"dotenv": "^17.4.2",
