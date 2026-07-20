@@ -45,7 +45,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.2",
-		"@types/node": "^25.9.1",
+		"@types/node": "^26.1.1",
 		"resolve-tspaths": "^0.8.23",
 		"typescript": "^6.0.3"
 	}
