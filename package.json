@@ -30,7 +30,7 @@
 		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs"
 	},
 	"dependencies": {
-		"@discordjs/core": "2.5.0",
+		"@discordjs/core": "2.6.0",
 		"@discordjs/rest": "^2.6.1",
 		"@discordjs/ws": "^2.0.4",
 		"@libsql/client": "^0.17.4",
