@@ -22,7 +22,7 @@
 		"lint:fix": "biome lint --write .",
 		"biome:debug": "biome rage --linter",
 		"drizzle:push": "drizzle-kit push",
-		"build": "tsc -p tsconfig.build.json && resolve-tspaths -p tsconfig.build.json",
+		"build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
 		"start": "bun src/index.ts",
 		"node:start": "node dist/src/index.js",
 		"migrate:v3": "bun src/migrate-v3-db.ts",
@@ -30,13 +30,13 @@
 		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs"
 	},
 	"dependencies": {
-		"@discordjs/core": "2.5.0",
-		"@discordjs/rest": "^2.6.1",
+		"@discordjs/core": "2.6.0",
+		"@discordjs/rest": "^2.6.3",
 		"@discordjs/ws": "^2.0.4",
 		"@libsql/client": "^0.17.4",
-		"@ticketpm/core": "^0.0.14",
-		"@ticketpm/discord-api": "^0.0.13",
-		"discord-api-types": "^0.38.49",
+		"@ticketpm/core": "^0.0.15",
+		"@ticketpm/discord-api": "^0.0.15",
+		"discord-api-types": "^0.38.52",
 		"dotenv": "^17.4.2",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
@@ -44,9 +44,9 @@
 		"typesafe-i18n": "^5.27.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.2",
-		"@types/node": "^25.9.1",
-		"resolve-tspaths": "^0.8.23",
-		"typescript": "^6.0.3"
+		"@biomejs/biome": "^2.5.7",
+		"@types/node": "^26.1.2",
+		"tsc-alias": "^1.9.1",
+		"typescript": "^7.0.2"
 	}
 }
