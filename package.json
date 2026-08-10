@@ -36,7 +36,7 @@
 		"@libsql/client": "^0.17.4",
 		"@ticketpm/core": "^0.0.15",
 		"@ticketpm/discord-api": "^0.0.15",
-		"discord-api-types": "^0.38.52",
+		"discord-api-types": "^0.38.53",
 		"dotenv": "^17.4.2",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
