@@ -44,7 +44,7 @@
 		"typesafe-i18n": "^5.27.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.7",
+		"@biomejs/biome": "^2.5.8",
 		"@types/node": "^26.1.2",
 		"resolve-tspaths": "^0.8.23",
 		"typescript": "^6.0.3"
