@@ -33,7 +33,7 @@
 		"@discordjs/core": "2.6.0",
 		"@discordjs/rest": "^2.6.3",
 		"@discordjs/ws": "^2.0.4",
-		"@libsql/client": "^0.17.4",
+		"@libsql/client": "^0.18.0",
 		"@ticketpm/core": "^0.0.15",
 		"@ticketpm/discord-api": "^0.0.15",
 		"discord-api-types": "^0.38.52",
