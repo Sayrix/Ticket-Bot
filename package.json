@@ -27,7 +27,8 @@
 		"node:start": "node dist/src/index.js",
 		"migrate:v3": "bun src/migrate-v3-db.ts",
 		"migrate:v3:config": "bun src/migrate-v3-config.ts",
-		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs"
+		"migrate:v3:test": "bun scripts/verify-migrate-v3.mjs",
+		"ticketban:test": "bun scripts/verify-ticketban.mjs"
 	},
 	"dependencies": {
 		"@discordjs/core": "2.6.0",

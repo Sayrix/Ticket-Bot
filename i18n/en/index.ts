@@ -14,6 +14,24 @@ const en: BaseTranslation = {
 		}
 	},
 	commands: {
+		ticketban: {
+			description: "Ban a user from opening tickets",
+			options: {
+				user: { description: "The user whose ticket ban to manage" },
+				duration: { description: "Duration (e.g. 30m, 2h, 7d, 1d12h); omit or use lifetime for a lifetime ban" }
+			},
+			not_allowed: "You need the Ban Members permission to manage ticket bans in this server.",
+			choose_user: "Choose a user whose ticket ban to manage.",
+			invalid_duration: "Enter a positive duration using s, m, h, d, or w (e.g. 30m, 7d, 1d12h), or lifetime.",
+			success_lifetime: "<@{userId:string}> is banned from opening tickets for life.",
+			success_until:
+				"<@{userId:string}> is banned from opening tickets until <t:{timestamp:number}:F> (<t:{timestamp:number}:R>)."
+		},
+		ticketunban: {
+			description: "Lift a user's ticket ban",
+			success: "<@{userId:string}> can open tickets again.",
+			not_banned: "<@{userId:string}> has no active ticket ban."
+		},
 		add: {
 			description: "Add someone to the current ticket",
 			options: {
@@ -107,6 +125,8 @@ const en: BaseTranslation = {
 			select_placeholder: "Select a ticket type"
 		},
 		open: {
+			banned_lifetime: "You are banned from opening tickets for life.",
+			banned_until: "You are banned from opening tickets until <t:{timestamp:number}:F> (<t:{timestamp:number}:R>).",
 			not_allowed_type: "You are not allowed to create that ticket type.",
 			unavailable_type: "That ticket type is not available from this panel.",
 			max_open_reached: "You already have the maximum number of open tickets ({limit:number}).",

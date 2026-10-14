@@ -35,6 +35,8 @@ async function verifyBasicMigration() {
 	await runMigration(["--source", sourceUrl, "--target", targetUrl, ...(firstPanelKey ? ["--panel-key", firstPanelKey] : [])]);
 
 	await withClient(targetUrl, async (target) => {
+		const bans = await target.execute("SELECT * FROM ticket_bans");
+		assert(bans.rows.length === 0, "basic migration should create the ticket bans table without banning anyone.");
 		const tickets = await target.execute("SELECT * FROM tickets ORDER BY id ASC");
 		assert(tickets.rows.length === 2, "basic migration should copy two tickets.");
 		assert(Number(tickets.rows[0].id) === 10, "basic migration should preserve ticket IDs.");

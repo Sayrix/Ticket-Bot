@@ -41,6 +41,7 @@ import { deferReply, editReply, followUp, reply, showModal, updateMessage } from
 import type { BotApp, ComponentExecutionContext } from "@/core/types";
 import { type TicketRecord, ticketsTable } from "@/db/schema";
 import { sendTicketLog } from "@/features/logs/service";
+import { getTicketBanMessage } from "@/features/tickets/bans";
 import {
 	getPanel,
 	getPanelTicketTypeKeys,
@@ -103,6 +104,14 @@ export async function continueTicketOpen(app: BotApp, interaction: APIMessageCom
 	const openForm = ticketType.openForm;
 	const hasOpenForm = Boolean(openForm?.questions.length);
 	const isStringSelect = interaction.data.component_type === ComponentType.StringSelect;
+	const banMessage = await getTicketBanMessage(app, getInteractionUser(interaction).id);
+	if (banMessage) {
+		if (isStringSelect) {
+			await updateMessage(app, interaction, {});
+		}
+		await respondToTicketOpen(app, interaction, banMessage, isStringSelect ? "follow-up" : "initial");
+		return;
+	}
 
 	if (!userCanAccessTicketType(app, ticketType, roleIds)) {
 		if (isStringSelect) {
@@ -281,6 +290,17 @@ async function createTicket(
 	}
 
 	const user = getInteractionUser(interaction);
+	// Recheck at creation because a moderator can ban a user while their form is open.
+	const banMessage = await getTicketBanMessage(app, user.id);
+	if (banMessage) {
+		const body = { content: banMessage, flags: MessageFlags.Ephemeral };
+		if (responseMode === "follow-up") {
+			await followUp(app, interaction, body);
+		} else {
+			await editReply(app, interaction, body);
+		}
+		return;
+	}
 	// Reserve before Discord work so every rendered number matches the eventual database primary key.
 	const ticketId = await reserveTicketId(app);
 	const ticketNumber = ticketId.toString();
