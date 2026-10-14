@@ -45,6 +45,65 @@ type RootTranslation = {
 		};
 	};
 	commands: {
+		ticketban: {
+			/**
+			 * B​a​n​ ​a​ ​u​s​e​r​ ​f​r​o​m​ ​o​p​e​n​i​n​g​ ​t​i​c​k​e​t​s
+			 */
+			description: string;
+			options: {
+				user: {
+					/**
+					 * T​h​e​ ​u​s​e​r​ ​w​h​o​s​e​ ​t​i​c​k​e​t​ ​b​a​n​ ​t​o​ ​m​a​n​a​g​e
+					 */
+					description: string;
+				};
+				duration: {
+					/**
+					 * D​u​r​a​t​i​o​n​ ​(​e​.​g​.​ ​3​0​m​,​ ​2​h​,​ ​7​d​,​ ​1​d​1​2​h​)​;​ ​o​m​i​t​ ​o​r​ ​u​s​e​ ​l​i​f​e​t​i​m​e​ ​f​o​r​ ​a​ ​l​i​f​e​t​i​m​e​ ​b​a​n
+					 */
+					description: string;
+				};
+			};
+			/**
+			 * Y​o​u​ ​n​e​e​d​ ​t​h​e​ ​B​a​n​ ​M​e​m​b​e​r​s​ ​p​e​r​m​i​s​s​i​o​n​ ​t​o​ ​m​a​n​a​g​e​ ​t​i​c​k​e​t​ ​b​a​n​s​ ​i​n​ ​t​h​i​s​ ​s​e​r​v​e​r​.
+			 */
+			not_allowed: string;
+			/**
+			 * C​h​o​o​s​e​ ​a​ ​u​s​e​r​ ​w​h​o​s​e​ ​t​i​c​k​e​t​ ​b​a​n​ ​t​o​ ​m​a​n​a​g​e​.
+			 */
+			choose_user: string;
+			/**
+			 * E​n​t​e​r​ ​a​ ​p​o​s​i​t​i​v​e​ ​d​u​r​a​t​i​o​n​ ​u​s​i​n​g​ ​s​,​ ​m​,​ ​h​,​ ​d​,​ ​o​r​ ​w​ ​(​e​.​g​.​ ​3​0​m​,​ ​7​d​,​ ​1​d​1​2​h​)​,​ ​o​r​ ​l​i​f​e​t​i​m​e​.
+			 */
+			invalid_duration: string;
+			/**
+			 * <​@​{​u​s​e​r​I​d​}​>​ ​i​s​ ​b​a​n​n​e​d​ ​f​r​o​m​ ​o​p​e​n​i​n​g​ ​t​i​c​k​e​t​s​ ​f​o​r​ ​l​i​f​e​.
+			 * @param {string} userId
+			 */
+			success_lifetime: RequiredParams<"userId">;
+			/**
+			 * <​@​{​u​s​e​r​I​d​}​>​ ​i​s​ ​b​a​n​n​e​d​ ​f​r​o​m​ ​o​p​e​n​i​n​g​ ​t​i​c​k​e​t​s​ ​u​n​t​i​l​ ​<​t​:​{​t​i​m​e​s​t​a​m​p​}​:​F​>​ ​(​<​t​:​{​t​i​m​e​s​t​a​m​p​}​:​R​>​)​.
+			 * @param {number} timestamp
+			 * @param {string} userId
+			 */
+			success_until: RequiredParams<"timestamp" | "timestamp" | "userId">;
+		};
+		ticketunban: {
+			/**
+			 * L​i​f​t​ ​a​ ​u​s​e​r​'​s​ ​t​i​c​k​e​t​ ​b​a​n
+			 */
+			description: string;
+			/**
+			 * <​@​{​u​s​e​r​I​d​}​>​ ​c​a​n​ ​o​p​e​n​ ​t​i​c​k​e​t​s​ ​a​g​a​i​n​.
+			 * @param {string} userId
+			 */
+			success: RequiredParams<"userId">;
+			/**
+			 * <​@​{​u​s​e​r​I​d​}​>​ ​h​a​s​ ​n​o​ ​a​c​t​i​v​e​ ​t​i​c​k​e​t​ ​b​a​n​.
+			 * @param {string} userId
+			 */
+			not_banned: RequiredParams<"userId">;
+		};
 		add: {
 			/**
 			 * A​d​d​ ​s​o​m​e​o​n​e​ ​t​o​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​t​i​c​k​e​t
@@ -310,6 +369,15 @@ type RootTranslation = {
 			select_placeholder: string;
 		};
 		open: {
+			/**
+			 * Y​o​u​ ​a​r​e​ ​b​a​n​n​e​d​ ​f​r​o​m​ ​o​p​e​n​i​n​g​ ​t​i​c​k​e​t​s​ ​f​o​r​ ​l​i​f​e​.
+			 */
+			banned_lifetime: string;
+			/**
+			 * Y​o​u​ ​a​r​e​ ​b​a​n​n​e​d​ ​f​r​o​m​ ​o​p​e​n​i​n​g​ ​t​i​c​k​e​t​s​ ​u​n​t​i​l​ ​<​t​:​{​t​i​m​e​s​t​a​m​p​}​:​F​>​ ​(​<​t​:​{​t​i​m​e​s​t​a​m​p​}​:​R​>​)​.
+			 * @param {number} timestamp
+			 */
+			banned_until: RequiredParams<"timestamp" | "timestamp">;
 			/**
 			 * Y​o​u​ ​a​r​e​ ​n​o​t​ ​a​l​l​o​w​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​t​h​a​t​ ​t​i​c​k​e​t​ ​t​y​p​e​.
 			 */
@@ -1056,6 +1124,60 @@ export type TranslationFunctions = {
 		};
 	};
 	commands: {
+		ticketban: {
+			/**
+			 * Ban a user from opening tickets
+			 */
+			description: () => LocalizedString;
+			options: {
+				user: {
+					/**
+					 * The user whose ticket ban to manage
+					 */
+					description: () => LocalizedString;
+				};
+				duration: {
+					/**
+					 * Duration (e.g. 30m, 2h, 7d, 1d12h); omit or use lifetime for a lifetime ban
+					 */
+					description: () => LocalizedString;
+				};
+			};
+			/**
+			 * You need the Ban Members permission to manage ticket bans in this server.
+			 */
+			not_allowed: () => LocalizedString;
+			/**
+			 * Choose a user whose ticket ban to manage.
+			 */
+			choose_user: () => LocalizedString;
+			/**
+			 * Enter a positive duration using s, m, h, d, or w (e.g. 30m, 7d, 1d12h), or lifetime.
+			 */
+			invalid_duration: () => LocalizedString;
+			/**
+			 * <@{userId}> is banned from opening tickets for life.
+			 */
+			success_lifetime: (arg: { userId: string }) => LocalizedString;
+			/**
+			 * <@{userId}> is banned from opening tickets until <t:{timestamp}:F> (<t:{timestamp}:R>).
+			 */
+			success_until: (arg: { timestamp: number; userId: string }) => LocalizedString;
+		};
+		ticketunban: {
+			/**
+			 * Lift a user's ticket ban
+			 */
+			description: () => LocalizedString;
+			/**
+			 * <@{userId}> can open tickets again.
+			 */
+			success: (arg: { userId: string }) => LocalizedString;
+			/**
+			 * <@{userId}> has no active ticket ban.
+			 */
+			not_banned: (arg: { userId: string }) => LocalizedString;
+		};
 		add: {
 			/**
 			 * Add someone to the current ticket
@@ -1311,6 +1433,14 @@ export type TranslationFunctions = {
 			select_placeholder: () => LocalizedString;
 		};
 		open: {
+			/**
+			 * You are banned from opening tickets for life.
+			 */
+			banned_lifetime: () => LocalizedString;
+			/**
+			 * You are banned from opening tickets until <t:{timestamp}:F> (<t:{timestamp}:R>).
+			 */
+			banned_until: (arg: { timestamp: number }) => LocalizedString;
 			/**
 			 * You are not allowed to create that ticket type.
 			 */

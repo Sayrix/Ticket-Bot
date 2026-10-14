@@ -8,6 +8,18 @@ Ticket Bot is a open-source Discord bot that allows you to easily manage support
 
 The documentation is available [here](https://github.com/Sayrix/Ticket-Bot/wiki)
 
+### Ticket bans
+
+Members with the **Ban Members** or **Administrator** permission can prevent a user from opening any ticket type:
+
+- `/ticketban user:@user duration:7d` bans them for seven days. Durations accept `s`, `m`, `h`, `d`, and `w`, including combinations such as `1d12h`.
+- `/ticketban user:@user` bans them for life. You can also set `duration:lifetime` or `duration:permanent` explicitly.
+- `/ticketunban user:@user` lifts a ticket ban early.
+
+Running `/ticketban` again replaces the user's current ban. Bans persist across restarts, and timed bans expire automatically, including while the bot is offline. Existing tickets and invitations are unaffected.
+
+Before starting this version, run `bun run drizzle:push` to add the `ticket_bans` table to your bot's database.
+
 ## 💬 Discord
 
 Ask questions and get support on our [Discord server](https://discord.gg/VasYV6MEJy).

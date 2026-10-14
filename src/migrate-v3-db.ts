@@ -106,6 +106,16 @@ CREATE TABLE IF NOT EXISTS app_meta (
 	updatedAt INTEGER NOT NULL
 )`;
 
+const CREATE_TICKET_BANS_TABLE = `
+CREATE TABLE IF NOT EXISTS ticket_bans (
+	guildId TEXT NOT NULL,
+	userId TEXT NOT NULL,
+	bannedBy TEXT NOT NULL,
+	createdAt INTEGER NOT NULL,
+	expiresAt INTEGER,
+	PRIMARY KEY (guildId, userId)
+)`;
+
 loadEnv({ path: "./config/.env", quiet: true });
 
 runFromCli().catch((error) => {
@@ -445,7 +455,10 @@ async function readOpenTicketMessageId(source: Client) {
 }
 
 async function ensureV4Schema(target: Client) {
-	await target.batch([CREATE_TICKETS_TABLE, CREATE_PANEL_MESSAGES_TABLE, CREATE_APP_META_TABLE], "write");
+	await target.batch(
+		[CREATE_TICKETS_TABLE, CREATE_PANEL_MESSAGES_TABLE, CREATE_APP_META_TABLE, CREATE_TICKET_BANS_TABLE],
+		"write"
+	);
 }
 
 async function assertTargetCanBeUsed(target: Client, overwrite: boolean) {

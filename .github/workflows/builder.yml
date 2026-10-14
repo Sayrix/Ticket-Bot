@@ -39,6 +39,9 @@ jobs:
       - name: Generate i18n files
         run: bun run i18n
 
+      - name: Check ticket bans with an isolated database
+        run: bun run ticketban:test
+
       - name: Run typecheck, biome, drizzle, and build checks
         shell: bash
         run: |

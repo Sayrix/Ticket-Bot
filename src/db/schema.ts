@@ -13,7 +13,7 @@ project repository or to its website.
 This notice must not be removed, obscured, or replaced.
 */
 
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // NOTE: Columns that does not have notNull constraint ARE nullable.
 
@@ -29,6 +29,20 @@ export const appMetaTable = sqliteTable("app_meta", {
 	value: text().notNull(),
 	updatedAt: int().notNull()
 });
+
+export const ticketBansTable = sqliteTable(
+	"ticket_bans",
+	{
+		guildId: text().notNull(),
+		userId: text().notNull(),
+		bannedBy: text().notNull(),
+		/** Unix time in milliseconds. */
+		createdAt: int().notNull(),
+		/** Null means lifetime; otherwise Unix time in milliseconds. */
+		expiresAt: int()
+	},
+	(table) => [primaryKey({ columns: [table.guildId, table.userId] })]
+);
 
 export const ticketsTable = sqliteTable("tickets", {
 	id: int().primaryKey({ autoIncrement: true }),

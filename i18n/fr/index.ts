@@ -14,6 +14,23 @@ const fr: Translation = {
 		}
 	},
 	commands: {
+		ticketban: {
+			description: "Bannir un utilisateur de l'ouverture de tickets",
+			options: {
+				user: { description: "L'utilisateur dont vous souhaitez gérer le bannissement des tickets" },
+				duration: { description: "Durée (ex. 30m, 2h, 7d, 1d12h) ; omettez ou utilisez lifetime pour un bannissement à vie" }
+			},
+			not_allowed: "Vous devez avoir la permission Bannir des membres pour gérer les bannissements des tickets sur ce serveur.",
+			choose_user: "Choisissez un utilisateur dont vous souhaitez gérer le bannissement des tickets.",
+			invalid_duration: "Indiquez une durée positive avec s, m, h, d ou w (ex. 30m, 7d, 1d12h), ou lifetime.",
+			success_lifetime: "<@{userId}> ne peut plus ouvrir de tickets à vie.",
+			success_until: "<@{userId}> ne peut plus ouvrir de tickets jusqu'au <t:{timestamp}:F> (<t:{timestamp}:R>)."
+		},
+		ticketunban: {
+			description: "Lever le bannissement des tickets d'un utilisateur",
+			success: "<@{userId}> peut à nouveau ouvrir des tickets.",
+			not_banned: "<@{userId}> n'a aucun bannissement des tickets actif."
+		},
 		add: {
 			description: "Ajouter quelqu'un au ticket actuel",
 			options: {
@@ -110,6 +127,8 @@ const fr: Translation = {
 			select_placeholder: "Sélectionner un type de ticket"
 		},
 		open: {
+			banned_lifetime: "Vous ne pouvez plus ouvrir de tickets à vie.",
+			banned_until: "Vous ne pouvez plus ouvrir de tickets jusqu'au <t:{timestamp}:F> (<t:{timestamp}:R>).",
 			not_allowed_type: "Vous n'êtes pas autorisé à créer ce type de ticket.",
 			unavailable_type: "Ce type de ticket n'est pas disponible depuis ce panneau.",
 			max_open_reached: "Vous avez déjà atteint le nombre maximum de tickets ouverts ({limit}).",
