@@ -119,7 +119,8 @@ const en: BaseTranslation = {
 		records: {
 			not_ticket_channel: "This interaction was not used in a ticket channel.",
 			not_open_ticket: "This channel is not an open ticket.",
-			already_closed: "This ticket is already closed."
+			already_closed: "This ticket is already closed.",
+			only_staff_manage: "Only staff can manage this ticket's participants."
 		},
 		panel: {
 			no_visible_types: "You do not have access to any ticket types on this panel.",

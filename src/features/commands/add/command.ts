@@ -26,8 +26,9 @@ import {
 	MAX_INVITED_TICKET_USERS,
 	updateInvitedUserIds
 } from "@/features/tickets/participants";
+import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
-import { getInteractionUser } from "@/features/tickets/utils";
+import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 
 export default defineCommand({
 	data: (LL) => ({
@@ -59,6 +60,14 @@ export default defineCommand({
 		if (!openTicket.ok) {
 			await reply(app, interaction, {
 				content: openTicket.message,
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		if (!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))) {
+			await reply(app, interaction, {
+				content: LL.tickets.records.only_staff_manage(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;

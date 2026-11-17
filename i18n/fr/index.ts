@@ -118,7 +118,8 @@ const fr: Translation = {
 		records: {
 			not_ticket_channel: "Cette interaction n'a pas été utilisée dans un salon de ticket.",
 			not_open_ticket: "Ce salon n'est pas un ticket ouvert.",
-			already_closed: "Ce ticket est déjà fermé."
+			already_closed: "Ce ticket est déjà fermé.",
+			only_staff_manage: "Seul le personnel peut gérer les participants de ce ticket."
 		},
 		panel: {
 			no_visible_types: "Vous n'avez accès à aucun type de ticket sur ce panneau.",
