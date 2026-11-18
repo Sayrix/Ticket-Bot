@@ -54,6 +54,8 @@ interface ConfigV0_0_1 {
 		channelNameTemplate: string;
 		maxOpenPerUser: number;
 		staffRoleIds: string[];
+		/** Restrict /add, /mass_add and /remove to staff. Defaults to true when omitted. */
+		participantsStaffOnly?: boolean;
 		blockedRoleIds: string[];
 		mentionRoleIds: string[];
 		defaultWelcomeMessage?: string;

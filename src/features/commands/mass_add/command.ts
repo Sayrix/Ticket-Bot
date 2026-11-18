@@ -67,7 +67,10 @@ export default defineCommand({
 			return;
 		}
 
-		if (!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))) {
+		if (
+			(app.config.tickets.participantsStaffOnly ?? true) &&
+			!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))
+		) {
 			await reply(app, interaction, {
 				content: LL.tickets.records.only_staff_manage(),
 				flags: MessageFlags.Ephemeral

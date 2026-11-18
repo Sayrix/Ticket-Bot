@@ -56,7 +56,10 @@ export default defineCommand({
 			return;
 		}
 
-		if (!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))) {
+		if (
+			(app.config.tickets.participantsStaffOnly ?? true) &&
+			!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))
+		) {
 			await reply(app, interaction, {
 				content: LL.tickets.records.only_staff_manage(),
 				flags: MessageFlags.Ephemeral
@@ -130,7 +133,10 @@ export async function handleRemoveUsersSelect(context: ComponentExecutionContext
 		return;
 	}
 
-	if (!hasTicketStaffAccess(context.app, openTicket.ticketType, getMemberRoleIds(interaction))) {
+	if (
+		(context.app.config.tickets.participantsStaffOnly ?? true) &&
+		!hasTicketStaffAccess(context.app, openTicket.ticketType, getMemberRoleIds(interaction))
+	) {
 		await updateMessage(context.app, interaction, {
 			content: context.app.LL.tickets.records.only_staff_manage(),
 			components: []
