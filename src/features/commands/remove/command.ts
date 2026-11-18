@@ -24,8 +24,8 @@ import type { TicketRecord } from "@/db/schema";
 import { getUserOption } from "@/features/commands/shared/options";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
-import { getInvitedUserIds, revokeTicketParticipantAccess, updateInvitedUserIds } from "@/features/tickets/participants";
 import { hasTicketStaffAccess } from "@/features/tickets/config-access";
+import { getInvitedUserIds, revokeTicketParticipantAccess, updateInvitedUserIds } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 

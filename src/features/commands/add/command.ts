@@ -20,13 +20,13 @@ import { reply } from "@/core/respond";
 import { getUserOption } from "@/features/commands/shared/options";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
+import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
 	MAX_INVITED_TICKET_USERS,
 	updateInvitedUserIds
 } from "@/features/tickets/participants";
-import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
 import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 
