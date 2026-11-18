@@ -70,6 +70,9 @@ export default defineConfig("0.0.1", {
 		maxOpenPerUser: 1,
 		// Global staff roles that can see and manage tickets.
 		staffRoleIds: ["111111111111111111"],
+		// Only staff can use /add, /mass_add and /remove. Defaults to true when omitted.
+		// Set to false to let anyone with access to the ticket manage its participants.
+		participantsStaffOnly: true,
 		// Roles that are blocked from opening any ticket type by default.
 		blockedRoleIds: ["222222222222222222"],
 		// Roles mentioned in the welcome message when a ticket is opened.

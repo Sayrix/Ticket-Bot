@@ -349,6 +349,10 @@ type RootTranslation = {
 			 * T​h​i​s​ ​t​i​c​k​e​t​ ​i​s​ ​a​l​r​e​a​d​y​ ​c​l​o​s​e​d​.
 			 */
 			already_closed: string;
+			/**
+			 * Only staff can manage this ticket's participants.
+			 */
+			only_staff_manage: string;
 		};
 		panel: {
 			/**
@@ -1413,6 +1417,10 @@ export type TranslationFunctions = {
 			 * This ticket is already closed.
 			 */
 			already_closed: () => LocalizedString;
+			/**
+			 * Only staff can manage this ticket's participants.
+			 */
+			only_staff_manage: () => LocalizedString;
 		};
 		panel: {
 			/**

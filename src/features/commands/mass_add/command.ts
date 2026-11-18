@@ -21,6 +21,7 @@ import type { BotApp } from "@/core/types";
 import { getStringOption } from "@/features/commands/shared/options";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
+import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import {
 	getInvitedUserIds,
 	grantTicketParticipantAccess,
@@ -28,7 +29,7 @@ import {
 	updateInvitedUserIds
 } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
-import { getInteractionUser } from "@/features/tickets/utils";
+import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 
 export default defineCommand({
 	data: (LL) => ({
@@ -61,6 +62,17 @@ export default defineCommand({
 		if (!openTicket.ok) {
 			await reply(app, interaction, {
 				content: openTicket.message,
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		if (
+			(app.config.tickets.participantsStaffOnly ?? true) &&
+			!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))
+		) {
+			await reply(app, interaction, {
+				content: LL.tickets.records.only_staff_manage(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;

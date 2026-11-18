@@ -24,9 +24,10 @@ import type { TicketRecord } from "@/db/schema";
 import { getUserOption } from "@/features/commands/shared/options";
 import { sendTicketLog } from "@/features/logs/service";
 import { createTicketLogContext } from "@/features/logs/utils";
+import { hasTicketStaffAccess } from "@/features/tickets/config-access";
 import { getInvitedUserIds, revokeTicketParticipantAccess, updateInvitedUserIds } from "@/features/tickets/participants";
 import { getOpenTicketByChannel } from "@/features/tickets/records";
-import { getInteractionUser } from "@/features/tickets/utils";
+import { getInteractionUser, getMemberRoleIds } from "@/features/tickets/utils";
 
 const REMOVE_USERS_CUSTOM_ID = createCustomId("tickets", "remove-users");
 
@@ -50,6 +51,17 @@ export default defineCommand({
 		if (!openTicket.ok) {
 			await reply(app, interaction, {
 				content: openTicket.message,
+				flags: MessageFlags.Ephemeral
+			});
+			return;
+		}
+
+		if (
+			(app.config.tickets.participantsStaffOnly ?? true) &&
+			!hasTicketStaffAccess(app, openTicket.ticketType, getMemberRoleIds(interaction))
+		) {
+			await reply(app, interaction, {
+				content: LL.tickets.records.only_staff_manage(),
 				flags: MessageFlags.Ephemeral
 			});
 			return;
@@ -116,6 +128,17 @@ export async function handleRemoveUsersSelect(context: ComponentExecutionContext
 	if (!openTicket.ok) {
 		await updateMessage(context.app, interaction, {
 			content: openTicket.message,
+			components: []
+		});
+		return;
+	}
+
+	if (
+		(context.app.config.tickets.participantsStaffOnly ?? true) &&
+		!hasTicketStaffAccess(context.app, openTicket.ticketType, getMemberRoleIds(interaction))
+	) {
+		await updateMessage(context.app, interaction, {
+			content: context.app.LL.tickets.records.only_staff_manage(),
 			components: []
 		});
 		return;
